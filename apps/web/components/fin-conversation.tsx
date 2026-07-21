@@ -97,6 +97,21 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
     return () => window.removeEventListener("nexo:financial-data-changed", refresh);
   }, [refreshFinancialContext]);
 
+  async function waitForLatestFinancialContext() {
+    while (true) {
+      const requestId = contextRequestRef.current;
+      const refreshPromise = refreshPromiseRef.current;
+      if (refreshPromise) await refreshPromise;
+
+      if (
+        requestId === contextRequestRef.current &&
+        refreshPromise === refreshPromiseRef.current
+      ) {
+        return;
+      }
+    }
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const content = message.trim();
@@ -104,8 +119,7 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
 
     messageSubmissionRef.current = true;
     try {
-      const refreshPromise = refreshPromiseRef.current;
-      if (refreshPromise) await refreshPromise;
+      await waitForLatestFinancialContext();
 
       const clientMessageId = crypto.randomUUID();
       if (!conversationId.current) conversationId.current = crypto.randomUUID();

@@ -531,7 +531,14 @@ for (const marker of [
   'cache: "no-store"',
   "refreshPromiseRef",
   "await refreshPromise",
-  "financialContext"
+  "financialContext",
+  "async function waitForLatestFinancialContext",
+  "while (true)",
+  "const requestId = contextRequestRef.current",
+  "const refreshPromise = refreshPromiseRef.current",
+  "requestId === contextRequestRef.current",
+  "refreshPromise === refreshPromiseRef.current",
+  "await waitForLatestFinancialContext();"
 ]) {
   if (!finRefresh.includes(marker)) {
     throw new Error(`Fin conversation must refresh financial context: missing ${marker}`);
@@ -539,6 +546,16 @@ for (const marker of [
 }
 if (finRefresh.includes("Seus dados financeiros foram atualizados. Vou considerar os valores mais recentes nas próximas respostas.")) {
   throw new Error("Fin conversation must not use a static financial refresh message");
+}
+const finSubmitPreparation = finRefresh.slice(
+  finRefresh.indexOf("async function handleSubmit"),
+  finRefresh.indexOf('fetch("/api/assistant/message"')
+);
+if (!finSubmitPreparation.includes("await waitForLatestFinancialContext();")) {
+  throw new Error("Fin submission must wait for the latest financial context generation");
+}
+if (finSubmitPreparation.includes("const refreshPromise = refreshPromiseRef.current")) {
+  throw new Error("Fin submission must not regress to a single captured financial refresh promise");
 }
 
 const creditCardFeedback = readFileSync(join(root, "components/credit-card-form.tsx"), "utf8");

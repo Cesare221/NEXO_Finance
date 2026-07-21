@@ -60,3 +60,15 @@
 ## Review Correction Commit
 
 - `fix(web): refresh Fin financial context` committed atomically with this report.
+
+## Latest Refresh Race Correction
+
+- Race analysis: a single captured `refreshPromiseRef` could settle while `nexo:financial-data-changed` started a newer dashboard generation, allowing the assistant request to proceed before that latest refresh completed.
+- Added `waitForLatestFinancialContext`, which repeatedly snapshots `contextRequestRef` and `refreshPromiseRef`, waits when needed, and returns only after both still match the observed generation and promise.
+- `handleSubmit` invokes that barrier immediately before constructing the assistant request; there is no subsequent `await` before `fetch("/api/assistant/message")` can begin.
+- Smoke scopes the pre-fetch portion of `handleSubmit` to require that barrier and reject a return to a single captured `refreshPromiseRef`.
+- RED: strengthened smoke assertions and observed `Fin conversation must refresh financial context: missing async function waitForLatestFinancialContext`.
+- GREEN: `cd apps/web; npm test` - PASS (`frontend smoke checks passed`).
+- `cd apps/web; npx tsc --noEmit` - PASS.
+- `cd apps/web; npm run build` - PASS; the existing multiple-lockfile warning remained non-blocking.
+- `graphify update .` - PASS (1082 nodes, 2066 edges, 83 communities).
