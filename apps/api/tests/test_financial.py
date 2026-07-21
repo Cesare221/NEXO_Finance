@@ -35,6 +35,24 @@ def _create_category(client, token: str, **kwargs) -> dict:
     return resp.json()
 
 
+def _create_credit_card(client, token: str, payment_account_id: int, **kwargs) -> dict:
+    defaults = {
+        "name": "Main Card",
+        "limit_amount": "500.00",
+        "closing_day": 10,
+        "due_day": 17,
+        "payment_account_id": payment_account_id,
+    }
+    defaults.update(kwargs)
+    resp = client.post(
+        "/financial/credit-cards",
+        json=defaults,
+        headers=_auth_header(token),
+    )
+    assert resp.status_code == 201
+    return resp.json()
+
+
 class TestAccounts:
     def test_create_account(self, client):
         token = _register_and_get_token(client)
@@ -702,6 +720,203 @@ class TestTransfers:
 
 
 class TestCreditCards:
+    def test_closing_cycle_includes_purchases_on_or_before_closing_day(self, client):
+        token = _register_and_get_token(client)
+        checking = _create_account(client, token, name="Checking")
+        card = _create_credit_card(client, token, checking["id"])
+
+        for occurred_on in ("2026-07-09", "2026-07-10"):
+            purchase = client.post(
+                f"/financial/credit-cards/{card['id']}/purchases",
+                json={"amount": "10.00", "occurred_on": occurred_on},
+                headers=_auth_header(token),
+            )
+            assert purchase.status_code == 201
+
+        statements = client.get(
+            "/financial/dashboard", headers=_auth_header(token)
+        ).json()["open_statements"]
+
+        assert len(statements) == 1
+        assert statements[0]["period_start"] == "2026-06-11"
+        assert statements[0]["period_end"] == "2026-07-10"
+        assert statements[0]["due_on"] == "2026-07-17"
+
+    def test_closing_cycle_moves_purchase_after_closing_to_next_cycle(self, client):
+        token = _register_and_get_token(client)
+        checking = _create_account(client, token, name="Checking")
+        card = _create_credit_card(client, token, checking["id"])
+
+        purchase = client.post(
+            f"/financial/credit-cards/{card['id']}/purchases",
+            json={"amount": "10.00", "occurred_on": "2026-07-11"},
+            headers=_auth_header(token),
+        )
+        statement = client.get(
+            "/financial/dashboard", headers=_auth_header(token)
+        ).json()["open_statements"][0]
+
+        assert purchase.status_code == 201
+        assert statement["period_start"] == "2026-07-11"
+        assert statement["period_end"] == "2026-08-10"
+        assert statement["due_on"] == "2026-08-17"
+
+    def test_statement_cycle_rolls_over_year_boundary(self, client):
+        token = _register_and_get_token(client)
+        checking = _create_account(client, token, name="Checking")
+        card = _create_credit_card(client, token, checking["id"])
+
+        purchase = client.post(
+            f"/financial/credit-cards/{card['id']}/purchases",
+            json={"amount": "10.00", "occurred_on": "2026-12-31"},
+            headers=_auth_header(token),
+        )
+        statement = client.get(
+            "/financial/dashboard", headers=_auth_header(token)
+        ).json()["open_statements"][0]
+
+        assert purchase.status_code == 201
+        assert statement["period_start"] == "2026-12-11"
+        assert statement["period_end"] == "2027-01-10"
+        assert statement["due_on"] == "2027-01-17"
+
+    def test_statement_cycle_clamps_short_months_and_moves_due_date(self, client):
+        token = _register_and_get_token(client)
+        checking = _create_account(client, token, name="Checking")
+        card = _create_credit_card(
+            client, token, checking["id"], closing_day=31, due_day=30
+        )
+
+        purchase = client.post(
+            f"/financial/credit-cards/{card['id']}/purchases",
+            json={"amount": "10.00", "occurred_on": "2026-02-28"},
+            headers=_auth_header(token),
+        )
+        statement = client.get(
+            "/financial/dashboard", headers=_auth_header(token)
+        ).json()["open_statements"][0]
+
+        assert purchase.status_code == 201
+        assert statement["period_start"] == "2026-02-01"
+        assert statement["period_end"] == "2026-02-28"
+        assert statement["due_on"] == "2026-03-30"
+
+    def test_duplicate_active_card_rejects_create_with_normalized_name(self, client):
+        token = _register_and_get_token(client)
+        checking = _create_account(client, token, name="Checking")
+        _create_credit_card(client, token, checking["id"], name="Main Card")
+
+        response = client.post(
+            "/financial/credit-cards",
+            json={
+                "name": "  MAIN CARD  ",
+                "limit_amount": "500.00",
+                "closing_day": 10,
+                "due_day": 17,
+                "payment_account_id": checking["id"],
+            },
+            headers=_auth_header(token),
+        )
+
+        assert response.status_code == 409
+
+    def test_duplicate_active_card_rejects_rename(self, client):
+        token = _register_and_get_token(client)
+        checking = _create_account(client, token, name="Checking")
+        _create_credit_card(client, token, checking["id"], name="Main Card")
+        other = _create_credit_card(client, token, checking["id"], name="Backup")
+
+        response = client.put(
+            f"/financial/credit-cards/{other['id']}",
+            json={"name": " main card "},
+            headers=_auth_header(token),
+        )
+
+        assert response.status_code == 409
+
+    def test_duplicate_active_card_allows_unchanged_name_on_update(self, client):
+        token = _register_and_get_token(client)
+        checking = _create_account(client, token, name="Checking")
+        card = _create_credit_card(client, token, checking["id"])
+
+        response = client.put(
+            f"/financial/credit-cards/{card['id']}",
+            json={"name": "Main Card", "due_day": 20},
+            headers=_auth_header(token),
+        )
+
+        assert response.status_code == 200
+
+    def test_duplicate_active_card_allows_same_name_for_another_user(self, client):
+        token_a = _register_and_get_token(client, email="a@test.com", name="User A")
+        token_b = _register_and_get_token(client, email="b@test.com", name="User B")
+        checking_a = _create_account(client, token_a, name="A Checking")
+        checking_b = _create_account(client, token_b, name="B Checking")
+        _create_credit_card(client, token_a, checking_a["id"], name="Main Card")
+
+        response = client.post(
+            "/financial/credit-cards",
+            json={
+                "name": "main card",
+                "limit_amount": "500.00",
+                "closing_day": 10,
+                "due_day": 17,
+                "payment_account_id": checking_b["id"],
+            },
+            headers=_auth_header(token_b),
+        )
+
+        assert response.status_code == 201
+
+    def test_duplicate_active_card_allows_archived_card_name_reuse(self, client):
+        token = _register_and_get_token(client)
+        checking = _create_account(client, token, name="Checking")
+        card = _create_credit_card(client, token, checking["id"], name="Main Card")
+        archived = client.delete(
+            f"/financial/credit-cards/{card['id']}",
+            headers=_auth_header(token),
+        )
+
+        replacement = client.post(
+            "/financial/credit-cards",
+            json={
+                "name": "main card",
+                "limit_amount": "500.00",
+                "closing_day": 10,
+                "due_day": 17,
+                "payment_account_id": checking["id"],
+            },
+            headers=_auth_header(token),
+        )
+
+        assert archived.status_code == 200
+        assert replacement.status_code == 201
+
+    def test_statement_cycle_preserves_existing_statement_after_card_edit(self, client):
+        token = _register_and_get_token(client)
+        checking = _create_account(client, token, name="Checking")
+        card = _create_credit_card(client, token, checking["id"])
+        purchase = client.post(
+            f"/financial/credit-cards/{card['id']}/purchases",
+            json={"amount": "10.00", "occurred_on": "2026-07-09"},
+            headers=_auth_header(token),
+        )
+
+        update = client.put(
+            f"/financial/credit-cards/{card['id']}",
+            json={"closing_day": 20, "due_day": 25},
+            headers=_auth_header(token),
+        )
+        statement = client.get(
+            "/financial/dashboard", headers=_auth_header(token)
+        ).json()["open_statements"][0]
+
+        assert purchase.status_code == 201
+        assert update.status_code == 200
+        assert statement["period_start"] == "2026-06-11"
+        assert statement["period_end"] == "2026-07-10"
+        assert statement["due_on"] == "2026-07-17"
+
     def test_update_credit_card(self, client):
         token = _register_and_get_token(client)
         checking = _create_account(client, token, name="Checking")

@@ -1,5 +1,5 @@
 from calendar import monthrange
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 
 from fastapi import HTTPException, status
@@ -529,14 +529,37 @@ def list_transfers(db: Session, user_id: int) -> list[Transfer]:
     )
 
 
-def _statement_period(day: date) -> tuple[date, date]:
-    last_day = monthrange(day.year, day.month)[1]
-    return date(day.year, day.month, 1), date(day.year, day.month, last_day)
+def _valid_day(year: int, month: int, requested_day: int) -> date:
+    return date(year, month, min(requested_day, monthrange(year, month)[1]))
 
 
-def _due_date(day: date, due_day: int) -> date:
-    last_day = monthrange(day.year, day.month)[1]
-    return date(day.year, day.month, min(due_day, last_day))
+def _month_shift(day: date, months: int) -> date:
+    index = day.year * 12 + day.month - 1 + months
+    return _valid_day(index // 12, index % 12 + 1, day.day)
+
+
+def _statement_cycle(
+    occurred_on: date, closing_day: int, due_day: int
+) -> tuple[date, date, date]:
+    current_close = _valid_day(occurred_on.year, occurred_on.month, closing_day)
+    next_month = _month_shift(current_close, 1)
+    period_end = (
+        current_close
+        if occurred_on <= current_close
+        else _valid_day(next_month.year, next_month.month, closing_day)
+    )
+    previous_month = _month_shift(period_end, -1)
+    period_start = (
+        _valid_day(previous_month.year, previous_month.month, closing_day)
+        + timedelta(days=1)
+    )
+    same_month_due = _valid_day(period_end.year, period_end.month, due_day)
+    if same_month_due > period_end:
+        due_on = same_month_due
+    else:
+        following_month = _month_shift(period_end, 1)
+        due_on = _valid_day(following_month.year, following_month.month, due_day)
+    return period_start, period_end, due_on
 
 
 def _get_card(db: Session, user_id: int, card_id: int) -> CreditCard:
@@ -583,6 +606,24 @@ def _card_response(db: Session, card: CreditCard) -> dict:
     }
 
 
+def _has_active_card_name_conflict(
+    db: Session, user_id: int, name: str, card_id: int | None = None
+) -> bool:
+    cards = (
+        db.query(CreditCard)
+        .filter(
+            CreditCard.user_id == user_id,
+            CreditCard.is_archived.is_(False),
+        )
+        .all()
+    )
+    normalized_name = name.strip().casefold()
+    return any(
+        card.id != card_id and card.name.strip().casefold() == normalized_name
+        for card in cards
+    )
+
+
 def create_credit_card(
     db: Session,
     user_id: int,
@@ -593,6 +634,8 @@ def create_credit_card(
     payment_account_id: int,
 ) -> dict:
     get_account(db, user_id, payment_account_id)
+    if _has_active_card_name_conflict(db, user_id, name):
+        raise _conflict("Credit card", name)
     card = CreditCard(
         user_id=user_id,
         payment_account_id=payment_account_id,
@@ -621,6 +664,9 @@ def update_credit_card(
     db: Session, user_id: int, card_id: int, **kwargs
 ) -> dict:
     card = _get_card(db, user_id, card_id)
+    if "name" in kwargs and kwargs["name"] is not None:
+        if _has_active_card_name_conflict(db, user_id, kwargs["name"], card_id):
+            raise _conflict("Credit card", kwargs["name"])
     if "payment_account_id" in kwargs:
         get_account(db, user_id, kwargs["payment_account_id"])
     if "limit_amount" in kwargs:
@@ -644,7 +690,9 @@ def archive_credit_card(db: Session, user_id: int, card_id: int) -> dict:
 def _get_or_create_statement(
     db: Session, user_id: int, card: CreditCard, occurred_on: date
 ) -> BillingStatement:
-    period_start, period_end = _statement_period(occurred_on)
+    period_start, period_end, due_on = _statement_cycle(
+        occurred_on, card.closing_day, card.due_day
+    )
     statement = (
         db.query(BillingStatement)
         .filter(
@@ -662,7 +710,7 @@ def _get_or_create_statement(
         credit_card_id=card.id,
         period_start=period_start,
         period_end=period_end,
-        due_on=_due_date(occurred_on, card.due_day),
+        due_on=due_on,
         total_amount=Decimal("0.00"),
         paid_amount=Decimal("0.00"),
         status="open",
