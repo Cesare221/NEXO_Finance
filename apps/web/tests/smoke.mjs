@@ -310,7 +310,9 @@ for (const marker of [
   "Recursos adotados",
   "nexo:financial-data-changed",
   "/api/financial/demo-dataset",
-  "<dialog"
+  "<dialog",
+  "AbortController",
+  "demo-dialog-feedback"
 ]) {
   if (!demoDatasetExperience.includes(marker)) {
     throw new Error(`Optional demo dataset experience must include ${marker}`);

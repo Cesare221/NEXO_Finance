@@ -32,6 +32,7 @@ async function readResponse(response: Response) {
 
 export function DemoDatasetControl({ variant }: DemoDatasetControlProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const statusControllerRef = useRef<AbortController | null>(null);
   const [state, setState] = useState<DemoDatasetState | null>(null);
   const [loading, setLoading] = useState(true);
   const [mutating, setMutating] = useState(false);
@@ -39,26 +40,36 @@ export function DemoDatasetControl({ variant }: DemoDatasetControlProps) {
   const [success, setSuccess] = useState("");
 
   const loadState = useCallback(async () => {
+    statusControllerRef.current?.abort();
+    const controller = new AbortController();
+    statusControllerRef.current = controller;
     setLoading(true);
     setError("");
     try {
       const response = await fetch("/api/financial/demo-dataset", {
-        cache: "no-store"
+        cache: "no-store",
+        signal: controller.signal
       });
+      if (controller.signal.aborted) return;
       setState(await readResponse(response));
     } catch (requestError) {
+      if (controller.signal.aborted) return;
       setError(
         requestError instanceof Error
           ? requestError.message
           : "N\u00e3o foi poss\u00edvel consultar os dados de exemplo."
       );
     } finally {
-      setLoading(false);
+      if (statusControllerRef.current === controller) {
+        statusControllerRef.current = null;
+        setLoading(false);
+      }
     }
   }, []);
 
   useEffect(() => {
     void loadState();
+    return () => statusControllerRef.current?.abort();
   }, [loadState]);
 
   async function confirmMutation() {
@@ -134,6 +145,9 @@ export function DemoDatasetControl({ variant }: DemoDatasetControlProps) {
           ? "O Nexo vai criar 3 contas, 1 cart\u00e3o, categorias e movimenta\u00e7\u00f5es relativas ao m\u00eas atual. Voc\u00ea poder\u00e1 remover tudo depois."
           : "A limpeza mira somente recursos demonstrativos. Recursos adotados por movimenta\u00e7\u00f5es reais ser\u00e3o preservados."}
       </p>
+      <div className="resource-feedback demo-dialog-feedback" aria-live="assertive">
+        {error ? <p className="error">{error}</p> : null}
+      </div>
       <div className="demo-dialog-actions">
         <button
           className="button secondary"
