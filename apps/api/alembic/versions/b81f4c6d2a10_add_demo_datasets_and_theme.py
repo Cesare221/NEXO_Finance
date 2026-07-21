@@ -71,6 +71,17 @@ def upgrade() -> None:
         "recurring_rules",
     ):
         with op.batch_alter_table(table_name) as batch_op:
+            if table_name == "categories":
+                batch_op.create_unique_constraint(
+                    "uq_categories_id_user_id", ["id", "user_id"]
+                )
+            elif table_name in ("transactions", "recurring_rules"):
+                batch_op.create_foreign_key(
+                    f"fk_{table_name}_category_user",
+                    "categories",
+                    ["category_id", "user_id"],
+                    ["id", "user_id"],
+                )
             batch_op.add_column(
                 sa.Column("demo_dataset_id", sa.Integer(), nullable=True)
             )
@@ -90,9 +101,30 @@ def upgrade() -> None:
                 ["demo_dataset_id", "user_id"],
                 ["id", "user_id"],
             )
+        if table_name == "categories":
+            with op.batch_alter_table("categories") as batch_op:
+                batch_op.create_foreign_key(
+                    "fk_categories_parent_user",
+                    "categories",
+                    ["parent_id", "user_id"],
+                    ["id", "user_id"],
+                )
+
+    with op.batch_alter_table("installment_plans") as batch_op:
+        batch_op.create_foreign_key(
+            "fk_installment_plans_category_user",
+            "categories",
+            ["category_id", "user_id"],
+            ["id", "user_id"],
+        )
 
 
 def downgrade() -> None:
+    with op.batch_alter_table("installment_plans") as batch_op:
+        batch_op.drop_constraint(
+            "fk_installment_plans_category_user", type_="foreignkey"
+        )
+
     for table_name in (
         "recurring_rules",
         "transactions",
@@ -102,6 +134,17 @@ def downgrade() -> None:
         "financial_accounts",
     ):
         with op.batch_alter_table(table_name) as batch_op:
+            if table_name in ("transactions", "recurring_rules"):
+                batch_op.drop_constraint(
+                    f"fk_{table_name}_category_user", type_="foreignkey"
+                )
+            elif table_name == "categories":
+                batch_op.drop_constraint(
+                    "fk_categories_parent_user", type_="foreignkey"
+                )
+                batch_op.drop_constraint(
+                    "uq_categories_id_user_id", type_="unique"
+                )
             batch_op.drop_constraint(
                 f"fk_{table_name}_demo_dataset_user", type_="foreignkey"
             )

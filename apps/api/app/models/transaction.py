@@ -31,6 +31,11 @@ class Transaction(Base):
             ["demo_datasets.id", "demo_datasets.user_id"],
             name="fk_transactions_demo_dataset_user",
         ),
+        ForeignKeyConstraint(
+            ["category_id", "user_id"],
+            ["categories.id", "categories.user_id"],
+            name="fk_transactions_category_user",
+        ),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -68,4 +73,6 @@ class Transaction(Base):
 
     user: Mapped["User"] = relationship(back_populates="transactions")
     account: Mapped["FinancialAccount"] = relationship(back_populates="transactions")
-    category: Mapped["Category | None"] = relationship(back_populates="transactions")
+    category: Mapped["Category | None"] = relationship(
+        back_populates="transactions", foreign_keys=[category_id]
+    )

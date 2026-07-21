@@ -3,6 +3,8 @@ from decimal import Decimal
 from unittest.mock import Mock
 
 import pytest
+from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException
 from app.models.action_proposal import ActionProposal
 from app.models.audit_event import AuditEvent
@@ -502,9 +504,11 @@ class TestCategories:
         token_b = _register_and_get_token(client, email="b-lifecycle@test.com", name="User B")
         category_a = _create_category(client, token_a, name="A category")
         account_b = _create_account(client, token_b, name="B account")
+        category_b = _create_category(client, token_b, name="B category")
 
         db = TestingSessionLocal()
         try:
+            db.execute(text("PRAGMA foreign_keys=ON"))
             user_b = db.query(User).filter(User.email == "b-lifecycle@test.com").one()
             db.add(
                 Transaction(
@@ -518,9 +522,24 @@ class TestCategories:
                     origin="manual",
                 )
             )
-            db.commit()
+            with pytest.raises(IntegrityError):
+                db.commit()
+            db.rollback()
         finally:
             db.close()
+
+        valid_b_transaction = client.post(
+            "/financial/transactions",
+            json={
+                "type": "expense",
+                "account_id": account_b["id"],
+                "category_id": category_b["id"],
+                "amount": "10.00",
+                "occurred_on": "2026-01-15",
+            },
+            headers=_auth_header(token_b),
+        )
+        assert valid_b_transaction.status_code == 201
 
         response = client.delete(
             f"/financial/categories/{category_a['id']}", headers=_auth_header(token_a)
@@ -528,6 +547,12 @@ class TestCategories:
 
         assert response.status_code == 200
         assert response.json()["action"] == "deleted"
+        b_transactions = client.get(
+            "/financial/transactions", headers=_auth_header(token_b)
+        ).json()
+        assert [transaction["id"] for transaction in b_transactions] == [
+            valid_b_transaction.json()["id"]
+        ]
 
     def test_duplicate_category_name(self, client):
         token = _register_and_get_token(client)

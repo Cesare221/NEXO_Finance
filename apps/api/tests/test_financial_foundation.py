@@ -4,7 +4,17 @@ from pathlib import Path
 from alembic.migration import MigrationContext
 from alembic.operations import Operations
 import pytest
-from sqlalchemy import Column, Integer, MetaData, Table, create_engine, event, inspect, text
+from sqlalchemy import (
+    Column,
+    ForeignKeyConstraint,
+    Integer,
+    MetaData,
+    Table,
+    create_engine,
+    event,
+    inspect,
+    text,
+)
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.schema import UniqueConstraint
 
@@ -18,6 +28,12 @@ RESOURCE_TABLES = (
     "credit_cards",
     "billing_statements",
     "transactions",
+    "recurring_rules",
+)
+
+CATEGORY_OWNERSHIP_TABLES = (
+    "transactions",
+    "installment_plans",
     "recurring_rules",
 )
 
@@ -94,6 +110,35 @@ def test_financial_foundation_metadata_contains_required_contracts() -> None:
             "demo_datasets.user_id",
         )
 
+    categories = Base.metadata.tables["categories"]
+    assert any(
+        isinstance(constraint, UniqueConstraint)
+        and constraint.name == "uq_categories_id_user_id"
+        and tuple(constraint.columns.keys()) == ("id", "user_id")
+        for constraint in categories.constraints
+    )
+    category_constraints = {
+        constraint.name: constraint for constraint in categories.foreign_key_constraints
+    }
+    parent_constraint = category_constraints["fk_categories_parent_user"]
+    assert tuple(parent_constraint.column_keys) == ("parent_id", "user_id")
+    assert tuple(element.target_fullname for element in parent_constraint.elements) == (
+        "categories.id",
+        "categories.user_id",
+    )
+
+    for table_name in CATEGORY_OWNERSHIP_TABLES:
+        constraints = {
+            constraint.name: constraint
+            for constraint in Base.metadata.tables[table_name].foreign_key_constraints
+        }
+        category_constraint = constraints[f"fk_{table_name}_category_user"]
+        assert tuple(category_constraint.column_keys) == ("category_id", "user_id")
+        assert tuple(element.target_fullname for element in category_constraint.elements) == (
+            "categories.id",
+            "categories.user_id",
+        )
+
 
 def test_alembic_migration_round_trips_sqlite_schema_and_dataset_ownership(
     tmp_path: Path,
@@ -111,12 +156,35 @@ def test_alembic_migration_round_trips_sqlite_schema_and_dataset_ownership(
         with engine.begin() as connection:
             metadata = MetaData()
             Table("users", metadata, Column("id", Integer, primary_key=True))
-            for table_name in RESOURCE_TABLES:
+            for table_name in (*RESOURCE_TABLES, "installment_plans"):
+                columns = [
+                    Column("id", Integer, primary_key=True),
+                    Column("user_id", Integer, nullable=False),
+                ]
+                if table_name == "categories":
+                    columns.extend(
+                        [
+                            Column("parent_id", Integer, nullable=True),
+                            ForeignKeyConstraint(
+                                ["parent_id"], ["categories.id"], ondelete="SET NULL"
+                            ),
+                        ]
+                    )
+                elif table_name in CATEGORY_OWNERSHIP_TABLES:
+                    columns.extend(
+                        [
+                            Column("category_id", Integer, nullable=True),
+                            ForeignKeyConstraint(
+                                ["category_id"],
+                                ["categories.id"],
+                                ondelete="SET NULL",
+                            ),
+                        ]
+                    )
                 Table(
                     table_name,
                     metadata,
-                    Column("id", Integer, primary_key=True),
-                    Column("user_id", Integer, nullable=False),
+                    *columns,
                 )
             metadata.create_all(connection)
 
@@ -160,6 +228,17 @@ def test_alembic_migration_round_trips_sqlite_schema_and_dataset_ownership(
             ).scalar_one()
             assert "CONSTRAINT uq_demo_datasets_id_user_id UNIQUE (id, user_id)" in dataset_table_sql
 
+            category_table_sql = connection.execute(
+                text(
+                    "SELECT sql FROM sqlite_master "
+                    "WHERE type = 'table' AND name = 'categories'"
+                )
+            ).scalar_one()
+            assert "CONSTRAINT uq_categories_id_user_id UNIQUE (id, user_id)" in category_table_sql
+            assert "CONSTRAINT fk_categories_parent_user " in category_table_sql
+            assert "FOREIGN KEY(parent_id, user_id) REFERENCES categories (id, user_id)" in category_table_sql
+            assert "FOREIGN KEY(parent_id) REFERENCES categories (id) ON DELETE SET NULL" in category_table_sql
+
             for table_name in RESOURCE_TABLES:
                 assert "demo_dataset_id" in {
                     column["name"] for column in inspector.get_columns(table_name)
@@ -179,6 +258,18 @@ def test_alembic_migration_round_trips_sqlite_schema_and_dataset_ownership(
                 assert "FOREIGN KEY(demo_dataset_id) REFERENCES demo_datasets (id) ON DELETE SET NULL" in table_sql
                 assert f"CONSTRAINT fk_{table_name}_demo_dataset_user " in table_sql
                 assert "FOREIGN KEY(demo_dataset_id, user_id) REFERENCES demo_datasets (id, user_id)" in table_sql
+
+            for table_name in CATEGORY_OWNERSHIP_TABLES:
+                table_sql = connection.execute(
+                    text(
+                        "SELECT sql FROM sqlite_master "
+                        "WHERE type = 'table' AND name = :table_name"
+                    ),
+                    {"table_name": table_name},
+                ).scalar_one()
+                assert f"CONSTRAINT fk_{table_name}_category_user " in table_sql
+                assert "FOREIGN KEY(category_id, user_id) REFERENCES categories (id, user_id)" in table_sql
+                assert "FOREIGN KEY(category_id) REFERENCES categories (id) ON DELETE SET NULL" in table_sql
 
             connection.execute(text("INSERT INTO users (id) VALUES (1), (2)"))
             connection.execute(
@@ -202,6 +293,16 @@ def test_alembic_migration_round_trips_sqlite_schema_and_dataset_ownership(
                     "VALUES (2, 1, 1)"
                 )
             )
+            connection.execute(
+                text("INSERT INTO categories (id, user_id) VALUES (3, 2)")
+            )
+            with pytest.raises(IntegrityError):
+                connection.execute(
+                    text(
+                        "INSERT INTO transactions (id, user_id, category_id) "
+                        "VALUES (1, 2, 2)"
+                    )
+                )
             connection.execute(text("DELETE FROM demo_datasets WHERE id = 1"))
             assert connection.execute(
                 text("SELECT demo_dataset_id FROM categories WHERE id = 2")
@@ -218,5 +319,26 @@ def test_alembic_migration_round_trips_sqlite_schema_and_dataset_ownership(
                 assert "demo_dataset_id" not in {
                     column["name"] for column in inspector.get_columns(table_name)
                 }
+
+            category_table_sql = connection.execute(
+                text(
+                    "SELECT sql FROM sqlite_master "
+                    "WHERE type = 'table' AND name = 'categories'"
+                )
+            ).scalar_one()
+            assert "uq_categories_id_user_id" not in category_table_sql
+            assert "fk_categories_parent_user" not in category_table_sql
+            assert "FOREIGN KEY(parent_id) REFERENCES categories (id) ON DELETE SET NULL" in category_table_sql
+
+            for table_name in CATEGORY_OWNERSHIP_TABLES:
+                table_sql = connection.execute(
+                    text(
+                        "SELECT sql FROM sqlite_master "
+                        "WHERE type = 'table' AND name = :table_name"
+                    ),
+                    {"table_name": table_name},
+                ).scalar_one()
+                assert f"fk_{table_name}_category_user" not in table_sql
+                assert "FOREIGN KEY(category_id) REFERENCES categories (id) ON DELETE SET NULL" in table_sql
     finally:
         engine.dispose()

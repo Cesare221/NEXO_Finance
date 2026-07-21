@@ -7,6 +7,7 @@ from sqlalchemy import (
     ForeignKeyConstraint,
     Integer,
     String,
+    UniqueConstraint,
     func,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -28,6 +29,12 @@ class Category(Base):
             ["demo_datasets.id", "demo_datasets.user_id"],
             name="fk_categories_demo_dataset_user",
         ),
+        ForeignKeyConstraint(
+            ["parent_id", "user_id"],
+            ["categories.id", "categories.user_id"],
+            name="fk_categories_parent_user",
+        ),
+        UniqueConstraint("id", "user_id", name="uq_categories_id_user_id"),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -51,9 +58,11 @@ class Category(Base):
 
     user: Mapped["User"] = relationship(back_populates="categories")
     parent: Mapped["Category | None"] = relationship(
-        back_populates="children", remote_side=[id]
+        back_populates="children", remote_side=[id], foreign_keys=[parent_id]
     )
     children: Mapped[list["Category"]] = relationship(
-        back_populates="parent", cascade="all, delete-orphan"
+        back_populates="parent", cascade="all, delete-orphan", foreign_keys=[parent_id]
     )
-    transactions: Mapped[list["Transaction"]] = relationship(back_populates="category")
+    transactions: Mapped[list["Transaction"]] = relationship(
+        back_populates="category", foreign_keys="Transaction.category_id"
+    )

@@ -31,6 +31,11 @@ class RecurringRule(Base):
             ["demo_datasets.id", "demo_datasets.user_id"],
             name="fk_recurring_rules_demo_dataset_user",
         ),
+        ForeignKeyConstraint(
+            ["category_id", "user_id"],
+            ["categories.id", "categories.user_id"],
+            name="fk_recurring_rules_category_user",
+        ),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
