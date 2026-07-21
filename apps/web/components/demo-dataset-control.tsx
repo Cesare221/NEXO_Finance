@@ -33,6 +33,7 @@ async function readResponse(response: Response) {
 export function DemoDatasetControl({ variant }: DemoDatasetControlProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const statusControllerRef = useRef<AbortController | null>(null);
+  const mutationControllerRef = useRef<AbortController | null>(null);
   const [state, setState] = useState<DemoDatasetState | null>(null);
   const [loading, setLoading] = useState(true);
   const [mutating, setMutating] = useState(false);
@@ -50,8 +51,9 @@ export function DemoDatasetControl({ variant }: DemoDatasetControlProps) {
         cache: "no-store",
         signal: controller.signal
       });
+      const nextState = await readResponse(response);
       if (controller.signal.aborted) return;
-      setState(await readResponse(response));
+      setState(nextState);
     } catch (requestError) {
       if (controller.signal.aborted) return;
       setError(
@@ -69,18 +71,30 @@ export function DemoDatasetControl({ variant }: DemoDatasetControlProps) {
 
   useEffect(() => {
     void loadState();
-    return () => statusControllerRef.current?.abort();
+    return () => {
+      const statusController = statusControllerRef.current;
+      statusControllerRef.current = null;
+      statusController?.abort();
+      const mutationController = mutationControllerRef.current;
+      mutationControllerRef.current = null;
+      mutationController?.abort();
+    };
   }, [loadState]);
 
   async function confirmMutation() {
+    mutationControllerRef.current?.abort();
+    const controller = new AbortController();
+    mutationControllerRef.current = controller;
     setMutating(true);
     setError("");
     setSuccess("");
     try {
       const response = await fetch("/api/financial/demo-dataset", {
-        method: variant === "install" ? "POST" : "DELETE"
+        method: variant === "install" ? "POST" : "DELETE",
+        signal: controller.signal
       });
       const nextState = await readResponse(response);
+      if (controller.signal.aborted) return;
       setState(nextState);
       setSuccess(
         variant === "install"
@@ -90,13 +104,17 @@ export function DemoDatasetControl({ variant }: DemoDatasetControlProps) {
       dialogRef.current?.close();
       window.dispatchEvent(new Event("nexo:financial-data-changed"));
     } catch (requestError) {
+      if (controller.signal.aborted) return;
       setError(
         requestError instanceof Error
           ? requestError.message
           : "N\u00e3o foi poss\u00edvel atualizar os dados de exemplo."
       );
     } finally {
-      setMutating(false);
+      if (mutationControllerRef.current === controller) {
+        mutationControllerRef.current = null;
+        setMutating(false);
+      }
     }
   }
 

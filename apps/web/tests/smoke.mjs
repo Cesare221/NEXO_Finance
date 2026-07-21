@@ -312,6 +312,7 @@ for (const marker of [
   "/api/financial/demo-dataset",
   "<dialog",
   "AbortController",
+  "mutationControllerRef",
   "demo-dialog-feedback"
 ]) {
   if (!demoDatasetExperience.includes(marker)) {
