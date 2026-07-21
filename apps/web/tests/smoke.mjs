@@ -519,9 +519,32 @@ for (const [manager, source] of Object.entries(financialMutationFeedback)) {
 }
 
 const finRefresh = readFileSync(join(root, "components/fin-conversation.tsx"), "utf8");
-for (const marker of ["aria-busy", 'aria-live="polite"', "disabled={sending", "nexo:financial-data-changed", "addEventListener", "removeEventListener"]) {
+for (const marker of [
+  "aria-busy",
+  'aria-live="polite"',
+  "disabled={sending",
+  "nexo:financial-data-changed",
+  "addEventListener",
+  "removeEventListener",
+  "DashboardData",
+  'fetch("/api/financial/dashboard"',
+  'cache: "no-store"',
+  "refreshPromiseRef",
+  "await refreshPromise",
+  "financialContext"
+]) {
   if (!finRefresh.includes(marker)) {
     throw new Error(`Fin conversation must refresh financial context: missing ${marker}`);
+  }
+}
+if (finRefresh.includes("Seus dados financeiros foram atualizados. Vou considerar os valores mais recentes nas próximas respostas.")) {
+  throw new Error("Fin conversation must not use a static financial refresh message");
+}
+
+const creditCardFeedback = readFileSync(join(root, "components/credit-card-form.tsx"), "utf8");
+for (const marker of ["aria-busy={saving}", 'aria-live="polite"', "if (saving) return", "disabled={saving}", "fetch("]) {
+  if (!creditCardFeedback.includes(marker)) {
+    throw new Error(`Credit card form must expose normalized save feedback: missing ${marker}`);
   }
 }
 

@@ -1,10 +1,11 @@
 "use client";
 
 import { LoaderCircle, Send, UserRound, X } from "lucide-react";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { FinMascot } from "@/components/brand-assets";
 import { notifyProposalsChanged } from "@/components/pending-proposals-provider";
 import { ActionProposal, ProposalCard } from "@/components/proposal-card";
+import type { DashboardData } from "@/lib/financial-types";
 
 type ChatMessage = {
   id: string;
@@ -24,6 +25,12 @@ const suggestions = [
   "Gastei R$ 35 no mercado"
 ];
 
+const currencyFormatter = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+
+function formatCurrency(value: string) {
+  return currencyFormatter.format(Number(value));
+}
+
 export function FinConversation({ compact = false, onClose }: { compact?: boolean; onClose?: () => void }) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -37,8 +44,14 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
   const [sending, setSending] = useState(false);
   const [pendingAction, setPendingAction] = useState<"confirm" | "cancel" | "edit" | null>(null);
   const [error, setError] = useState("");
+  const [financialContext, setFinancialContext] = useState<DashboardData | null>(null);
+  const [contextLoading, setContextLoading] = useState(true);
+  const [contextError, setContextError] = useState("");
   const conversationId = useRef<string | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const refreshPromiseRef = useRef<Promise<void> | null>(null);
+  const contextRequestRef = useRef(0);
+  const messageSubmissionRef = useRef(false);
 
   function addAssistantMessage(text: string) {
     setMessages((current) => [
@@ -47,31 +60,63 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
     ]);
   }
 
-  useEffect(() => {
-    const refreshFinancialContext = () => {
-      setError("");
-      addAssistantMessage("Seus dados financeiros foram atualizados. Vou considerar os valores mais recentes nas próximas respostas.");
-    };
-    window.addEventListener("nexo:financial-data-changed", refreshFinancialContext);
-    return () => window.removeEventListener("nexo:financial-data-changed", refreshFinancialContext);
+  const refreshFinancialContext = useCallback(() => {
+    const requestId = contextRequestRef.current + 1;
+    contextRequestRef.current = requestId;
+    setContextLoading(true);
+    setContextError("");
+
+    const refreshPromise = (async () => {
+      try {
+        const response = await fetch("/api/financial/dashboard", { cache: "no-store" });
+        const body = (await response.json().catch(() => ({}))) as DashboardData & { detail?: string };
+        if (!response.ok) throw new Error(body.detail ?? "Não foi possível atualizar o contexto financeiro.");
+        if (requestId === contextRequestRef.current) setFinancialContext(body);
+      } catch (requestError) {
+        if (requestId === contextRequestRef.current) {
+          setContextError(requestError instanceof Error ? requestError.message : "Não foi possível atualizar o contexto financeiro.");
+        }
+      }
+    })();
+
+    refreshPromiseRef.current = refreshPromise;
+    void refreshPromise.finally(() => {
+      if (refreshPromiseRef.current === refreshPromise) {
+        refreshPromiseRef.current = null;
+        setContextLoading(false);
+      }
+    });
+
+    return refreshPromise;
   }, []);
+
+  useEffect(() => {
+    void refreshFinancialContext();
+    const refresh = () => void refreshFinancialContext();
+    window.addEventListener("nexo:financial-data-changed", refresh);
+    return () => window.removeEventListener("nexo:financial-data-changed", refresh);
+  }, [refreshFinancialContext]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const content = message.trim();
-    if (!content || sending) return;
+    if (!content || sending || messageSubmissionRef.current) return;
 
-    const clientMessageId = crypto.randomUUID();
-    if (!conversationId.current) conversationId.current = crypto.randomUUID();
-    setMessages((current) => [
-      ...current,
-      { id: clientMessageId, role: "user", text: content }
-    ]);
-    setMessage("");
-    setSending(true);
-    setError("");
-
+    messageSubmissionRef.current = true;
     try {
+      const refreshPromise = refreshPromiseRef.current;
+      if (refreshPromise) await refreshPromise;
+
+      const clientMessageId = crypto.randomUUID();
+      if (!conversationId.current) conversationId.current = crypto.randomUUID();
+      setMessages((current) => [
+        ...current,
+        { id: clientMessageId, role: "user", text: content }
+      ]);
+      setMessage("");
+      setSending(true);
+      setError("");
+
       const response = await fetch("/api/assistant/message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -92,6 +137,7 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
       setError(requestError instanceof Error ? requestError.message : "Não foi possível enviar a mensagem.");
     } finally {
       setSending(false);
+      messageSubmissionRef.current = false;
       requestAnimationFrame(() => inputRef.current?.focus());
     }
   }
@@ -153,12 +199,29 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
   }
 
   return (
-    <section className={compact ? "fin-chat compact" : "fin-chat"} aria-busy={sending || pendingAction !== null} aria-labelledby="fin-chat-title">
+    <section className={compact ? "fin-chat compact" : "fin-chat"} aria-busy={sending || pendingAction !== null || contextLoading} aria-labelledby="fin-chat-title">
       <div className="fin-chat-header">
         <span className="fin-avatar" aria-hidden="true"><FinMascot variant="avatar" /></span>
         <div><h2 id="fin-chat-title">Conversa com o Fin</h2><span>Online · suas ações sempre passam por revisão</span></div>
         {onClose ? <button className="icon-button fin-chat-close" type="button" aria-label="Fechar conversa com o Fin" onClick={onClose}><X size={18} aria-hidden="true" /></button> : null}
       </div>
+
+      <section className="fin-financial-context" aria-busy={contextLoading} aria-live="polite" aria-label="Resumo financeiro atual">
+        <div className="fin-financial-context-heading">
+          <span>Contexto financeiro</span>
+          {contextLoading && <span role="status">Atualizando</span>}
+        </div>
+        {financialContext && (
+          <dl className="fin-financial-summary">
+            <div><dt>Saldo</dt><dd>{formatCurrency(financialContext.total_balance)}</dd></div>
+            <div><dt>Receitas</dt><dd>{formatCurrency(financialContext.period_income)}</dd></div>
+            <div><dt>Despesas</dt><dd>{formatCurrency(financialContext.period_expenses)}</dd></div>
+            <div><dt>Faturas</dt><dd>{formatCurrency(financialContext.open_statement_total)}</dd></div>
+          </dl>
+        )}
+        {!financialContext && contextLoading && <p className="fin-context-state">Carregando dados financeiros...</p>}
+        {contextError && <p className="fin-context-state error" role="status">{contextError}</p>}
+      </section>
 
       <div className="fin-messages" aria-live="polite" aria-relevant="additions">
         {messages.map((item) => (

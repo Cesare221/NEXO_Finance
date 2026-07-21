@@ -99,13 +99,13 @@ export function CreditCardForm({ accounts, card, onSaved, onCancel }: CreditCard
   }
 
   return (
-    <form className="card form resource-form credit-card-form" onSubmit={saveCard} noValidate>
+    <form className="card form resource-form credit-card-form" onSubmit={saveCard} noValidate aria-busy={saving}>
       <div className="resource-heading">
         <div>
           <span className="section-kicker">{card ? "Edição" : "Cadastro"}</span>
           <h2>{card ? "Editar cartão" : "Novo cartão"}</h2>
         </div>
-        <button className="icon-button" type="button" aria-label="Fechar formulário" onClick={onCancel}>
+        <button className="icon-button" type="button" aria-label="Fechar formulário" onClick={onCancel} disabled={saving}>
           <X size={19} aria-hidden="true" />
         </button>
       </div>
@@ -124,6 +124,7 @@ export function CreditCardForm({ accounts, card, onSaved, onCancel }: CreditCard
                 aria-invalid={Boolean(fieldErrors.name)}
                 aria-describedby={fieldErrors.name ? `${ids.name}-error` : undefined}
                 maxLength={80}
+                disabled={saving}
                 required
               />
               {fieldErrors.name && <span className="field-error" id={`${ids.name}-error`}>{fieldErrors.name}</span>}
@@ -154,6 +155,7 @@ export function CreditCardForm({ accounts, card, onSaved, onCancel }: CreditCard
                   onChange={(event) => setClosingDay(event.target.value)}
                   aria-invalid={Boolean(fieldErrors.closingDay)}
                   aria-describedby={`${ids.closing}-help${fieldErrors.closingDay ? ` ${ids.closing}-error` : ""}`}
+                  disabled={saving}
                   required
                 />
                 <span className="field-help" id={`${ids.closing}-help`}>Compras após esse dia entram no próximo ciclo.</span>
@@ -171,6 +173,7 @@ export function CreditCardForm({ accounts, card, onSaved, onCancel }: CreditCard
                   onChange={(event) => setDueDay(event.target.value)}
                   aria-invalid={Boolean(fieldErrors.dueDay)}
                   aria-describedby={`${ids.due}-help${fieldErrors.dueDay ? ` ${ids.due}-error` : ""}`}
+                  disabled={saving}
                   required
                 />
                 <span className="field-help" id={`${ids.due}-help`}>Dia previsto para pagamento da fatura.</span>
@@ -186,6 +189,7 @@ export function CreditCardForm({ accounts, card, onSaved, onCancel }: CreditCard
                 onChange={(event) => setPaymentAccountId(event.target.value)}
                 aria-invalid={Boolean(fieldErrors.account)}
                 aria-describedby={fieldErrors.account ? `${ids.account}-error` : undefined}
+                disabled={saving}
                 required
               >
                 <option value="">Selecione</option>
@@ -217,7 +221,9 @@ export function CreditCardForm({ accounts, card, onSaved, onCancel }: CreditCard
         </aside>
       </div>
 
-      {error && <p className="error" role="alert">{error}</p>}
+      <div className="credit-card-feedback" aria-live="polite">
+        {error && <p className="error" role="alert">{error}</p>}
+      </div>
       {accounts.length === 0 ? (
         <div className="credit-card-account-empty">
           <p>Cadastre uma conta antes de criar o cartão. Ela será usada no pagamento das faturas.</p>
@@ -225,7 +231,7 @@ export function CreditCardForm({ accounts, card, onSaved, onCancel }: CreditCard
         </div>
       ) : (
         <div className="resource-form-actions">
-          <button className="button secondary" type="button" onClick={onCancel}>Cancelar</button>
+          <button className="button secondary" type="button" onClick={onCancel} disabled={saving}>Cancelar</button>
           <button className="button" type="submit" disabled={saving}>
             {saving ? <LoaderCircle className="spin" size={18} aria-hidden="true" /> : <CheckCircle2 size={18} aria-hidden="true" />}
             {saving ? "Salvando" : "Salvar cartão"}

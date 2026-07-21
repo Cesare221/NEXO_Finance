@@ -1885,6 +1885,58 @@ textarea.input {
   font-size: 11px;
 }
 
+.fin-financial-context {
+  display: grid;
+  gap: 10px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--hairline);
+  background: var(--surface-soft);
+}
+
+.fin-financial-context-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.fin-financial-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.fin-financial-summary div {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.fin-financial-summary dt,
+.fin-context-state {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.fin-financial-summary dd {
+  margin: 0;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fin-context-state {
+  margin: 0;
+}
+
 .fin-messages {
   min-height: 360px;
   display: flex;
@@ -2827,6 +2879,15 @@ textarea.input {
     padding: 16px 12px;
   }
 
+  .fin-financial-context {
+    padding-inline: 12px;
+  }
+
+  .fin-financial-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 10px;
+  }
+
   .chat-avatar {
     width: 32px;
     height: 32px;
@@ -3605,6 +3666,14 @@ textarea.input {
 
 .resource-feedback:empty {
   display: none;
+}
+
+.credit-card-feedback:empty {
+  display: none;
+}
+
+.credit-card-feedback p {
+  margin: 0;
 }
 
 .transaction-feedback:empty {
