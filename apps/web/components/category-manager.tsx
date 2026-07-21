@@ -112,12 +112,18 @@ export function CategoryManager() {
     try {
       const response = await fetch(`/api/financial/categories/${category.id}`, { method: "DELETE" });
       if (!response.ok) throw new Error(await readError(response));
-      const result = await response.json() as CategoryDeleteResult;
-      const successMessage = result.action === "deleted"
-        ? "Categoria excluída."
-        : result.action === "archived"
-          ? "Categoria arquivada para preservar seu histórico."
-          : "";
+      const result = await response.json() as Partial<CategoryDeleteResult>;
+      if (result.action !== "deleted" && result.action !== "archived") {
+        throw new Error("A API retornou um resultado de exclusão de categoria inválido.");
+      }
+      let successMessage: string;
+      if (result.action === "deleted") {
+        successMessage = "Categoria excluída.";
+      } else if (result.action === "archived") {
+        successMessage = "Categoria arquivada para preservar seu histórico.";
+      } else {
+        throw new Error("A API retornou um resultado de exclusão de categoria inválido.");
+      }
       setSuccess(successMessage);
       await loadCategories();
       window.dispatchEvent(new Event("nexo:financial-data-changed"));
