@@ -20,6 +20,7 @@ const requiredFiles = [
   "components/auth-form.tsx",
   "components/session-profile.tsx",
   "components/theme-provider.tsx",
+  "components/theme-toggle.tsx",
   "components/theme-settings.tsx",
   "components/profile-settings.tsx",
   "components/install-app-button.tsx",
@@ -179,7 +180,7 @@ for (const marker of [
 }
 
 const shell = readFileSync(join(root, "components/app-shell.tsx"), "utf8");
-for (const marker of ["usePathname", "Menu principal", "NavigationDrawer", "FinChatPanel", "PendingProposalsProvider", "SessionProfile"]) {
+for (const marker of ["usePathname", "Menu principal", "NavigationDrawer", "FinChatPanel", "PendingProposalsProvider", "SessionProfile", "ThemeToggle"]) {
   if (!shell.includes(marker)) {
     throw new Error(`Nexo app shell must include ${marker}`);
   }
@@ -643,6 +644,7 @@ if (!settings.includes("InstallAppButton")) {
 const themeExperience =
   readFileSync(join(root, "lib/theme.ts"), "utf8") +
   readFileSync(join(root, "components/theme-provider.tsx"), "utf8") +
+  readFileSync(join(root, "components/theme-toggle.tsx"), "utf8") +
   readFileSync(join(root, "components/theme-settings.tsx"), "utf8") +
   readFileSync(join(root, "components/session-profile.tsx"), "utf8") +
   layout +
@@ -650,7 +652,9 @@ const themeExperience =
   styles;
 for (const marker of [
   "ThemeSettings",
+  "ThemeToggle",
   "ThemeProvider",
+  "resolvedTheme",
   "theme_preference",
   "data-theme",
   "nexo-theme",

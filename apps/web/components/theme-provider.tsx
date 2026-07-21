@@ -12,12 +12,14 @@ import {
 import {
   applyTheme,
   isThemePreference,
+  ResolvedTheme,
   THEME_STORAGE_KEY,
   ThemePreference
 } from "@/lib/theme";
 
 type ThemeContextValue = {
   preference: ThemePreference;
+  resolvedTheme: ResolvedTheme;
   setPreference: (preference: ThemePreference) => void;
 };
 
@@ -25,30 +27,31 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [preference, setPreferenceState] = useState<ThemePreference>("system");
+  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>("light");
 
   const setPreference = useCallback((nextPreference: ThemePreference) => {
     setPreferenceState(nextPreference);
-    applyTheme(nextPreference);
+    setResolvedTheme(applyTheme(nextPreference));
   }, []);
 
   useEffect(() => {
     const stored = localStorage.getItem(THEME_STORAGE_KEY);
     const initialPreference = isThemePreference(stored) ? stored : "system";
     setPreferenceState(initialPreference);
-    applyTheme(initialPreference);
+    setResolvedTheme(applyTheme(initialPreference));
   }, []);
 
   useEffect(() => {
     if (preference !== "system") return;
     const media = window.matchMedia("(prefers-color-scheme: dark)");
-    const syncSystemTheme = () => applyTheme("system");
+    const syncSystemTheme = () => setResolvedTheme(applyTheme("system"));
     media.addEventListener("change", syncSystemTheme);
     return () => media.removeEventListener("change", syncSystemTheme);
   }, [preference]);
 
   const value = useMemo(
-    () => ({ preference, setPreference }),
-    [preference, setPreference]
+    () => ({ preference, resolvedTheme, setPreference }),
+    [preference, resolvedTheme, setPreference]
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

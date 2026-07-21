@@ -3010,6 +3010,7 @@ textarea.input {
 .app-shell {
   min-height: 100dvh;
   display: block;
+  padding-top: 0;
   background: var(--canvas);
 }
 
@@ -3105,6 +3106,103 @@ textarea.input {
   align-items: center;
   gap: 8px;
   margin-left: auto;
+}
+
+.theme-toggle-wrap {
+  width: 68px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+.theme-toggle {
+  width: 68px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--chrome-topbar-muted);
+}
+
+.theme-toggle-track {
+  position: relative;
+  width: 64px;
+  height: 32px;
+  display: block;
+  border: 1px solid var(--chrome-topbar-border);
+  border-radius: 16px;
+  background: var(--chrome-topbar);
+  transition: border-color 200ms ease, background-color 200ms ease;
+}
+
+.theme-toggle.is-dark .theme-toggle-track {
+  border-color: #263d38;
+  background: #0a0a0a;
+}
+
+.theme-toggle.is-light .theme-toggle-track {
+  border-color: #e5e5e5;
+  background: #ffffff;
+}
+
+.theme-toggle-icon {
+  position: absolute;
+  top: 8px;
+  color: var(--chrome-topbar-muted);
+}
+
+.theme-toggle-moon {
+  left: 8px;
+}
+
+.theme-toggle-sun {
+  right: 8px;
+}
+
+.theme-toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  transition: transform 220ms ease, background-color 220ms ease, color 220ms ease;
+}
+
+.theme-toggle.is-dark .theme-toggle-thumb {
+  transform: translateX(0);
+  background: #1c1c1e;
+  color: #ffffff;
+}
+
+.theme-toggle.is-light .theme-toggle-thumb {
+  transform: translateX(32px);
+  background: #e8f7f3;
+  color: #1c1c1e;
+}
+
+.theme-toggle:hover .theme-toggle-track {
+  border-color: var(--chrome-sidebar-active);
+}
+
+.theme-toggle:focus-visible {
+  outline: none;
+}
+
+.theme-toggle:focus-visible .theme-toggle-track {
+  outline: 3px solid color-mix(in srgb, var(--focus) 42%, transparent);
+  outline-offset: 2px;
+}
+
+.theme-toggle:disabled {
+  cursor: wait;
+  opacity: 0.6;
 }
 
 .topbar-badge,
@@ -4038,7 +4136,8 @@ textarea.input {
   }
 
   .topbar-brand strong,
-  .topbar-separator {
+  .topbar-separator,
+  .topbar-page-title {
     display: none;
   }
 

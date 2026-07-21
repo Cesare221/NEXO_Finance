@@ -5371,7 +5371,7 @@
       "label": "pageTitles",
       "file_type": "code",
       "source_file": "apps/web/components/app-shell.tsx",
-      "source_location": "L13",
+      "source_location": "L14",
       "id": "components_app_shell_pagetitles",
       "community": 68,
       "norm_label": "pagetitles"
@@ -5380,7 +5380,7 @@
       "label": "AppShell()",
       "file_type": "code",
       "source_file": "apps/web/components/app-shell.tsx",
-      "source_location": "L24",
+      "source_location": "L25",
       "id": "components_app_shell_appshell",
       "community": 82,
       "norm_label": "appshell()"
@@ -5389,7 +5389,7 @@
       "label": "AppShellContent()",
       "file_type": "code",
       "source_file": "apps/web/components/app-shell.tsx",
-      "source_location": "L34",
+      "source_location": "L35",
       "id": "components_app_shell_appshellcontent",
       "community": 57,
       "norm_label": "appshellcontent()"
@@ -6309,32 +6309,32 @@
       "source_file": "apps/web/components/theme-provider.tsx",
       "source_location": "L1",
       "id": "apps_web_components_theme_provider_tsx",
-      "community": 33,
+      "community": 85,
       "norm_label": "theme-provider.tsx"
     },
     {
       "label": "ThemeContextValue",
       "file_type": "code",
       "source_file": "apps/web/components/theme-provider.tsx",
-      "source_location": "L19",
+      "source_location": "L20",
       "id": "components_theme_provider_themecontextvalue",
-      "community": 33,
+      "community": 85,
       "norm_label": "themecontextvalue"
     },
     {
       "label": "ThemeContext",
       "file_type": "code",
       "source_file": "apps/web/components/theme-provider.tsx",
-      "source_location": "L24",
+      "source_location": "L26",
       "id": "components_theme_provider_themecontext",
-      "community": 33,
+      "community": 85,
       "norm_label": "themecontext"
     },
     {
       "label": "ThemeProvider()",
       "file_type": "code",
       "source_file": "apps/web/components/theme-provider.tsx",
-      "source_location": "L26",
+      "source_location": "L28",
       "id": "components_theme_provider_themeprovider",
       "community": 85,
       "norm_label": "themeprovider()"
@@ -6343,7 +6343,7 @@
       "label": "useTheme()",
       "file_type": "code",
       "source_file": "apps/web/components/theme-provider.tsx",
-      "source_location": "L57",
+      "source_location": "L60",
       "id": "components_theme_provider_usetheme",
       "community": 33,
       "norm_label": "usetheme()"
@@ -6383,6 +6383,42 @@
       "id": "components_theme_settings_themesettings",
       "community": 33,
       "norm_label": "themesettings()"
+    },
+    {
+      "label": "theme-toggle.tsx",
+      "file_type": "code",
+      "source_file": "apps/web/components/theme-toggle.tsx",
+      "source_location": "L1",
+      "id": "apps_web_components_theme_toggle_tsx",
+      "community": 33,
+      "norm_label": "theme-toggle.tsx"
+    },
+    {
+      "label": "ThemeToggleProps",
+      "file_type": "code",
+      "source_file": "apps/web/components/theme-toggle.tsx",
+      "source_location": "L8",
+      "id": "components_theme_toggle_themetoggleprops",
+      "community": 33,
+      "norm_label": "themetoggleprops"
+    },
+    {
+      "label": "readError()",
+      "file_type": "code",
+      "source_file": "apps/web/components/theme-toggle.tsx",
+      "source_location": "L12",
+      "id": "components_theme_toggle_readerror",
+      "community": 33,
+      "norm_label": "readerror()"
+    },
+    {
+      "label": "ThemeToggle()",
+      "file_type": "code",
+      "source_file": "apps/web/components/theme-toggle.tsx",
+      "source_location": "L17",
+      "id": "components_theme_toggle_themetoggle",
+      "community": 33,
+      "norm_label": "themetoggle()"
     },
     {
       "label": "transaction-manager.tsx",
@@ -6894,7 +6930,7 @@
       "source_file": "apps/web/lib/financial-types.ts",
       "source_location": "L86",
       "id": "lib_financial_types_financialtransaction",
-      "community": 66,
+      "community": 54,
       "norm_label": "financialtransaction"
     },
     {
@@ -6912,7 +6948,7 @@
       "source_file": "apps/web/lib/theme.ts",
       "source_location": "L1",
       "id": "apps_web_lib_theme_ts",
-      "community": 33,
+      "community": 85,
       "norm_label": "theme.ts"
     },
     {
@@ -6921,7 +6957,7 @@
       "source_file": "apps/web/lib/theme.ts",
       "source_location": "L1",
       "id": "lib_theme_themepreference",
-      "community": 33,
+      "community": 85,
       "norm_label": "themepreference"
     },
     {
@@ -6930,7 +6966,7 @@
       "source_file": "apps/web/lib/theme.ts",
       "source_location": "L2",
       "id": "lib_theme_resolvedtheme",
-      "community": 33,
+      "community": 85,
       "norm_label": "resolvedtheme"
     },
     {
@@ -6939,7 +6975,7 @@
       "source_file": "apps/web/lib/theme.ts",
       "source_location": "L6",
       "id": "lib_theme_isthemepreference",
-      "community": 33,
+      "community": 85,
       "norm_label": "isthemepreference()"
     },
     {
@@ -6948,7 +6984,7 @@
       "source_file": "apps/web/lib/theme.ts",
       "source_location": "L10",
       "id": "lib_theme_resolvetheme",
-      "community": 33,
+      "community": 85,
       "norm_label": "resolvetheme()"
     },
     {
@@ -6957,7 +6993,7 @@
       "source_file": "apps/web/lib/theme.ts",
       "source_location": "L18",
       "id": "lib_theme_applytheme",
-      "community": 33,
+      "community": 85,
       "norm_label": "applytheme()"
     },
     {
@@ -7027,7 +7063,7 @@
       "label": "missing",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L87",
+      "source_location": "L88",
       "id": "tests_smoke_missing",
       "community": 36,
       "norm_label": "missing"
@@ -7036,7 +7072,7 @@
       "label": "chart",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L134",
+      "source_location": "L135",
       "id": "tests_smoke_chart",
       "community": 36,
       "norm_label": "chart"
@@ -7045,7 +7081,7 @@
       "label": "scoreCards",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L150",
+      "source_location": "L151",
       "id": "tests_smoke_scorecards",
       "community": 36,
       "norm_label": "scorecards"
@@ -7054,7 +7090,7 @@
       "label": "financialDashboard",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L157",
+      "source_location": "L158",
       "id": "tests_smoke_financialdashboard",
       "community": 36,
       "norm_label": "financialdashboard"
@@ -7063,7 +7099,7 @@
       "label": "shell",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L181",
+      "source_location": "L182",
       "id": "tests_smoke_shell",
       "community": 36,
       "norm_label": "shell"
@@ -7072,7 +7108,7 @@
       "label": "demoDatasetRoute",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L311",
+      "source_location": "L312",
       "id": "tests_smoke_demodatasetroute",
       "community": 36,
       "norm_label": "demodatasetroute"
@@ -7081,7 +7117,7 @@
       "label": "financialTypes",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L353",
+      "source_location": "L354",
       "id": "tests_smoke_financialtypes",
       "community": 36,
       "norm_label": "financialtypes"
@@ -7090,7 +7126,7 @@
       "label": "authCookies",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L415",
+      "source_location": "L416",
       "id": "tests_smoke_authcookies",
       "community": 36,
       "norm_label": "authcookies"
@@ -7099,7 +7135,7 @@
       "label": "authRoutes",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L428",
+      "source_location": "L429",
       "id": "tests_smoke_authroutes",
       "community": 36,
       "norm_label": "authroutes"
@@ -7108,7 +7144,7 @@
       "label": "middleware",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L460",
+      "source_location": "L461",
       "id": "tests_smoke_middleware",
       "community": 36,
       "norm_label": "middleware"
@@ -7117,7 +7153,7 @@
       "label": "nextConfig",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L467",
+      "source_location": "L468",
       "id": "tests_smoke_nextconfig",
       "community": 36,
       "norm_label": "nextconfig"
@@ -7126,7 +7162,7 @@
       "label": "layout",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L479",
+      "source_location": "L480",
       "id": "tests_smoke_layout",
       "community": 36,
       "norm_label": "layout"
@@ -7135,7 +7171,7 @@
       "label": "styles",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L502",
+      "source_location": "L503",
       "id": "tests_smoke_styles",
       "community": 36,
       "norm_label": "styles"
@@ -7144,7 +7180,7 @@
       "label": "financialMutationFeedback",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L522",
+      "source_location": "L523",
       "id": "tests_smoke_financialmutationfeedback",
       "community": 36,
       "norm_label": "financialmutationfeedback"
@@ -7153,7 +7189,7 @@
       "label": "finRefresh",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L537",
+      "source_location": "L538",
       "id": "tests_smoke_finrefresh",
       "community": 36,
       "norm_label": "finrefresh"
@@ -7162,7 +7198,7 @@
       "label": "finSubmitPreparation",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L566",
+      "source_location": "L567",
       "id": "tests_smoke_finsubmitpreparation",
       "community": 36,
       "norm_label": "finsubmitpreparation"
@@ -7171,7 +7207,7 @@
       "label": "creditCardFeedback",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L577",
+      "source_location": "L578",
       "id": "tests_smoke_creditcardfeedback",
       "community": 36,
       "norm_label": "creditcardfeedback"
@@ -7180,7 +7216,7 @@
       "label": "serviceWorker",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L600",
+      "source_location": "L601",
       "id": "tests_smoke_serviceworker",
       "community": 36,
       "norm_label": "serviceworker"
@@ -7189,7 +7225,7 @@
       "label": "manifest",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L617",
+      "source_location": "L618",
       "id": "tests_smoke_manifest",
       "community": 36,
       "norm_label": "manifest"
@@ -7198,7 +7234,7 @@
       "label": "onboarding",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L630",
+      "source_location": "L631",
       "id": "tests_smoke_onboarding",
       "community": 36,
       "norm_label": "onboarding"
@@ -7207,7 +7243,7 @@
       "label": "themeSettings",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L631",
+      "source_location": "L632",
       "id": "tests_smoke_themesettings",
       "community": 36,
       "norm_label": "themesettings"
@@ -7216,7 +7252,7 @@
       "label": "settings",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L638",
+      "source_location": "L639",
       "id": "tests_smoke_settings",
       "community": 36,
       "norm_label": "settings"
@@ -26314,6 +26350,28 @@
       "target": "components_session_profile_sessionprovider"
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/components/app-shell.tsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "apps_web_components_app_shell_tsx",
+      "target": "apps_web_components_theme_toggle_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/components/app-shell.tsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "apps_web_components_app_shell_tsx",
+      "target": "components_theme_toggle_themetoggle",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/web/components/app-shell.tsx",
@@ -27916,6 +27974,17 @@
       "target": "apps_web_components_session_profile_tsx"
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/components/theme-toggle.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "apps_web_components_theme_toggle_tsx",
+      "target": "apps_web_components_session_profile_tsx",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -27949,6 +28018,17 @@
       "target": "components_session_profile_usesession"
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/components/theme-toggle.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "apps_web_components_theme_toggle_tsx",
+      "target": "components_session_profile_usesession",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -27957,6 +28037,17 @@
       "source_location": "L31",
       "weight": 1.0,
       "source": "components_theme_settings_themesettings",
+      "target": "components_session_profile_usesession"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/web/components/theme-toggle.tsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "components_theme_toggle_themetoggle",
       "target": "components_session_profile_usesession"
     },
     {
@@ -28002,6 +28093,17 @@
       "confidence_score": 1.0,
       "source": "apps_web_components_theme_provider_tsx",
       "target": "lib_theme_isthemepreference"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/components/theme-provider.tsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "apps_web_components_theme_provider_tsx",
+      "target": "lib_theme_resolvedtheme",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -28066,6 +28168,17 @@
       "target": "apps_web_components_theme_provider_tsx"
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/components/theme-toggle.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "apps_web_components_theme_toggle_tsx",
+      "target": "apps_web_components_theme_provider_tsx",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -28077,6 +28190,17 @@
       "target": "components_theme_provider_usetheme"
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/components/theme-toggle.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "apps_web_components_theme_toggle_tsx",
+      "target": "components_theme_provider_usetheme",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -28085,6 +28209,17 @@
       "source_location": "L32",
       "weight": 1.0,
       "source": "components_theme_settings_themesettings",
+      "target": "components_theme_provider_usetheme"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/web/components/theme-toggle.tsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "components_theme_toggle_themetoggle",
       "target": "components_theme_provider_usetheme"
     },
     {
@@ -28138,6 +28273,36 @@
       "confidence_score": 1.0,
       "source": "apps_web_components_theme_settings_tsx",
       "target": "components_theme_settings_themesettings"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/components/theme-toggle.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "apps_web_components_theme_toggle_tsx",
+      "target": "components_theme_toggle_themetoggleprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/components/theme-toggle.tsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "apps_web_components_theme_toggle_tsx",
+      "target": "components_theme_toggle_readerror",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/web/components/theme-toggle.tsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "apps_web_components_theme_toggle_tsx",
+      "target": "components_theme_toggle_themetoggle",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -31693,5 +31858,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "1a9a41ebf91afe1323adc42aa59fbffbbbac90c8"
+  "built_at_commit": "1eef7327a53da8937db5b9961a7c7d81ed8291d9"
 }

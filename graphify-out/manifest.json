@@ -1260,8 +1260,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\components\\app-shell.tsx": {
-    "mtime": 1784345607.518361,
-    "ast_hash": "dfba88e270c8e16ba065deb6ee9448a0",
+    "mtime": 1784659137.2442153,
+    "ast_hash": "3b697124204aa63ff32bb87bccd475d7",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\components\\auth-form.tsx": {
@@ -1385,8 +1385,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\tests\\smoke.mjs": {
-    "mtime": 1784658218.1926851,
-    "ast_hash": "bbc9f794e3400d54de5379629e23ab67",
+    "mtime": 1784659032.8857791,
+    "ast_hash": "5634517fc8b3fb0170915e089d106366",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\README.md": {
@@ -1570,8 +1570,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\components\\theme-provider.tsx": {
-    "mtime": 1784630585.7397735,
-    "ast_hash": "773dd16f22cfd48809f75211cbe29f4e",
+    "mtime": 1784659137.241782,
+    "ast_hash": "ec74580f508c4268f00795b08121a397",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\components\\theme-settings.tsx": {
@@ -1632,6 +1632,11 @@
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\tmp\\mascot-review\\fin-mobile.png": {
     "mtime": 1784656215.3025644,
     "ast_hash": "8ece75c09c8899d154ed85c57e6eb45c",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\components\\theme-toggle.tsx": {
+    "mtime": 1784659137.241782,
+    "ast_hash": "f9badae0a6cc605a3f60b9348324e240",
     "semantic_hash": ""
   }
 }

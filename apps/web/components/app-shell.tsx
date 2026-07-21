@@ -9,6 +9,7 @@ import { FinChatPanel } from "@/components/fin-chat-panel";
 import { NavigationDrawer } from "@/components/navigation-drawer";
 import { PendingProposalsProvider, usePendingProposals } from "@/components/pending-proposals-provider";
 import { SessionProfile, SessionProvider } from "@/components/session-profile";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -68,6 +69,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
         <span className="topbar-separator" aria-hidden="true" />
         <span className="topbar-page-title">{pageTitle}</span>
         <div className="topbar-actions">
+          <ThemeToggle />
           <button className={chatOpen ? "topbar-icon active" : "topbar-icon"} type="button" aria-label={chatOpen ? "Fechar conversa com o Fin" : "Abrir conversa com o Fin"} aria-pressed={chatOpen} onClick={() => setChatOpen((open) => !open)}>
             <MessageSquareText size={20} aria-hidden="true" />
             {proposals.length ? <span className="topbar-badge">{proposals.length}</span> : null}

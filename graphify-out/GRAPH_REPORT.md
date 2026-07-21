@@ -1,16 +1,16 @@
 # Graph Report - NEXO_finance  (2026-07-21)
 
 ## Corpus Check
-- 145 files · ~216,992 words
+- 146 files · ~217,277 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1104 nodes · 2090 edges · 87 communities (72 shown, 15 thin omitted)
+- 1108 nodes · 2102 edges · 87 communities (72 shown, 15 thin omitted)
 - Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 104 edges (avg confidence: 0.67)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1a9a41eb`
+- Built from commit: `1eef7327`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -180,8 +180,8 @@ Cohesion: 0.33
 Nodes (4): ADR 0001: Phase 1 Modular Monolith, Consequences, Context, Decision
 
 ### Community 33 - "Community 33"
-Cohesion: 0.16
-Nodes (17): initials(), SessionContext, SessionContextValue, SessionProfile(), SessionProvider(), SessionUser, useSession(), ThemeContext (+9 more)
+Cohesion: 0.20
+Nodes (12): initials(), SessionContext, SessionContextValue, SessionProfile(), SessionProvider(), SessionUser, useSession(), useTheme() (+4 more)
 
 ### Community 34 - "Community 34"
 Cohesion: 0.10
@@ -240,8 +240,8 @@ Cohesion: 0.15
 Nodes (19): Acessibilidade e responsividade, Arquitetura de componentes, Barra superior, Caixa de conversa do Fin, Central de movimentacoes reconhecidas, Conversa e revisao, Criterios de aceite, Dados e API (+11 more)
 
 ### Community 54 - "Community 54"
-Cohesion: 0.18
-Nodes (3): CategoryOption, TransactionManager(), TransactionType
+Cohesion: 0.17
+Nodes (4): CategoryOption, TransactionManager(), TransactionType, FinancialTransaction
 
 ### Community 55 - "Community 55"
 Cohesion: 0.14
@@ -280,8 +280,8 @@ Cohesion: 0.05
 Nodes (37): code:python (def test_demo_dataset_and_theme_are_mapped():), code:python (return {"action": action, "category": snapshot}), code:powershell (git add apps/api/app/schemas/financial.py apps/api/app/servi), code:python (def test_install_is_complete_and_idempotent(client):), code:python (class DemoDatasetSummary(BaseModel):), code:python (try:), code:powershell (git add apps/api/app/services/demo_dataset_service.py apps/a), code:typescript (export type DemoDatasetState = {) (+29 more)
 
 ### Community 66 - "Community 66"
-Cohesion: 0.14
-Nodes (9): CategoryManager(), CategoryRow, CategoryDeleteResult, DashboardAccount, DashboardCashFlowPoint, DashboardStatement, DashboardTransaction, FinancialCategory (+1 more)
+Cohesion: 0.15
+Nodes (8): CategoryManager(), CategoryRow, CategoryDeleteResult, DashboardAccount, DashboardCashFlowPoint, DashboardStatement, DashboardTransaction, FinancialCategory
 
 ### Community 68 - "Community 68"
 Cohesion: 0.18
@@ -324,8 +324,8 @@ Cohesion: 0.29
 Nodes (7): BillingStatement, _due_date(), _get_or_create_statement(), _month_shift(), _statement_cycle(), _statement_period(), _valid_day()
 
 ### Community 85 - "Community 85"
-Cohesion: 0.33
-Nodes (4): metadata, viewport, PWARegistration(), ThemeProvider()
+Cohesion: 0.18
+Nodes (11): metadata, viewport, PWARegistration(), ThemeContext, ThemeContextValue, ThemeProvider(), applyTheme(), isThemePreference() (+3 more)
 
 ## Knowledge Gaps
 - **269 isolated node(s):** `builder`, `dockerfilePath`, `preDeployCommand`, `startCommand`, `healthcheckPath` (+264 more)
@@ -336,11 +336,11 @@ Nodes (4): metadata, viewport, PWARegistration(), ThemeProvider()
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `AuditEvent` connect `Community 0` to `Community 1`, `Community 2`, `Community 69`, `Community 70`, `Community 22`?**
-  _High betweenness centrality (0.023) - this node is a cross-community bridge._
+  _High betweenness centrality (0.024) - this node is a cross-community bridge._
 - **Why does `Base` connect `Community 69` to `Community 0`, `Community 1`, `Community 70`, `Community 71`, `Community 83`, `Community 84`, `Community 22`, `Community 86`?**
   _High betweenness centrality (0.018) - this node is a cross-community bridge._
 - **Why does `update_profile()` connect `Community 1` to `Community 0`?**
-  _High betweenness centrality (0.015) - this node is a cross-community bridge._
+  _High betweenness centrality (0.016) - this node is a cross-community bridge._
 - **What connects `builder`, `dockerfilePath`, `preDeployCommand` to the rest of the system?**
   _271 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
