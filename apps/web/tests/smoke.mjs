@@ -272,11 +272,38 @@ for (const marker of [
   "/api/financial/categories",
   "Nova categoria",
   "Categoria principal",
+  "Excluir categoria",
+  "Excluir ${category.name}? Se a categoria tiver histórico, o Nexo irá arquivá-la para preservar seus lançamentos.",
+  'result.action === "deleted"',
+  'result.action === "archived"',
+  "Categoria excluída.",
+  "Categoria arquivada para preservar seu histórico.",
   "validateRequestOrigin",
   "nexo:financial-data-changed"
 ]) {
   if (!categories.includes(marker)) {
     throw new Error(`Functional categories manager must include ${marker}`);
+  }
+}
+
+const categorySelectorSources =
+  readFileSync(join(root, "components/transaction-manager.tsx"), "utf8") +
+  readFileSync(join(root, "components/card-manager.tsx"), "utf8") +
+  readFileSync(join(root, "../api/app/services/financial_service.py"), "utf8");
+for (const marker of [
+  'id="transaction-category"',
+  'id="purchase-category"',
+  "def get_category_tree",
+  "Category.is_archived.is_(False)",
+  "def create_transaction",
+  "def create_card_purchase",
+  "def create_installment_plan",
+  "def create_recurring_rule",
+  "_validate_category(db, user_id, category_id)",
+  "Archived categories cannot receive new records"
+]) {
+  if (!categorySelectorSources.includes(marker)) {
+    throw new Error(`Category selectors must remain active-only: missing ${marker}`);
   }
 }
 

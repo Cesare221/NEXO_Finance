@@ -1,8 +1,8 @@
 "use client";
 
-import { Archive, CheckCircle2, FolderTree, LoaderCircle, Pencil, Plus, Tag, X } from "lucide-react";
+import { CheckCircle2, FolderTree, LoaderCircle, Pencil, Plus, Tag, Trash2, X } from "lucide-react";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
-import type { FinancialCategory } from "@/lib/financial-types";
+import type { CategoryDeleteResult, FinancialCategory } from "@/lib/financial-types";
 
 type CategoryRow = FinancialCategory & { depth: number };
 
@@ -27,7 +27,7 @@ export function CategoryManager() {
   const [color, setColor] = useState("#e2b849");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [archivingId, setArchivingId] = useState<number | null>(null);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -104,21 +104,27 @@ export function CategoryManager() {
     }
   }
 
-  async function archiveCategory(category: CategoryRow) {
-    if (!window.confirm(`Arquivar ${category.name}? O histórico classificado será preservado.`)) return;
-    setArchivingId(category.id);
+  async function deleteCategory(category: CategoryRow) {
+    if (!window.confirm(`Excluir ${category.name}? Se a categoria tiver histórico, o Nexo irá arquivá-la para preservar seus lançamentos.`)) return;
+    setDeletingId(category.id);
     setError("");
     setSuccess("");
     try {
       const response = await fetch(`/api/financial/categories/${category.id}`, { method: "DELETE" });
       if (!response.ok) throw new Error(await readError(response));
-      setSuccess("Categoria arquivada.");
+      const result = await response.json() as CategoryDeleteResult;
+      const successMessage = result.action === "deleted"
+        ? "Categoria excluída."
+        : result.action === "archived"
+          ? "Categoria arquivada para preservar seu histórico."
+          : "";
+      setSuccess(successMessage);
       await loadCategories();
       window.dispatchEvent(new Event("nexo:financial-data-changed"));
-    } catch (archiveError) {
-      setError(archiveError instanceof Error ? archiveError.message : "Não foi possível arquivar a categoria.");
+    } catch (deleteError) {
+      setError(deleteError instanceof Error ? deleteError.message : "Não foi possível excluir a categoria.");
     } finally {
-      setArchivingId(null);
+      setDeletingId(null);
     }
   }
 
@@ -209,8 +215,8 @@ export function CategoryManager() {
                 <button className="icon-button" type="button" aria-label={`Editar ${category.name}`} onClick={() => startEdit(category)}>
                   <Pencil size={17} aria-hidden="true" />
                 </button>
-                <button className="icon-button" type="button" aria-label={`Arquivar ${category.name}`} disabled={archivingId === category.id} onClick={() => void archiveCategory(category)}>
-                  {archivingId === category.id ? <LoaderCircle className="spin" size={17} aria-hidden="true" /> : <Archive size={17} aria-hidden="true" />}
+                <button className="icon-button category-delete-action" type="button" aria-label={`Excluir ${category.name}`} title="Excluir categoria" disabled={deletingId === category.id} onClick={() => void deleteCategory(category)}>
+                  {deletingId === category.id ? <LoaderCircle className="spin" size={17} aria-hidden="true" /> : <Trash2 size={17} aria-hidden="true" />}
                 </button>
               </div>
             </article>
