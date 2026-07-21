@@ -1,3 +1,5 @@
+import pytest
+
 from app.models.audit_event import AuditEvent
 from app.models.session import UserSession
 from app.models.user import User
@@ -9,6 +11,68 @@ VALID_AVATAR = (
     "data:image/png;base64,"
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII="
 )
+
+
+def _register_theme_user(client, email: str = "theme@example.com") -> dict[str, str]:
+    response = client.post(
+        "/auth/register",
+        json={"name": "Theme User", "email": email, "password": STRONG_PASSWORD},
+    )
+    assert response.status_code == 201
+    return {"Authorization": f"Bearer {response.json()['access_token']}"}
+
+
+def test_theme_preference_defaults_to_system_and_is_returned(client):
+    headers = _register_theme_user(client)
+
+    response = client.get("/auth/me", headers=headers)
+
+    assert response.status_code == 200
+    assert response.json()["theme_preference"] == "system"
+
+
+@pytest.mark.parametrize("preference", ["system", "light", "dark"])
+def test_theme_preference_accepts_supported_values(client, preference):
+    headers = _register_theme_user(client, f"theme-{preference}@example.com")
+
+    response = client.patch(
+        "/auth/me",
+        json={"theme_preference": preference},
+        headers=headers,
+    )
+
+    assert response.status_code == 200
+    assert response.json()["theme_preference"] == preference
+    with TestingSessionLocal() as db:
+        user = db.query(User).filter(User.email == f"theme-{preference}@example.com").one()
+        assert user.theme_preference == preference
+
+
+def test_theme_preference_rejects_unknown_value(client):
+    headers = _register_theme_user(client, "theme-invalid@example.com")
+
+    response = client.patch(
+        "/auth/me",
+        json={"theme_preference": "midnight"},
+        headers=headers,
+    )
+
+    assert response.status_code == 422
+
+
+def test_theme_preference_update_is_audited_without_profile_values(client):
+    headers = _register_theme_user(client, "theme-audit@example.com")
+
+    response = client.patch(
+        "/auth/me",
+        json={"theme_preference": "dark"},
+        headers=headers,
+    )
+
+    assert response.status_code == 200
+    with TestingSessionLocal() as db:
+        audit = db.query(AuditEvent).filter_by(event_type="profile.updated").one()
+        assert audit.payload == {"changed_fields": ["theme_preference"]}
 
 
 def test_register(client):

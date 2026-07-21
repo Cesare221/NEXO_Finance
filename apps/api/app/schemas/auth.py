@@ -1,7 +1,10 @@
 import base64
 import binascii
+from typing import Literal
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
+
+ThemePreference = Literal["system", "light", "dark"]
 
 
 class RegisterRequest(BaseModel):
@@ -31,12 +34,14 @@ class MeResponse(BaseModel):
     email: str
     phone: str | None
     avatar_data_url: str | None
+    theme_preference: ThemePreference
 
 
 class ProfileUpdateRequest(BaseModel):
     name: str | None = Field(None, min_length=1, max_length=255)
     phone: str | None = Field(None, min_length=8, max_length=32, pattern=r"^[0-9+() .-]+$")
     avatar_data_url: str | None = Field(None, max_length=350_000)
+    theme_preference: ThemePreference | None = None
 
     @field_validator("name")
     @classmethod

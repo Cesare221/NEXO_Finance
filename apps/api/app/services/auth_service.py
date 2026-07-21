@@ -114,7 +114,7 @@ def logout_user(db: Session, user_id: int, refresh_token: str | None = None):
 
 def update_profile(db: Session, user: User, changes: dict) -> User:
     changed_fields: list[str] = []
-    for field in ("name", "phone", "avatar_data_url"):
+    for field in ("name", "phone", "avatar_data_url", "theme_preference"):
         if field not in changes:
             continue
         value = changes[field]

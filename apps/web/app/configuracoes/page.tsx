@@ -1,6 +1,7 @@
 import { AppShell } from "@/components/app-shell";
 import { InstallAppButton } from "@/components/install-app-button";
 import { ProfileSettings } from "@/components/profile-settings";
+import { ThemeSettings } from "@/components/theme-settings";
 
 export default function ConfiguracoesPage() {
   return (
@@ -13,6 +14,7 @@ export default function ConfiguracoesPage() {
       </header>
       <div className="settings-stack">
         <ProfileSettings />
+        <ThemeSettings />
         <section className="card settings-info-panel">
           <div>
             <h2>Segurança</h2>

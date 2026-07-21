@@ -19,6 +19,8 @@ const requiredFiles = [
   "components/app-shell.tsx",
   "components/auth-form.tsx",
   "components/session-profile.tsx",
+  "components/theme-provider.tsx",
+  "components/theme-settings.tsx",
   "components/profile-settings.tsx",
   "components/install-app-button.tsx",
   "components/pwa-registration.tsx",
@@ -41,6 +43,7 @@ const requiredFiles = [
   "lib/auth-cookies.ts",
   "lib/auth-server.ts",
   "lib/financial-types.ts",
+  "lib/theme.ts",
   "app/api/auth/login/route.ts",
   "app/api/auth/register/route.ts",
   "app/api/auth/session/route.ts",
@@ -435,6 +438,32 @@ for (const marker of ["install", "activate", "fetch", "/offline"]) {
 const settings = readFileSync(join(root, "app/configuracoes/page.tsx"), "utf8");
 if (!settings.includes("InstallAppButton")) {
   throw new Error("Settings must expose the PWA installation action");
+}
+
+const themeExperience =
+  readFileSync(join(root, "lib/theme.ts"), "utf8") +
+  readFileSync(join(root, "components/theme-provider.tsx"), "utf8") +
+  readFileSync(join(root, "components/theme-settings.tsx"), "utf8") +
+  readFileSync(join(root, "components/session-profile.tsx"), "utf8") +
+  layout +
+  settings +
+  styles;
+for (const marker of [
+  "ThemeSettings",
+  "ThemeProvider",
+  "theme_preference",
+  "data-theme",
+  "nexo-theme",
+  "prefers-color-scheme",
+  "Sistema",
+  "Claro",
+  "Escuro",
+  'aria-pressed',
+  'aria-live="polite"'
+]) {
+  if (!themeExperience.includes(marker)) {
+    throw new Error(`Persistent theme experience must include ${marker}`);
+  }
 }
 
 const profile =

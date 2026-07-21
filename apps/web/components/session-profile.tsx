@@ -11,6 +11,8 @@ import {
   useMemo,
   useState
 } from "react";
+import { useTheme } from "@/components/theme-provider";
+import type { ThemePreference } from "@/lib/theme";
 
 type SessionUser = {
   id: number;
@@ -18,6 +20,7 @@ type SessionUser = {
   email: string;
   phone: string | null;
   avatar_data_url: string | null;
+  theme_preference: ThemePreference;
 };
 
 type SessionContextValue = {
@@ -31,6 +34,7 @@ const SessionContext = createContext<SessionContextValue | null>(null);
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const { setPreference } = useTheme();
   const [user, setUser] = useState<SessionUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -48,12 +52,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       if (!response.ok) throw new Error("session_unavailable");
       const body = (await response.json()) as { user: SessionUser };
       setUser(body.user);
+      setPreference(body.user.theme_preference);
     } catch {
       setNetworkError(true);
     } finally {
       setLoading(false);
     }
-  }, [router]);
+  }, [router, setPreference]);
 
   useEffect(() => {
     void loadSession();

@@ -9,6 +9,7 @@ export type SessionUser = {
   email: string;
   phone: string | null;
   avatar_data_url: string | null;
+  theme_preference: "system" | "light" | "dark";
 };
 
 export class BackendApiError extends Error {

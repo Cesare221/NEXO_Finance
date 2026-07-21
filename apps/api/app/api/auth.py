@@ -116,6 +116,7 @@ def me(current_user: User = Depends(get_current_user)):
         email=current_user.email,
         phone=current_user.phone,
         avatar_data_url=current_user.avatar_data_url,
+        theme_preference=current_user.theme_preference,
     )
 
 
@@ -136,4 +137,5 @@ def update_me(
         email=user.email,
         phone=user.phone,
         avatar_data_url=user.avatar_data_url,
+        theme_preference=user.theme_preference,
     )
