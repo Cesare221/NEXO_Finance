@@ -1,8 +1,12 @@
+from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from unittest.mock import Mock
 
 import pytest
 from fastapi import HTTPException
+from app.models.action_proposal import ActionProposal
+from app.models.audit_event import AuditEvent
+from app.models.transaction import Transaction
 from app.models.user import User
 from app.services import financial_service
 from tests.conftest import TestingSessionLocal
@@ -275,11 +279,11 @@ class TestCategories:
         assert response.status_code == 200
         assert response.json()["parent_id"] is None
 
-    def test_delete_category_archives(self, client):
+    def test_delete_unused_category_permanently_removes_it_and_audits(self, client):
         token = _register_and_get_token(client)
         cat = client.post(
             "/financial/categories",
-            json={"name": "ToArchive"},
+            json={"name": "Unused"},
             headers=_auth_header(token),
         ).json()
         resp = client.delete(
@@ -287,9 +291,140 @@ class TestCategories:
             headers=_auth_header(token),
         )
         assert resp.status_code == 200
-        assert resp.json()["is_archived"] is True
+        assert resp.json() == {
+            "action": "deleted",
+            "category": {
+                **cat,
+                "children": [],
+            },
+        }
+        assert client.get("/financial/categories", headers=_auth_header(token)).json() == []
 
-    def test_archiving_preserves_parent_child(self, client):
+        db = TestingSessionLocal()
+        try:
+            event = db.query(AuditEvent).filter(AuditEvent.entity_id == cat["id"]).one()
+            assert event.event_type == "category.deleted"
+            assert event.payload == {"action": "deleted", "category_ids": [cat["id"]]}
+            assert "amount" not in str(event.payload).lower()
+            assert "description" not in str(event.payload).lower()
+        finally:
+            db.close()
+
+    @pytest.mark.parametrize(
+        ("dependency", "expected_kind"),
+        [
+            ("transaction", "transactions"),
+            ("soft_deleted_transaction", "transactions"),
+            ("installment_plan", "installment_plans"),
+            ("recurring_rule", "recurring_rules"),
+            ("child", "child_categories"),
+            ("proposed_proposal", "action_proposals"),
+            ("confirmed_proposal", "action_proposals"),
+        ],
+    )
+    def test_category_dependency_archives_historical_tree_and_audits(
+        self, client, dependency, expected_kind
+    ):
+        token = _register_and_get_token(client)
+        account = _create_account(client, token)
+        category = _create_category(client, token, name=f"{dependency} category")
+
+        if dependency in {"transaction", "soft_deleted_transaction"}:
+            transaction = client.post(
+                "/financial/transactions",
+                json={
+                    "type": "expense",
+                    "account_id": account["id"],
+                    "category_id": category["id"],
+                    "amount": "13.50",
+                    "description": "Historical purchase",
+                    "occurred_on": "2026-01-15",
+                },
+                headers=_auth_header(token),
+            ).json()
+            if dependency == "soft_deleted_transaction":
+                deleted = client.delete(
+                    f"/financial/transactions/{transaction['id']}",
+                    headers=_auth_header(token),
+                )
+                assert deleted.status_code == 200
+        elif dependency == "installment_plan":
+            response = client.post(
+                "/financial/installment-plans",
+                json={
+                    "type": "expense",
+                    "account_id": account["id"],
+                    "category_id": category["id"],
+                    "amount": "120.00",
+                    "installments_count": 2,
+                    "description": "Plan description",
+                    "first_due_on": "2026-01-15",
+                },
+                headers=_auth_header(token),
+            )
+            assert response.status_code == 201
+        elif dependency == "recurring_rule":
+            response = client.post(
+                "/financial/recurring-rules",
+                json={
+                    "type": "expense",
+                    "account_id": account["id"],
+                    "category_id": category["id"],
+                    "amount": "45.00",
+                    "description": "Rule description",
+                    "frequency": "monthly",
+                    "next_occurrence_on": "2026-02-01",
+                },
+                headers=_auth_header(token),
+            )
+            assert response.status_code == 201
+        elif dependency == "child":
+            child = _create_category(client, token, name="Required child", parent_id=category["id"])
+        else:
+            db = TestingSessionLocal()
+            try:
+                user = db.query(User).filter(User.email == "test@example.com").one()
+                db.add(
+                    ActionProposal(
+                        user_id=user.id,
+                        action_type="create_transaction",
+                        payload={"category_id": category["id"], "amount": "99.99"},
+                        human_summary="Pending proposal description",
+                        previous_state_snapshot={},
+                        status=dependency.removesuffix("_proposal"),
+                        expires_at=datetime.now(timezone.utc) + timedelta(days=1),
+                        idempotency_key="category-delete-proposal",
+                    )
+                )
+                db.commit()
+            finally:
+                db.close()
+
+        response = client.delete(
+            f"/financial/categories/{category['id']}", headers=_auth_header(token)
+        )
+
+        assert response.status_code == 200
+        assert response.json()["action"] == "archived"
+        assert response.json()["category"]["id"] == category["id"]
+        assert response.json()["category"]["is_archived"] is True
+        assert client.get("/financial/categories", headers=_auth_header(token)).json() == []
+
+        db = TestingSessionLocal()
+        try:
+            event = db.query(AuditEvent).filter(AuditEvent.entity_id == category["id"]).one()
+            assert event.event_type == "category.archived"
+            assert event.payload["action"] == "archived"
+            assert category["id"] in event.payload["category_ids"]
+            assert event.payload[expected_kind] is True
+            assert "amount" not in str(event.payload).lower()
+            assert "description" not in str(event.payload).lower()
+            if dependency == "child":
+                assert child["id"] in event.payload["category_ids"]
+        finally:
+            db.close()
+
+    def test_archived_parent_and_required_descendants_are_omitted_from_active_tree(self, client):
         token = _register_and_get_token(client)
         parent = client.post(
             "/financial/categories",
@@ -307,12 +442,92 @@ class TestCategories:
         )
 
         resp = client.get("/financial/categories", headers=_auth_header(token))
-        roots = resp.json()
-        assert len(roots) == 1
-        archived_parent = roots[0]
-        assert archived_parent["is_archived"] is True
-        assert len(archived_parent["children"]) == 1
-        assert archived_parent["children"][0]["name"] == "Child"
+        assert resp.json() == []
+
+    def test_archived_category_is_rejected_by_every_new_record_path(self, client):
+        token = _register_and_get_token(client)
+        account = _create_account(client, token)
+        category = _create_category(client, token, name="Historical")
+        card = _create_credit_card(client, token, account["id"])
+        transaction = client.post(
+            "/financial/transactions",
+            json={
+                "type": "expense",
+                "account_id": account["id"],
+                "category_id": category["id"],
+                "amount": "1.00",
+                "occurred_on": "2026-01-15",
+            },
+            headers=_auth_header(token),
+        )
+        assert transaction.status_code == 201
+        assert client.delete(
+            f"/financial/categories/{category['id']}", headers=_auth_header(token)
+        ).json()["action"] == "archived"
+
+        requests = [
+            (
+                "/financial/transactions",
+                {
+                    "type": "expense", "account_id": account["id"], "category_id": category["id"],
+                    "amount": "2.00", "occurred_on": "2026-02-01",
+                },
+            ),
+            (
+                f"/financial/credit-cards/{card['id']}/purchases",
+                {"category_id": category["id"], "amount": "2.00", "occurred_on": "2026-02-01"},
+            ),
+            (
+                "/financial/installment-plans",
+                {
+                    "type": "expense", "account_id": account["id"], "category_id": category["id"],
+                    "amount": "4.00", "installments_count": 2, "first_due_on": "2026-02-01",
+                },
+            ),
+            (
+                "/financial/recurring-rules",
+                {
+                    "type": "expense", "account_id": account["id"], "category_id": category["id"],
+                    "amount": "2.00", "frequency": "monthly", "next_occurrence_on": "2026-02-01",
+                },
+            ),
+        ]
+        for path, body in requests:
+            response = client.post(path, json=body, headers=_auth_header(token))
+            assert response.status_code == 409
+            assert "archived" in response.json()["detail"].lower()
+
+    def test_other_users_dependencies_do_not_influence_category_lifecycle(self, client):
+        token_a = _register_and_get_token(client, email="a-lifecycle@test.com", name="User A")
+        token_b = _register_and_get_token(client, email="b-lifecycle@test.com", name="User B")
+        category_a = _create_category(client, token_a, name="A category")
+        account_b = _create_account(client, token_b, name="B account")
+
+        db = TestingSessionLocal()
+        try:
+            user_b = db.query(User).filter(User.email == "b-lifecycle@test.com").one()
+            db.add(
+                Transaction(
+                    user_id=user_b.id,
+                    account_id=account_b["id"],
+                    category_id=category_a["id"],
+                    type="expense",
+                    amount="10.00",
+                    description="B only",
+                    occurred_on=date(2026, 1, 15),
+                    origin="manual",
+                )
+            )
+            db.commit()
+        finally:
+            db.close()
+
+        response = client.delete(
+            f"/financial/categories/{category_a['id']}", headers=_auth_header(token_a)
+        )
+
+        assert response.status_code == 200
+        assert response.json()["action"] == "deleted"
 
     def test_duplicate_category_name(self, client):
         token = _register_and_get_token(client)

@@ -4,7 +4,10 @@ from decimal import Decimal
 
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.attributes import set_committed_value
 
+from app.models.action_proposal import ActionProposal
+from app.models.audit_event import AuditEvent
 from app.models.billing_statement import BillingStatement
 from app.models.category import Category
 from app.models.credit_card import CreditCard
@@ -314,7 +317,7 @@ def update_category(
         )
         if not parent:
             raise _not_found("Parent category")
-        descendant_ids = _get_descendant_ids(db, category_id)
+        descendant_ids = _get_descendant_ids(db, user_id, category_id)
         if kwargs["parent_id"] in descendant_ids:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -330,28 +333,145 @@ def update_category(
     return category
 
 
-def archive_category(db: Session, user_id: int, category_id: int) -> Category:
-    return update_category(db, user_id, category_id, is_archived=True)
-
-
-def _get_descendant_ids(db: Session, category_id: int) -> set[int]:
+def _get_descendant_ids(db: Session, user_id: int, category_id: int) -> set[int]:
     children = (
-        db.query(Category).filter(Category.parent_id == category_id).all()
+        db.query(Category)
+        .filter(Category.parent_id == category_id, Category.user_id == user_id)
+        .all()
     )
     ids = set()
     for child in children:
         ids.add(child.id)
-        ids |= _get_descendant_ids(db, child.id)
+        ids |= _get_descendant_ids(db, user_id, child.id)
     return ids
+
+
+def _category_snapshot(categories: list[Category], category_id: int) -> dict:
+    snapshots = {
+        category.id: {
+            "id": category.id,
+            "user_id": category.user_id,
+            "name": category.name,
+            "parent_id": category.parent_id,
+            "color": category.color,
+            "icon": category.icon,
+            "is_archived": category.is_archived,
+            "children": [],
+        }
+        for category in categories
+    }
+    for category in categories:
+        if category.parent_id in snapshots:
+            snapshots[category.parent_id]["children"].append(snapshots[category.id])
+    return snapshots[category_id]
+
+
+def _proposal_references_categories(value: object, category_ids: set[int], key: str = "") -> bool:
+    if isinstance(value, dict):
+        return any(
+            _proposal_references_categories(child, category_ids, child_key)
+            for child_key, child in value.items()
+        )
+    if isinstance(value, list):
+        return any(_proposal_references_categories(child, category_ids, key) for child in value)
+    normalized_key = key.lower().replace("_", "")
+    if not (
+        normalized_key.endswith("categoryid")
+        or normalized_key.endswith("categoryids")
+    ):
+        return False
+    if isinstance(value, bool):
+        return False
+    if isinstance(value, int):
+        return value in category_ids
+    return isinstance(value, str) and value.isdigit() and int(value) in category_ids
+
+
+def delete_or_archive_category(db: Session, user_id: int, category_id: int) -> dict:
+    category = (
+        db.query(Category)
+        .filter(Category.id == category_id, Category.user_id == user_id)
+        .first()
+    )
+    if not category:
+        raise _not_found("Category")
+
+    descendant_ids = _get_descendant_ids(db, user_id, category.id)
+    category_ids = {category.id, *descendant_ids}
+    categories = (
+        db.query(Category)
+        .filter(Category.user_id == user_id, Category.id.in_(category_ids))
+        .all()
+    )
+    dependency_kinds: set[str] = set()
+    if descendant_ids:
+        dependency_kinds.add("child_categories")
+    if (
+        db.query(Transaction)
+        .filter(Transaction.user_id == user_id, Transaction.category_id.in_(category_ids))
+        .first()
+    ):
+        dependency_kinds.add("transactions")
+    if (
+        db.query(InstallmentPlan)
+        .filter(InstallmentPlan.user_id == user_id, InstallmentPlan.category_id.in_(category_ids))
+        .first()
+    ):
+        dependency_kinds.add("installment_plans")
+    if (
+        db.query(RecurringRule)
+        .filter(RecurringRule.user_id == user_id, RecurringRule.category_id.in_(category_ids))
+        .first()
+    ):
+        dependency_kinds.add("recurring_rules")
+    proposals = (
+        db.query(ActionProposal)
+        .filter(ActionProposal.user_id == user_id, ActionProposal.status.in_(("proposed", "confirmed")))
+        .all()
+    )
+    if any(_proposal_references_categories(proposal.payload, category_ids) for proposal in proposals):
+        dependency_kinds.add("action_proposals")
+
+    if dependency_kinds:
+        for item in categories:
+            item.is_archived = True
+        action = "archived"
+        event_type = "category.archived"
+    else:
+        action = "deleted"
+        event_type = "category.deleted"
+
+    snapshot = _category_snapshot(categories, category.id)
+    payload = {"action": action, "category_ids": sorted(category_ids)}
+    payload.update({kind: True for kind in sorted(dependency_kinds)})
+    db.add(
+        AuditEvent(
+            user_id=user_id,
+            event_type=event_type,
+            entity_type="category",
+            entity_id=category.id,
+            payload=payload,
+        )
+    )
+    if action == "deleted":
+        db.delete(category)
+    db.commit()
+    return {"action": action, "category": snapshot}
 
 
 def get_category_tree(db: Session, user_id: int) -> list[Category]:
     all_categories = (
         db.query(Category)
-        .filter(Category.user_id == user_id)
+        .filter(Category.user_id == user_id, Category.is_archived.is_(False))
         .all()
     )
-    roots = [c for c in all_categories if c.parent_id is None]
+    for category in all_categories:
+        set_committed_value(
+            category,
+            "children",
+            [child for child in all_categories if child.parent_id == category.id],
+        )
+    roots = [category for category in all_categories if category.parent_id is None]
     return roots
 
 
@@ -372,14 +492,7 @@ def create_transaction(
             detail=f"Type must be one of: {', '.join(sorted(TRANSACTION_CREATE_TYPES))}",
         )
     get_account(db, user_id, account_id)
-    if category_id is not None:
-        category = (
-            db.query(Category)
-            .filter(Category.id == category_id, Category.user_id == user_id)
-            .first()
-        )
-        if not category:
-            raise _not_found("Category")
+    _validate_category(db, user_id, category_id)
     transaction = Transaction(
         user_id=user_id,
         account_id=account_id,
@@ -749,14 +862,7 @@ def create_card_purchase(
             status_code=status.HTTP_409_CONFLICT,
             detail="Archived cards cannot receive new purchases",
         )
-    if category_id is not None:
-        category = (
-            db.query(Category)
-            .filter(Category.id == category_id, Category.user_id == user_id)
-            .first()
-        )
-        if not category:
-            raise _not_found("Category")
+    _validate_category(db, user_id, category_id)
     statement = _get_or_create_statement(db, user_id, card, occurred_on)
     transaction = Transaction(
         user_id=user_id,
@@ -831,6 +937,11 @@ def _validate_category(db: Session, user_id: int, category_id: int | None) -> No
     )
     if not category:
         raise _not_found("Category")
+    if category.is_archived:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Archived categories cannot receive new records",
+        )
 
 
 def create_installment_plan(

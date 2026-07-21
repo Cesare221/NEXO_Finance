@@ -15,6 +15,7 @@ from app.schemas.financial import (
     CardPurchaseCreate,
     CardPurchaseResponse,
     CategoryCreate,
+    CategoryDeleteResponse,
     CategoryResponse,
     CategoryUpdate,
     CreditCardCreate,
@@ -139,13 +140,13 @@ def update_category(
     )
 
 
-@router.delete("/categories/{category_id}", response_model=CategoryResponse)
+@router.delete("/categories/{category_id}", response_model=CategoryDeleteResponse)
 def delete_category(
     category_id: int,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    return fs.archive_category(db, current_user.id, category_id)
+    return fs.delete_or_archive_category(db, current_user.id, category_id)
 
 
 @router.get("/transactions", response_model=list[TransactionResponse])

@@ -1,5 +1,6 @@
 from datetime import date
 from decimal import Decimal
+from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -83,6 +84,11 @@ class CategoryResponse(BaseModel):
     children: list["CategoryResponse"] = []
 
     model_config = {"from_attributes": True}
+
+
+class CategoryDeleteResponse(BaseModel):
+    action: Literal["deleted", "archived"]
+    category: CategoryResponse
 
 
 class TransactionCreate(BaseModel):
