@@ -504,6 +504,21 @@ if (styles.includes("min-width: 320px")) {
   throw new Error("Global styles must not force horizontal overflow on narrow mobile viewports");
 }
 
+for (const marker of [
+  "--chrome-sidebar:",
+  "--chrome-sidebar-active:",
+  "--chrome-sidebar-active-ink:",
+  "--chrome-topbar:",
+  "--chrome-topbar-hover:",
+  "--chrome-topbar-border:",
+  "background: var(--chrome-sidebar);",
+  "background: var(--chrome-topbar);"
+]) {
+  if (!styles.includes(marker)) {
+    throw new Error(`Application chrome must use the Mintlify-inspired semantic palette: missing ${marker}`);
+  }
+}
+
 const financialMutationFeedback = {
   "Account manager": readFileSync(join(root, "components/account-manager.tsx"), "utf8"),
   "Card manager": readFileSync(join(root, "components/card-manager.tsx"), "utf8"),

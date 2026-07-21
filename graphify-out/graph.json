@@ -7144,7 +7144,7 @@
       "label": "financialMutationFeedback",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L507",
+      "source_location": "L522",
       "id": "tests_smoke_financialmutationfeedback",
       "community": 36,
       "norm_label": "financialmutationfeedback"
@@ -7153,7 +7153,7 @@
       "label": "finRefresh",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L522",
+      "source_location": "L537",
       "id": "tests_smoke_finrefresh",
       "community": 36,
       "norm_label": "finrefresh"
@@ -7162,7 +7162,7 @@
       "label": "finSubmitPreparation",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L551",
+      "source_location": "L566",
       "id": "tests_smoke_finsubmitpreparation",
       "community": 36,
       "norm_label": "finsubmitpreparation"
@@ -7171,7 +7171,7 @@
       "label": "creditCardFeedback",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L562",
+      "source_location": "L577",
       "id": "tests_smoke_creditcardfeedback",
       "community": 36,
       "norm_label": "creditcardfeedback"
@@ -7180,7 +7180,7 @@
       "label": "serviceWorker",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L585",
+      "source_location": "L600",
       "id": "tests_smoke_serviceworker",
       "community": 36,
       "norm_label": "serviceworker"
@@ -7189,7 +7189,7 @@
       "label": "manifest",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L602",
+      "source_location": "L617",
       "id": "tests_smoke_manifest",
       "community": 36,
       "norm_label": "manifest"
@@ -7198,7 +7198,7 @@
       "label": "onboarding",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L615",
+      "source_location": "L630",
       "id": "tests_smoke_onboarding",
       "community": 36,
       "norm_label": "onboarding"
@@ -7207,7 +7207,7 @@
       "label": "themeSettings",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L616",
+      "source_location": "L631",
       "id": "tests_smoke_themesettings",
       "community": 36,
       "norm_label": "themesettings"
@@ -7216,7 +7216,7 @@
       "label": "settings",
       "file_type": "code",
       "source_file": "apps/web/tests/smoke.mjs",
-      "source_location": "L623",
+      "source_location": "L638",
       "id": "tests_smoke_settings",
       "community": 36,
       "norm_label": "settings"
@@ -29197,9 +29197,9 @@
       "source_file": "README.md",
       "source_location": "L75",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "nexo_finance_readme_nexo",
-      "target": "nexo_finance_readme_rollout_financeiro",
-      "confidence_score": 1.0
+      "target": "nexo_finance_readme_rollout_financeiro"
     },
     {
       "relation": "contains",
@@ -29267,9 +29267,9 @@
       "source_file": "README.md",
       "source_location": "L79",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "nexo_finance_readme_rollout_financeiro",
-      "target": "nexo_finance_readme_codeblock_6",
-      "confidence_score": 1.0
+      "target": "nexo_finance_readme_codeblock_6"
     },
     {
       "relation": "contains",
@@ -29797,9 +29797,9 @@
       "source_file": "docs/DEPLOYMENT.md",
       "source_location": "L58",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_deployment_implanta\u00e7\u00e3o_do_nexo",
-      "target": "docs_deployment_rollout_financeiro",
-      "confidence_score": 1.0
+      "target": "docs_deployment_rollout_financeiro"
     },
     {
       "relation": "contains",
@@ -29877,9 +29877,9 @@
       "source_file": "docs/DEPLOYMENT.md",
       "source_location": "L62",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_deployment_rollout_financeiro",
-      "target": "docs_deployment_codeblock_3",
-      "confidence_score": 1.0
+      "target": "docs_deployment_codeblock_3"
     },
     {
       "relation": "contains",
@@ -31693,5 +31693,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "52a6fd72c6d8d59538116aa4901cfc860a9165fd"
+  "built_at_commit": "1a9a41ebf91afe1323adc42aa59fbffbbbac90c8"
 }
