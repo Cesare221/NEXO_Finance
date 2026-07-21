@@ -105,6 +105,7 @@ export function AccountManager() {
 
   async function submitAccount(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (saving) return;
     setError("");
     setSuccess("");
     if (name.trim().length < 2) {
@@ -131,8 +132,8 @@ export function AccountManager() {
       if (!response.ok) throw new Error(await readError(response));
       resetForm();
       setSuccess(editingId ? "Conta atualizada." : "Conta adicionada ao Nexo.");
-      await loadAccounts();
       window.dispatchEvent(new Event("nexo:financial-data-changed"));
+      await loadAccounts();
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : "Não foi possível salvar a conta.");
     } finally {
@@ -141,6 +142,7 @@ export function AccountManager() {
   }
 
   async function archiveAccount(account: FinancialAccount) {
+    if (archivingId !== null) return;
     if (!window.confirm(`Arquivar ${account.name}? O histórico será preservado.`)) return;
     setArchivingId(account.id);
     setError("");
@@ -149,8 +151,8 @@ export function AccountManager() {
       const response = await fetch(`/api/financial/accounts/${account.id}`, { method: "DELETE" });
       if (!response.ok) throw new Error(await readError(response));
       setSuccess("Conta arquivada. As movimentações continuam no histórico.");
-      await loadAccounts();
       window.dispatchEvent(new Event("nexo:financial-data-changed"));
+      await loadAccounts();
     } catch (archiveError) {
       setError(archiveError instanceof Error ? archiveError.message : "Não foi possível arquivar a conta.");
     } finally {
@@ -159,7 +161,7 @@ export function AccountManager() {
   }
 
   return (
-    <div className="resource-layout">
+    <div className="resource-layout" aria-busy={saving || archivingId !== null}>
       <section className="resource-summary" aria-label="Resumo das contas">
         <div>
           <span>Saldo consolidado</span>

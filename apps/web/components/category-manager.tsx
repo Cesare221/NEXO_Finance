@@ -77,6 +77,7 @@ export function CategoryManager() {
 
   async function submitCategory(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (saving) return;
     setError("");
     setSuccess("");
     if (name.trim().length < 2) {
@@ -101,8 +102,8 @@ export function CategoryManager() {
       if (!response.ok) throw new Error(await readError(response));
       resetForm();
       setSuccess(editingId ? "Categoria atualizada." : "Categoria adicionada ao Nexo.");
-      await loadCategories();
       window.dispatchEvent(new Event("nexo:financial-data-changed"));
+      await loadCategories();
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : "Não foi possível salvar a categoria.");
     } finally {
@@ -111,6 +112,7 @@ export function CategoryManager() {
   }
 
   async function deleteCategory(category: CategoryRow) {
+    if (deletingId !== null) return;
     if (!window.confirm(`Excluir ${category.name}? Se a categoria tiver histórico, o Nexo irá arquivá-la para preservar seus lançamentos.`)) return;
     setDeletingId(category.id);
     setError("");
@@ -124,8 +126,8 @@ export function CategoryManager() {
         ? "Categoria excluída."
         : "Categoria arquivada para preservar seu histórico.";
       setSuccess(successMessage);
-      await loadCategories();
       window.dispatchEvent(new Event("nexo:financial-data-changed"));
+      await loadCategories();
     } catch (deleteError) {
       setError(deleteError instanceof Error ? deleteError.message : "Não foi possível excluir a categoria.");
     } finally {
@@ -134,7 +136,7 @@ export function CategoryManager() {
   }
 
   return (
-    <div className="resource-layout">
+    <div className="resource-layout" aria-busy={saving || deletingId !== null}>
       <section className="resource-summary" aria-label="Resumo das categorias">
         <div>
           <span>Categorias ativas</span>

@@ -131,6 +131,7 @@ export function TransactionManager() {
 
   async function submitTransaction(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (saving) return;
     setError("");
     setSuccess("");
 
@@ -181,6 +182,7 @@ export function TransactionManager() {
   }
 
   async function deleteTransaction(transaction: FinancialTransaction) {
+    if (deletingId !== null) return;
     const label = transaction.description || "esta movimentação";
     if (!window.confirm(`Excluir ${label}? Essa ação atualizará seus saldos.`)) return;
 
@@ -203,7 +205,7 @@ export function TransactionManager() {
   }
 
   return (
-    <div className="transactions-layout">
+    <div className="transactions-layout" aria-busy={saving || deletingId !== null}>
       <form className="card form transaction-form" onSubmit={submitTransaction}>
         <div className="transaction-section-heading">
           <div>
@@ -283,9 +285,11 @@ export function TransactionManager() {
           </div>
         </div>
 
-        {accounts.length === 0 && !loading && <p className="transaction-notice" role="status">Crie uma conta antes de registrar sua primeira movimentação.</p>}
-        {error && <p className="error" role="alert">{error}</p>}
-        {success && <p className="transaction-success" role="status"><CheckCircle2 aria-hidden="true" />{success}</p>}
+        <div className="transaction-feedback" aria-live="polite">
+          {accounts.length === 0 && !loading && <p className="transaction-notice" role="status">Crie uma conta antes de registrar sua primeira movimentação.</p>}
+          {error && <p className="error" role="alert">{error}</p>}
+          {success && <p className="transaction-success" role="status"><CheckCircle2 aria-hidden="true" />{success}</p>}
+        </div>
 
         <button className="button transaction-submit" type="submit" disabled={saving || loading || accounts.length === 0}>
           {saving ? <LoaderCircle className="spin" aria-hidden="true" /> : <ReceiptText aria-hidden="true" />}

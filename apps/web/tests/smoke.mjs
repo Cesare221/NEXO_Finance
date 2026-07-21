@@ -503,6 +503,34 @@ if (styles.includes("min-width: 320px")) {
   throw new Error("Global styles must not force horizontal overflow on narrow mobile viewports");
 }
 
+const financialMutationFeedback = {
+  "Account manager": readFileSync(join(root, "components/account-manager.tsx"), "utf8"),
+  "Card manager": readFileSync(join(root, "components/card-manager.tsx"), "utf8"),
+  "Category manager": readFileSync(join(root, "components/category-manager.tsx"), "utf8"),
+  "Transaction manager": readFileSync(join(root, "components/transaction-manager.tsx"), "utf8")
+};
+
+for (const [manager, source] of Object.entries(financialMutationFeedback)) {
+  for (const marker of ["aria-busy", 'aria-live="polite"', "disabled={saving", "nexo:financial-data-changed"]) {
+    if (!source.includes(marker)) {
+      throw new Error(`${manager} must expose normalized mutation feedback: missing ${marker}`);
+    }
+  }
+}
+
+const finRefresh = readFileSync(join(root, "components/fin-conversation.tsx"), "utf8");
+for (const marker of ["aria-busy", 'aria-live="polite"', "disabled={sending", "nexo:financial-data-changed", "addEventListener", "removeEventListener"]) {
+  if (!finRefresh.includes(marker)) {
+    throw new Error(`Fin conversation must refresh financial context: missing ${marker}`);
+  }
+}
+
+for (const marker of ["aria-busy", 'aria-live="polite"', "nexo:financial-data-changed", "addEventListener", "removeEventListener"]) {
+  if (!dashboard.includes(marker)) {
+    throw new Error(`Dashboard must preserve financial refresh feedback: missing ${marker}`);
+  }
+}
+
 for (const marker of [
   "env(safe-area-inset-bottom)",
   "prefers-reduced-motion",

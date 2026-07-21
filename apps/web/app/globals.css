@@ -3607,6 +3607,15 @@ textarea.input {
   display: none;
 }
 
+.transaction-feedback:empty {
+  display: none;
+}
+
+.transaction-feedback {
+  display: grid;
+  gap: 10px;
+}
+
 .resource-feedback p {
   margin: 0;
 }

@@ -138,6 +138,7 @@ export function CardManager() {
 
   async function createPurchase(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (saving) return;
     setError("");
     setSuccess("");
     if (!selectedCardId || parseAmount(purchaseAmount) <= 0 || description.trim().length < 2) {
@@ -159,8 +160,8 @@ export function CardManager() {
       if (!response.ok) throw new Error(await readError(response));
       closeForm();
       setSuccess("Compra registrada na fatura.");
-      await loadData();
       window.dispatchEvent(new Event("nexo:financial-data-changed"));
+      await loadData();
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : "Não foi possível registrar a compra.");
     } finally {
@@ -169,6 +170,7 @@ export function CardManager() {
   }
 
   async function archiveCard(card: FinancialCreditCard) {
+    if (archivingId !== null) return;
     if (!window.confirm(`Arquivar ${card.name}? Compras futuras serão bloqueadas, mas o histórico e as faturas serão preservados.`)) return;
     setArchivingId(card.id);
     setError("");
@@ -177,8 +179,8 @@ export function CardManager() {
       const response = await fetch(`/api/financial/credit-cards/${card.id}`, { method: "DELETE" });
       if (!response.ok) throw new Error(await readError(response));
       setSuccess("Cartão arquivado com o histórico preservado.");
-      await loadData();
       window.dispatchEvent(new Event("nexo:financial-data-changed"));
+      await loadData();
     } catch (archiveError) {
       setError(archiveError instanceof Error ? archiveError.message : "Não foi possível arquivar o cartão.");
     } finally {
@@ -187,6 +189,7 @@ export function CardManager() {
   }
 
   async function payStatement(statementId: number, cardName: string) {
+    if (payingStatementId !== null) return;
     if (!window.confirm(`Confirmar o pagamento da fatura de ${cardName}? O valor será descontado da conta vinculada.`)) return;
     setPayingStatementId(statementId);
     setError("");
@@ -199,8 +202,8 @@ export function CardManager() {
       });
       if (!response.ok) throw new Error(await readError(response));
       setSuccess("Fatura paga e saldo da conta atualizado.");
-      await loadData();
       window.dispatchEvent(new Event("nexo:financial-data-changed"));
+      await loadData();
     } catch (paymentError) {
       setError(paymentError instanceof Error ? paymentError.message : "Não foi possível pagar a fatura.");
     } finally {
@@ -209,7 +212,7 @@ export function CardManager() {
   }
 
   return (
-    <div className="resource-layout">
+    <div className="resource-layout" aria-busy={saving || archivingId !== null || payingStatementId !== null}>
       <section className="resource-summary card-summary-actions" aria-label="Ações de cartões">
         <div><span>Cartões ativos</span><strong>{cards.length}</strong></div>
         <div><span>Faturas abertas</span><strong>{dashboard?.open_statements.length ?? 0}</strong></div>
@@ -233,8 +236,8 @@ export function CardManager() {
             const wasEditing = Boolean(editingCard);
             closeForm();
             setSuccess(wasEditing ? "Cartão atualizado." : "Cartão adicionado ao Nexo.");
-            await loadData();
             window.dispatchEvent(new Event("nexo:financial-data-changed"));
+            await loadData();
           }}
         />
       )}

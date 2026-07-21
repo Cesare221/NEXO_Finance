@@ -1,7 +1,7 @@
 "use client";
 
 import { LoaderCircle, Send, UserRound, X } from "lucide-react";
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { FinMascot } from "@/components/brand-assets";
 import { notifyProposalsChanged } from "@/components/pending-proposals-provider";
 import { ActionProposal, ProposalCard } from "@/components/proposal-card";
@@ -47,6 +47,15 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
     ]);
   }
 
+  useEffect(() => {
+    const refreshFinancialContext = () => {
+      setError("");
+      addAssistantMessage("Seus dados financeiros foram atualizados. Vou considerar os valores mais recentes nas próximas respostas.");
+    };
+    window.addEventListener("nexo:financial-data-changed", refreshFinancialContext);
+    return () => window.removeEventListener("nexo:financial-data-changed", refreshFinancialContext);
+  }, []);
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const content = message.trim();
@@ -88,7 +97,7 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
   }
 
   async function proposalAction(action: "confirm" | "cancel") {
-    if (!proposal) return;
+    if (!proposal || pendingAction) return;
     setPendingAction(action);
     setError("");
     try {
@@ -116,7 +125,7 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
   }
 
   async function editProposal(payload: ActionProposal["payload"], summary: string) {
-    if (!proposal) return;
+    if (!proposal || pendingAction) return;
     setPendingAction("edit");
     setError("");
     try {
@@ -144,7 +153,7 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
   }
 
   return (
-    <section className={compact ? "fin-chat compact" : "fin-chat"} aria-labelledby="fin-chat-title">
+    <section className={compact ? "fin-chat compact" : "fin-chat"} aria-busy={sending || pendingAction !== null} aria-labelledby="fin-chat-title">
       <div className="fin-chat-header">
         <span className="fin-avatar" aria-hidden="true"><FinMascot variant="avatar" /></span>
         <div><h2 id="fin-chat-title">Conversa com o Fin</h2><span>Online · suas ações sempre passam por revisão</span></div>

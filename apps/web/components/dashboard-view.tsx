@@ -92,7 +92,7 @@ export function DashboardView() {
 
   if (error || !data) {
     return (
-      <section className="card dashboard-state" role="alert">
+      <section className="card dashboard-state" role="alert" aria-live="polite">
         <RefreshCw size={24} aria-hidden="true" />
         <h1>Não foi possível atualizar sua visão financeira</h1>
         <p>{error}</p>
@@ -116,6 +116,7 @@ export function DashboardView() {
 
   return (
     <>
+      <p className="sr-only" aria-live="polite">Dashboard atualizado com os dados financeiros mais recentes.</p>
       <header className="page-header dashboard-header">
         <div>
           <span className="eyebrow">Visão geral</span>
@@ -209,6 +210,7 @@ export function DashboardView() {
 function DashboardSkeleton() {
   return (
     <div className="dashboard-skeleton" aria-busy="true" aria-label="Carregando dashboard">
+      <p className="sr-only" aria-live="polite">Carregando dashboard.</p>
       <div className="skeleton skeleton-title" />
       <div className="metric-grid">{Array.from({ length: 4 }, (_, index) => <div className="card skeleton skeleton-metric" key={index} />)}</div>
       <div className="dashboard-grid"><div className="card skeleton skeleton-chart" /><div className="card skeleton skeleton-chart" /></div>
