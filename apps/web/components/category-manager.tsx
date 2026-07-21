@@ -6,6 +6,12 @@ import type { CategoryDeleteResult, FinancialCategory } from "@/lib/financial-ty
 
 type CategoryRow = FinancialCategory & { depth: number };
 
+function isCategoryDeleteResult(payload: unknown): payload is CategoryDeleteResult {
+  if (typeof payload !== "object" || payload === null || Array.isArray(payload)) return false;
+  const result = payload as { action?: unknown };
+  return result.action === "deleted" || result.action === "archived";
+}
+
 function flattenCategories(categories: FinancialCategory[], depth = 0): CategoryRow[] {
   return categories.flatMap((category) => [
     { ...category, depth },
@@ -112,18 +118,11 @@ export function CategoryManager() {
     try {
       const response = await fetch(`/api/financial/categories/${category.id}`, { method: "DELETE" });
       if (!response.ok) throw new Error(await readError(response));
-      const result = await response.json() as Partial<CategoryDeleteResult>;
-      if (result.action !== "deleted" && result.action !== "archived") {
-        throw new Error("A API retornou um resultado de exclusão de categoria inválido.");
-      }
-      let successMessage: string;
-      if (result.action === "deleted") {
-        successMessage = "Categoria excluída.";
-      } else if (result.action === "archived") {
-        successMessage = "Categoria arquivada para preservar seu histórico.";
-      } else {
-        throw new Error("A API retornou um resultado de exclusão de categoria inválido.");
-      }
+      const result: unknown = await response.json().catch(() => null);
+      if (!isCategoryDeleteResult(result)) throw new Error("A API retornou um resultado inválido para exclusão de categoria. Tente novamente.");
+      const successMessage = result.action === "deleted"
+        ? "Categoria excluída."
+        : "Categoria arquivada para preservar seu histórico.";
       setSuccess(successMessage);
       await loadCategories();
       window.dispatchEvent(new Event("nexo:financial-data-changed"));
