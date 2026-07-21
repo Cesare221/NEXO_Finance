@@ -19,6 +19,7 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CashFlowChart } from "@/components/ui/cash-flow-chart";
 import { MovementReviewInbox } from "@/components/movement-review-inbox";
+import { DemoDatasetControl } from "@/components/demo-dataset-control";
 import type { DashboardData, DashboardTransaction } from "@/lib/financial-types";
 
 const currency = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
@@ -134,7 +135,10 @@ export function DashboardView() {
           <WalletCards size={28} aria-hidden="true" />
           <h2>Seu dashboard está pronto para receber dados</h2>
           <p>Cadastre uma conta para acompanhar saldos, receitas, despesas e vencimentos reais.</p>
-          <Link className="button" href="/onboarding"><Plus size={18} aria-hidden="true" />Configurar primeira conta</Link>
+          <div className="dashboard-empty-actions">
+            <Link className="button" href="/onboarding"><Plus size={18} aria-hidden="true" />Configurar primeira conta</Link>
+            <DemoDatasetControl variant="install" />
+          </div>
         </section>
       ) : null}
 

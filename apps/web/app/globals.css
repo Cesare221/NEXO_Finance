@@ -2312,6 +2312,101 @@ textarea.input {
   min-height: 0;
 }
 
+.onboarding-demo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 24px;
+  padding: 24px 0;
+  border-top: 1px solid var(--hairline);
+}
+
+.onboarding-demo h2,
+.demo-dataset-settings h2,
+.demo-dataset-dialog h2 {
+  margin: 2px 0 6px;
+}
+
+.onboarding-demo p,
+.demo-settings-copy p,
+.demo-dataset-dialog p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.demo-install-control {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+}
+
+.dashboard-empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.demo-dataset-feedback {
+  max-width: 560px;
+}
+
+.demo-dataset-settings {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px 24px;
+}
+
+.demo-settings-copy {
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.demo-settings-icon,
+.demo-dialog-icon {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--primary-soft);
+  color: var(--teal);
+}
+
+.demo-dataset-settings > .demo-dataset-feedback {
+  grid-column: 1 / -1;
+}
+
+.demo-dataset-dialog {
+  width: min(calc(100vw - 32px), 520px);
+  padding: 24px;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.32);
+}
+
+.demo-dataset-dialog::backdrop {
+  background: rgba(3, 12, 11, 0.58);
+}
+
+.demo-dataset-dialog .demo-dialog-icon {
+  margin-bottom: 14px;
+}
+
+.demo-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+}
+
 .offline-panel {
   max-width: 480px;
   text-align: center;
@@ -3737,6 +3832,27 @@ textarea.input {
 
   .theme-segmented-control {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .onboarding-demo,
+  .demo-dataset-settings {
+    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .onboarding-demo {
+    flex-direction: column;
+  }
+
+  .demo-install-control,
+  .demo-install-control .button,
+  .demo-cleanup-button {
+    width: 100%;
+  }
+
+  .demo-dialog-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .resource-summary {

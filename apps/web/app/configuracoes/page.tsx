@@ -2,6 +2,7 @@ import { AppShell } from "@/components/app-shell";
 import { InstallAppButton } from "@/components/install-app-button";
 import { ProfileSettings } from "@/components/profile-settings";
 import { ThemeSettings } from "@/components/theme-settings";
+import { DemoDatasetControl } from "@/components/demo-dataset-control";
 
 export default function ConfiguracoesPage() {
   return (
@@ -15,6 +16,7 @@ export default function ConfiguracoesPage() {
       <div className="settings-stack">
         <ProfileSettings />
         <ThemeSettings />
+        <DemoDatasetControl variant="cleanup" />
         <section className="card settings-info-panel">
           <div>
             <h2>Segurança</h2>

@@ -1,4 +1,5 @@
 import { AppShell } from "@/components/app-shell";
+import { DemoDatasetControl } from "@/components/demo-dataset-control";
 
 export default function OnboardingPage() {
   return (
@@ -18,6 +19,14 @@ export default function OnboardingPage() {
           <h2>Categorias base</h2>
           <p>Organize alimentação, moradia, transporte e renda.</p>
         </article>
+      </section>
+      <section className="onboarding-demo" aria-labelledby="onboarding-demo-title">
+        <div>
+          <span className="section-kicker">Opcional</span>
+          <h2 id="onboarding-demo-title">Conhe\u00e7a o Nexo antes de cadastrar tudo</h2>
+          <p>Use um conjunto remov\u00edvel para explorar saldos, gr\u00e1ficos, cart\u00f5es e o Fin.</p>
+        </div>
+        <DemoDatasetControl variant="install" />
       </section>
     </AppShell>
   );

@@ -27,6 +27,7 @@ const requiredFiles = [
   "components/proposal-card.tsx",
   "components/fin-conversation.tsx",
   "components/dashboard-view.tsx",
+  "components/demo-dataset-control.tsx",
   "components/navigation-drawer.tsx",
   "components/fin-chat-panel.tsx",
   "components/pending-proposals-provider.tsx",
@@ -291,6 +292,28 @@ for (const marker of [
 ]) {
   if (!demoDatasetRoute.includes(marker)) {
     throw new Error(`Demo dataset BFF must include ${marker}`);
+  }
+}
+
+const demoDatasetExperience =
+  readFileSync(join(root, "components/demo-dataset-control.tsx"), "utf8") +
+  readFileSync(join(root, "app/onboarding/page.tsx"), "utf8") +
+  readFileSync(join(root, "components/dashboard-view.tsx"), "utf8") +
+  readFileSync(join(root, "app/configuracoes/page.tsx"), "utf8");
+for (const marker of [
+  "DemoDatasetControl",
+  "Explorar com dados de exemplo",
+  "Limpar dados de exemplo",
+  "aria-busy",
+  "3 contas, 1 cart",
+  "recursos demonstrativos",
+  "Recursos adotados",
+  "nexo:financial-data-changed",
+  "/api/financial/demo-dataset",
+  "<dialog"
+]) {
+  if (!demoDatasetExperience.includes(marker)) {
+    throw new Error(`Optional demo dataset experience must include ${marker}`);
   }
 }
 
