@@ -527,6 +527,13 @@ def clean_demo_dataset(db: Session, user_id: int) -> dict:
                     fs._proposal_references_categories(proposal.payload, {category.id})
                     for proposal in pending_proposals
                 )
+                or _has_row(
+                    db.query(Category.id).filter(
+                        Category.user_id == user_id,
+                        Category.parent_id == category.id,
+                        _not_owned(Category.demo_dataset_id, dataset.id),
+                    )
+                )
                 or any(
                     original_parent.get(child_id) == category.id
                     for child_id in preserved_category_ids

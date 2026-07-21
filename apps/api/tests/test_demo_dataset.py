@@ -317,6 +317,37 @@ def test_cleanup_preserves_and_detaches_adopted_demo_graph(client):
         assert real_tx.demo_dataset_id is None
 
 
+def test_cleanup_preserves_demo_parent_with_real_child_category(client):
+    headers, user_id = _register(client, "real-child@example.com")
+    assert client.post("/financial/demo-dataset", headers=headers).status_code == 201
+
+    with TestingSessionLocal() as db:
+        dataset = db.query(DemoDataset).filter_by(user_id=user_id, status="active").one()
+        demo_parent = db.query(Category).filter_by(
+            demo_dataset_id=dataset.id, name="Lazer"
+        ).one()
+        real_child = Category(
+            user_id=user_id,
+            name="Hobby pessoal",
+            parent_id=demo_parent.id,
+        )
+        db.add(real_child)
+        db.commit()
+        parent_id = demo_parent.id
+        child_id = real_child.id
+
+    assert client.delete("/financial/demo-dataset", headers=headers).status_code == 200
+
+    with TestingSessionLocal() as db:
+        preserved_parent = db.get(Category, parent_id)
+        preserved_child = db.get(Category, child_id)
+        assert preserved_parent is not None
+        assert preserved_parent.demo_dataset_id is None
+        assert preserved_child is not None
+        assert preserved_child.demo_dataset_id is None
+        assert preserved_child.parent_id == preserved_parent.id
+
+
 def test_install_and_cleanup_audits_are_sanitized(client):
     headers, user_id = _register(client, "audit@example.com")
     assert client.post("/financial/demo-dataset", headers=headers).status_code == 201
