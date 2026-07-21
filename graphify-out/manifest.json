@@ -1,0 +1,772 @@
+{
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\alembic\\env.py": {
+    "mtime": 1784325030.5180807,
+    "ast_hash": "cc2c94244a5b98fbce983c68b3a6089f",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\alembic\\versions\\27433dba7e47_create_financial_accounts_and_categories.py": {
+    "mtime": 1784326422.2709796,
+    "ast_hash": "90d73c4d749d53afeeef73e66bbcb3a5",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\alembic\\versions\\3670683b044e_create_transactions.py": {
+    "mtime": 1784329114.788187,
+    "ast_hash": "2fc09c2991e09f0a5ca723e5ecbef5b2",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\alembic\\versions\\807218102e99_create_users_and_sessions.py": {
+    "mtime": 1784325039.3108878,
+    "ast_hash": "85cfaeaab25136c27cf8f3dff9af77e3",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\main.py": {
+    "mtime": 1784590307.4707797,
+    "ast_hash": "facf5300f8770e8f02790895e610ed44",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\__init__.py": {
+    "mtime": 1784324734.370201,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\api\\auth.py": {
+    "mtime": 1784592916.1770086,
+    "ast_hash": "1dd55ce1a15308ddf937b715e98c597b",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\api\\deps.py": {
+    "mtime": 1784324761.6756227,
+    "ast_hash": "70d6dbf73276259c94d75f4e2b7c3fb4",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\api\\financial.py": {
+    "mtime": 1784592396.6363828,
+    "ast_hash": "7d84813f2776da94cab6d88e05b617e8",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\api\\health.py": {
+    "mtime": 1784590344.741639,
+    "ast_hash": "17e5795072b08d36092c6067c36b5e3a",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\api\\__init__.py": {
+    "mtime": 1784324735.6115205,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\core\\config.py": {
+    "mtime": 1784590307.466011,
+    "ast_hash": "388466bc2c57856faa4a7703f665132c",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\core\\database.py": {
+    "mtime": 1784590307.4680128,
+    "ast_hash": "89224645a03bdef302605e9966681ba6",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\core\\security.py": {
+    "mtime": 1784336877.5279136,
+    "ast_hash": "afc2e38de0b90ea7b3434ecd96e57c86",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\core\\__init__.py": {
+    "mtime": 1784324734.641551,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\models\\category.py": {
+    "mtime": 1784328916.807433,
+    "ast_hash": "91a660367dbe055102201f30339bc653",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\models\\financial_account.py": {
+    "mtime": 1784328916.807433,
+    "ast_hash": "0c7fef8a39bd82ac0b1aa9b55bd76d3a",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\models\\session.py": {
+    "mtime": 1784336877.533358,
+    "ast_hash": "7d2e471b25a984598e42cbf912a38a39",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\models\\transaction.py": {
+    "mtime": 1784331703.8846507,
+    "ast_hash": "eaa62dcc70cdad1290dd37d3f40fafaa",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\models\\user.py": {
+    "mtime": 1784592916.1708336,
+    "ast_hash": "56e98f1c1692e62e2a10cfc13af5610d",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\models\\__init__.py": {
+    "mtime": 1784332549.1104777,
+    "ast_hash": "7da19f6d8bcaa3dc4d25b609a2eb9b20",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\schemas\\auth.py": {
+    "mtime": 1784592916.1724832,
+    "ast_hash": "bacc8066be7e9693633b3e6ce038ce4d",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\schemas\\financial.py": {
+    "mtime": 1784592396.632561,
+    "ast_hash": "9c4cb0026fa7685cc74c774b165c268e",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\schemas\\__init__.py": {
+    "mtime": 1784324735.357467,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\services\\auth_service.py": {
+    "mtime": 1784592916.174829,
+    "ast_hash": "56511d40eac40ad3581d2feeaf657723",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\services\\financial_service.py": {
+    "mtime": 1784592396.6403844,
+    "ast_hash": "bd079f589d92b87f9950773677b67a76",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\services\\__init__.py": {
+    "mtime": 1784324736.0279055,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\tests\\conftest.py": {
+    "mtime": 1784338742.0371692,
+    "ast_hash": "41ca6532b618a88ef00d98affc65a411",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\tests\\test_auth.py": {
+    "mtime": 1784592860.1936238,
+    "ast_hash": "0df2252993308f20618aaa447af4d732",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\tests\\test_financial.py": {
+    "mtime": 1784592363.6284683,
+    "ast_hash": "50a0854a709c71fce7e1f0b76c27b89f",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\tests\\test_health.py": {
+    "mtime": 1784590331.9394464,
+    "ast_hash": "a0fb93b7104b8e26f4b6e3867f46acfc",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\tests\\__init__.py": {
+    "mtime": 1784324736.2914946,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\alembic\\versions\\4fd2d7e95ffb_create_transfers.py": {
+    "mtime": 1784331549.439032,
+    "ast_hash": "1fb345b7a10564613602e2b1d3a01141",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\alembic\\versions\\54213976b4f9_create_assistant_proposals_and_audit.py": {
+    "mtime": 1784332637.7997386,
+    "ast_hash": "359f240a690b78e41d9dd1249d74cff8",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\alembic\\versions\\87808d445675_create_installments_and_recurring_rules.py": {
+    "mtime": 1784332239.4426188,
+    "ast_hash": "44fe88acc504723f396f79ba01d0fdf9",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\alembic\\versions\\e7ae64bddf45_create_credit_cards_and_statements.py": {
+    "mtime": 1784331795.3386362,
+    "ast_hash": "1d30474ecb06eb7752ed53136a865d2c",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\api\\assistant.py": {
+    "mtime": 1784342437.3918786,
+    "ast_hash": "5c1a738351d0c587b256b94579c809c5",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\models\\action_execution.py": {
+    "mtime": 1784332549.1074681,
+    "ast_hash": "07ad289b60d5b16d75348b22c9d32b82",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\models\\action_proposal.py": {
+    "mtime": 1784332549.1054275,
+    "ast_hash": "b03bf062598f0070ba3c9d858163976a",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\models\\audit_event.py": {
+    "mtime": 1784332549.1084812,
+    "ast_hash": "049cdad1a30e186e24a62da2e0f18e83",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\models\\billing_statement.py": {
+    "mtime": 1784331703.8836367,
+    "ast_hash": "fc6331a20c8f995ab96dd18eb40bfc81",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\models\\credit_card.py": {
+    "mtime": 1784331703.8825574,
+    "ast_hash": "6f1feee9a6fa9452d77dfa8c3450b0ab",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\models\\installment.py": {
+    "mtime": 1784332128.9248354,
+    "ast_hash": "f2f88c4c242c7ec887b7e00dd50eb389",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\models\\installment_plan.py": {
+    "mtime": 1784332128.9238331,
+    "ast_hash": "7f5179e8e9171178ef0b9ff497d2843b",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\models\\recurring_rule.py": {
+    "mtime": 1784332128.9258351,
+    "ast_hash": "0e797ae718cc35fd8c350c5cf7c04c7c",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\models\\transfer.py": {
+    "mtime": 1784331496.6192725,
+    "ast_hash": "abc8402429e76731448f5e9b4e283c74",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\schemas\\assistant.py": {
+    "mtime": 1784342437.389912,
+    "ast_hash": "86b3d157fef4c95ee92c9bbfc4deea66",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\services\\assistant_service.py": {
+    "mtime": 1784342437.3936677,
+    "ast_hash": "54f8fbe9078e556cf62fccca5c78ee25",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\tests\\test_assistant.py": {
+    "mtime": 1784342401.6890614,
+    "ast_hash": "96b88c261c064fa498fa6ea31897c9a5",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\README.md": {
+    "mtime": 1784590810.3216343,
+    "ast_hash": "67a86921f24023fdf002062f35d53d72",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\docs\\architecture\\decisions\\0001-phase-1-modular-monolith.md": {
+    "mtime": 1784332045.952674,
+    "ast_hash": "8472bba3bf6a27cda559f184f155ba54",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\docs\\superpowers\\plans\\2026-07-13-fin-phase-1.md": {
+    "mtime": 1784333374.1313293,
+    "ast_hash": "4bc0083a08c401e99db64ea07bba427a",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\docs\\superpowers\\plans\\2026-07-17-fin-roadmap-restante.md": {
+    "mtime": 1784333498.3027267,
+    "ast_hash": "55c8013624822a0f7538de9b7868f356",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\next-env.d.ts": {
+    "mtime": 1784333335.6233718,
+    "ast_hash": "ba64ff7d54714a8f64db89b1003207d8",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\next.config.ts": {
+    "mtime": 1784337710.8924632,
+    "ast_hash": "0efe08ce3d11871afc05ff206b73224f",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\package.json": {
+    "mtime": 1784338870.616833,
+    "ast_hash": "fe8e8bacbaae52dab6bcf37b6116a1b3",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\tsconfig.json": {
+    "mtime": 1784333128.088471,
+    "ast_hash": "93db602de359111ffe5b00fb4a32953c",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\layout.tsx": {
+    "mtime": 1784599707.4858139,
+    "ast_hash": "5a71378e3dafc60b25e16ff26507242a",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\page.tsx": {
+    "mtime": 1784333192.6268196,
+    "ast_hash": "b98eef43c3ac4600ed07fd3681405cad",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\cadastro\\page.tsx": {
+    "mtime": 1784345607.521361,
+    "ast_hash": "27ce546116caaf1cd491e81a9d6e9ea8",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\cartoes\\page.tsx": {
+    "mtime": 1784590952.4128387,
+    "ast_hash": "2ffeba1e5d77db72620535ab46e9a50b",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\categorias\\page.tsx": {
+    "mtime": 1784590575.1490135,
+    "ast_hash": "112585fc6de1c9a75f8deaba8e6f5929",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\configuracoes\\page.tsx": {
+    "mtime": 1784593163.8014362,
+    "ast_hash": "0cbe839a4edd7b8f3cc72a3676920dbc",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\contas\\page.tsx": {
+    "mtime": 1784590575.1372964,
+    "ast_hash": "116a8076b92fb5e6aa0f37f46798ed0e",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\dashboard\\page.tsx": {
+    "mtime": 1784342338.7669933,
+    "ast_hash": "9b062a0d5ffc42fa907eafbb2429ae07",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\fin\\page.tsx": {
+    "mtime": 1784345607.5233579,
+    "ast_hash": "90d7eac1a1f84b590c3d31b7682aaf1d",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\login\\page.tsx": {
+    "mtime": 1784345607.520362,
+    "ast_hash": "33256ee92397ad71ee1e4848b500ffea",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\onboarding\\page.tsx": {
+    "mtime": 1784333192.6308205,
+    "ast_hash": "6edc9cee982cd749bd5232b6c7b7253e",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\transacoes\\page.tsx": {
+    "mtime": 1784344435.0533988,
+    "ast_hash": "9c564ebe8f6f6f298049933f91a7e5e3",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\components\\app-shell.tsx": {
+    "mtime": 1784345607.518361,
+    "ast_hash": "dfba88e270c8e16ba065deb6ee9448a0",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\components\\proposal-card.tsx": {
+    "mtime": 1784342528.448365,
+    "ast_hash": "604672339a4949a9a7881cbc6c325941",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\lib\\api.ts": {
+    "mtime": 1784333128.092508,
+    "ast_hash": "314e64812baeea76a708b7ddd8e7696e",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\tests\\smoke.mjs": {
+    "mtime": 1784600436.4277577,
+    "ast_hash": "591ac54b9ed83b8552b01f1a881027c5",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\manifest.ts": {
+    "mtime": 1784599707.4858139,
+    "ast_hash": "a92d7d296a838d7dda789d334faa74ed",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\offline\\page.tsx": {
+    "mtime": 1784342127.2085938,
+    "ast_hash": "903a05b09047df49f7c86f9836d60ab5",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\components\\install-app-button.tsx": {
+    "mtime": 1784334837.1476374,
+    "ast_hash": "5cbcf3fb1b3d9f165678a9e0f41da5b9",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\components\\pwa-registration.tsx": {
+    "mtime": 1784334837.146878,
+    "ast_hash": "99ca3cbf62d6a53472b3b54e59c3430b",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\public\\sw.js": {
+    "mtime": 1784599707.4858139,
+    "ast_hash": "4b5f93b36cc520157592dc341f94fa99",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\DESIGN.md": {
+    "mtime": 1784334147.3919415,
+    "ast_hash": "d2b9de6ecab156f5da58baae336ea6bf",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\public\\icons\\fin-192.png": {
+    "mtime": 1784334876.703,
+    "ast_hash": "0be6f483103133069729761337714bde",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\public\\icons\\fin-512.png": {
+    "mtime": 1784334876.706,
+    "ast_hash": "3ec5c08b7e76b5c50211e50bef870fc4",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\public\\icons\\fin-source.svg": {
+    "mtime": 1784334864.0721865,
+    "ast_hash": "5b723937822c56ad1fb86c8f8a341f46",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\app\\core\\rate_limit.py": {
+    "mtime": 1784338742.0341735,
+    "ast_hash": "8bd6ecedb75fa7f2c9517eb7c29d4f2f",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\middleware.ts": {
+    "mtime": 1784337602.4682035,
+    "ast_hash": "e950606b3fd36b701409fba4081162b5",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\api\\assistant\\message\\route.ts": {
+    "mtime": 1784338295.0126724,
+    "ast_hash": "80a9ce9902707268a98cfe055b29ceab",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\api\\assistant\\proposals\\[proposalId]\\route.ts": {
+    "mtime": 1784338295.0171945,
+    "ast_hash": "c9235ae8536841e1af811540693d6ba6",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\api\\assistant\\proposals\\[proposalId]\\[action]\\route.ts": {
+    "mtime": 1784338295.0186007,
+    "ast_hash": "87766214ed433655cf1596b9dc3ab29f",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\api\\auth\\login\\route.ts": {
+    "mtime": 1784337602.4619863,
+    "ast_hash": "06bb9da6852b5530bdc2ea396ca44090",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\api\\auth\\logout\\route.ts": {
+    "mtime": 1784337602.4671957,
+    "ast_hash": "f7110349d215a893b17329da9edd85e1",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\api\\auth\\register\\route.ts": {
+    "mtime": 1784337602.4642808,
+    "ast_hash": "9382900f326928f5154f655af43f173f",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\api\\auth\\session\\route.ts": {
+    "mtime": 1784337602.4652815,
+    "ast_hash": "74d75fdaf1088b0dce003fe266b3a372",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\components\\auth-form.tsx": {
+    "mtime": 1784339405.4189525,
+    "ast_hash": "611f0c4be16c8fd3170cbb20f130ec65",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\components\\fin-conversation.tsx": {
+    "mtime": 1784599707.4858139,
+    "ast_hash": "d5ac0dbf448bcaff3d252b4e656f7ba5",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\components\\session-profile.tsx": {
+    "mtime": 1784593163.794395,
+    "ast_hash": "5843dcc72c302a54022edd18f153bfb8",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\components\\ui\\cash-flow-chart.tsx": {
+    "mtime": 1784342937.034629,
+    "ast_hash": "1e4463836e89de2362ab66e5c29e620c",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\components\\ui\\financial-dashboard.tsx": {
+    "mtime": 1784338385.9481497,
+    "ast_hash": "cbf7f2cb54b4ddfdf628bb328baf1015",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\components\\ui\\financial-score-cards.tsx": {
+    "mtime": 1784338385.9476242,
+    "ast_hash": "aaa43c282a3fd1818b65977c6ace4c5e",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\lib\\auth-cookies.ts": {
+    "mtime": 1784337602.4559383,
+    "ast_hash": "919c4fe0eb3a6d3ccf3e3a3239519f84",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\lib\\auth-server.ts": {
+    "mtime": 1784593264.544817,
+    "ast_hash": "3933fcf69e59922c02f89f53c00407ff",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\docs\\superpowers\\plans\\2026-07-17-public-auth-security.md": {
+    "mtime": 1784336711.074667,
+    "ast_hash": "f773ddc00bba51b9b746da3fab3f9336",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\docs\\superpowers\\specs\\2026-07-17-public-auth-security-design.md": {
+    "mtime": 1784336696.4570858,
+    "ast_hash": "befa0b4a20c9ceed3ffc932203bdf905",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\docs\\superpowers\\specs\\2026-07-17-pierre-dashboard-chat-design.md": {
+    "mtime": 1784342062.4251213,
+    "ast_hash": "8fd244c87f9d38893fccd83fed26e803",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\api\\assistant\\proposals\\route.ts": {
+    "mtime": 1784342528.4459915,
+    "ast_hash": "70f63bbd29c76999e6865a480f56c1fa",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\api\\financial\\dashboard\\route.ts": {
+    "mtime": 1784342338.7614605,
+    "ast_hash": "2fe4d3cf1a6cd4a8aacf1353d2ad58f0",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\components\\dashboard-view.tsx": {
+    "mtime": 1784342755.5951457,
+    "ast_hash": "df88565d92084543c21bf5c5a0febcb5",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\components\\fin-chat-panel.tsx": {
+    "mtime": 1784342643.5990248,
+    "ast_hash": "10515003b3310d80cac3bf9264365dd8",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\components\\movement-review-inbox.tsx": {
+    "mtime": 1784342528.448365,
+    "ast_hash": "2f1be76e976b4caebbb4705927c2382e",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\components\\navigation-drawer.tsx": {
+    "mtime": 1784345607.5193622,
+    "ast_hash": "28b492e64aba6b3f1e18f06271ef1f82",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\components\\pending-proposals-provider.tsx": {
+    "mtime": 1784342528.4473672,
+    "ast_hash": "17f73b2a071033a1d50d3dbe644a06fe",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\lib\\financial-types.ts": {
+    "mtime": 1784590863.5269792,
+    "ast_hash": "e2ed040835a983fd65a9d4db0f85a85b",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\docs\\superpowers\\plans\\2026-07-17-nexo-dashboard-fin-inbox.md": {
+    "mtime": 1784342062.426134,
+    "ast_hash": "e8a931112fb40c8259ceb998183e24c3",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\api\\financial\\accounts\\route.ts": {
+    "mtime": 1784590447.3893855,
+    "ast_hash": "1c54468441432956ca0cd8297d400f21",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\api\\financial\\categories\\route.ts": {
+    "mtime": 1784590447.3948698,
+    "ast_hash": "2468b9c28e5fe3abcb932bf596eabf67",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\api\\financial\\transactions\\route.ts": {
+    "mtime": 1784344348.581921,
+    "ast_hash": "ce0b0a19108d72be6b755ee09fea592a",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\api\\financial\\transactions\\[transactionId]\\route.ts": {
+    "mtime": 1784344693.0065086,
+    "ast_hash": "fc16d92003ecdbbc9aad667ad4d7ddad",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\components\\transaction-manager.tsx": {
+    "mtime": 1784344787.8161497,
+    "ast_hash": "b49ef754ee860b871fa697d3795400cc",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\img institucional.png": {
+    "mtime": 1784344814.189099,
+    "ast_hash": "d360bdfcae02ad16ba15840468b5d542",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\components\\brand-assets.tsx": {
+    "mtime": 1784599707.4858139,
+    "ast_hash": "b1eb667d076eb51ffd3c211821b34c66",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\public\\brand\\fin-mascot.png": {
+    "mtime": 1784599613.106812,
+    "ast_hash": "34c3848d6c14368b125921bc07d62177",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\public\\brand\\fin-mascot.webp": {
+    "mtime": 1784599622.4122698,
+    "ast_hash": "599d9f91289e2f37ff5a43ce845d935c",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\public\\brand\\nexo-icon-master.png": {
+    "mtime": 1784599601.883361,
+    "ast_hash": "e0dd38197816e65522902d260869a755",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\public\\brand\\nexo-logo.png": {
+    "mtime": 1784599602.292897,
+    "ast_hash": "7bf567bfa01e9d4e5a011866694bd7ed",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\public\\brand\\nexo-logo.webp": {
+    "mtime": 1784599607.70887,
+    "ast_hash": "42ed171f1c67c80b19c8069854cbb3d1",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\public\\icons\\nexo-192.png": {
+    "mtime": 1784599602.003236,
+    "ast_hash": "eb4d3695e999f26d60e2ace3bc36f8f2",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\public\\icons\\nexo-512.png": {
+    "mtime": 1784599601.9595766,
+    "ast_hash": "471ca5a123902e2549836064be7fd2aa",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\railway.json": {
+    "mtime": 1784590307.4767802,
+    "ast_hash": "9ef88e1272fd79b56141652d8d8aa845",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\tests\\test_config.py": {
+    "mtime": 1784590235.167917,
+    "ast_hash": "de6c4c1d991c2e01d4d582aa773eeebd",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\tests\\test_dependencies.py": {
+    "mtime": 1784591467.462879,
+    "ast_hash": "4be978e97757757a2baffdf971ca5a9b",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\vercel.json": {
+    "mtime": 1784590307.4805841,
+    "ast_hash": "9c7f6bd0c337422b74c909323ed4b72e",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\api\\financial\\accounts\\[accountId]\\route.ts": {
+    "mtime": 1784590447.3928237,
+    "ast_hash": "791393ca37654ea88fa6bac60afb46f4",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\api\\financial\\categories\\[categoryId]\\route.ts": {
+    "mtime": 1784590447.3979013,
+    "ast_hash": "f66d4ec667b2ff8385c89f07360bc85d",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\api\\financial\\credit-cards\\route.ts": {
+    "mtime": 1784590863.52199,
+    "ast_hash": "810e01c7babb83dc7a00a4c6849a7f58",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\api\\financial\\credit-cards\\[cardId]\\purchases\\route.ts": {
+    "mtime": 1784590863.5239995,
+    "ast_hash": "d94d292c850dc42c721b6eafb9df8a41",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\components\\account-manager.tsx": {
+    "mtime": 1784590575.1338916,
+    "ast_hash": "6f302e00456406eb485f1627389a618f",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\components\\card-manager.tsx": {
+    "mtime": 1784592579.1793406,
+    "ast_hash": "6c7b17290913455da2b6a6225cacfd2f",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\components\\category-manager.tsx": {
+    "mtime": 1784590575.1348886,
+    "ast_hash": "b797c71a511d2bf0f38a020926b3738c",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\.github\\workflows\\ci.yml": {
+    "mtime": 1784590810.3216343,
+    "ast_hash": "4e74dec10448b6390cbfa09977f52218",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\docs\\DEPLOYMENT.md": {
+    "mtime": 1784590810.3243353,
+    "ast_hash": "441ae2b218113546ecf38a2099a4bf33",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\api\\alembic\\versions\\ac12f8739a6b_add_user_profile_fields.py": {
+    "mtime": 1784592916.1770086,
+    "ast_hash": "122a3c2a3c690d125c7e9dc0751181d6",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\api\\auth\\profile\\route.ts": {
+    "mtime": 1784593163.7992566,
+    "ast_hash": "cb0c77e3a699e18aa38f197ca22399e5",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\api\\financial\\credit-cards\\[cardId]\\route.ts": {
+    "mtime": 1784592460.168478,
+    "ast_hash": "f94ee7a3400b23d383d911bed07539ec",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\app\\api\\financial\\statements\\[statementId]\\pay\\route.ts": {
+    "mtime": 1784592460.1788409,
+    "ast_hash": "4553715611ce4984d68ada59dd66dacf",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\components\\profile-settings.tsx": {
+    "mtime": 1784593163.8014362,
+    "ast_hash": "e7983a5038046221d82e5bf333a6c4fe",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\.superpowers\\brainstorm\\1030-1784594142\\content\\card-flow.html": {
+    "mtime": 1784594335.777645,
+    "ast_hash": "6f013b8b31467fbe11835c2e24b7b562",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\.superpowers\\brainstorm\\1030-1784594142\\content\\theme-direction.html": {
+    "mtime": 1784594181.7050202,
+    "ast_hash": "ad5fc9e827813f02bb660cf7bf34c0eb",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\.superpowers\\brainstorm\\1030-1784594142\\content\\waiting-architecture.html": {
+    "mtime": 1784594475.8072414,
+    "ast_hash": "e06a6d6df6bdc65096d73fe89ed3461f",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\docs\\superpowers\\specs\\2026-07-20-nexo-financial-foundation-design.md": {
+    "mtime": 1784596184.293325,
+    "ast_hash": "b95dfbedbc48213d383da5535e10d7c3",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\public\\icons\\nexo-maskable-512.png": {
+    "mtime": 1784598761.6179764,
+    "ast_hash": "6632f75a1f74a93e510d144f304be15d",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\public\\brand\\fin-avatar.webp": {
+    "mtime": 1784599628.0026343,
+    "ast_hash": "c512239ffac7fc6a92ea8d2cd1704b31",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\public\\brand\\nexo-logo-dark.webp": {
+    "mtime": 1784599612.9896362,
+    "ast_hash": "cafc0e2349bd1b57315f33dfe78ba21f",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\public\\icons\\nexo-16.png": {
+    "mtime": 1784599602.0591848,
+    "ast_hash": "54168f4eb3a39a70cd0fdf77d7704c4d",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\public\\icons\\nexo-32.png": {
+    "mtime": 1784599602.052036,
+    "ast_hash": "1d3590770431e88c5155dc715a70a92f",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\apps\\web\\public\\icons\\nexo-apple-180.png": {
+    "mtime": 1784599602.052036,
+    "ast_hash": "ecfc1c25156cbaf7d766d2748197ae8e",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\Fin\\docs\\superpowers\\plans\\2026-07-20-nexo-financial-foundation.md": {
+    "mtime": 1784601222.1028364,
+    "ast_hash": "4e3c326682da2760945a7f41add9de4d",
+    "semantic_hash": ""
+  }
+}

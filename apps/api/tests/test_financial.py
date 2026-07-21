@@ -1,0 +1,1156 @@
+from decimal import Decimal
+
+
+def _register_and_get_token(client, email="test@example.com", name="Test User") -> str:
+    resp = client.post(
+        "/auth/register",
+        json={"name": name, "email": email, "password": "FinSeguro123!"},
+    )
+    return resp.json()["access_token"]
+
+
+def _auth_header(token: str) -> dict:
+    return {"Authorization": f"Bearer {token}"}
+
+
+def _create_account(client, token: str, **kwargs) -> dict:
+    defaults = {"name": "My Account", "type": "checking", "initial_balance": "0.00"}
+    defaults.update(kwargs)
+    resp = client.post(
+        "/financial/accounts",
+        json=defaults,
+        headers=_auth_header(token),
+    )
+    return resp.json()
+
+
+def _create_category(client, token: str, **kwargs) -> dict:
+    defaults = {"name": "General"}
+    defaults.update(kwargs)
+    resp = client.post(
+        "/financial/categories",
+        json=defaults,
+        headers=_auth_header(token),
+    )
+    return resp.json()
+
+
+class TestAccounts:
+    def test_create_account(self, client):
+        token = _register_and_get_token(client)
+        data = _create_account(client, token, name="Checking", type="checking")
+        assert data["name"] == "Checking"
+        assert data["type"] == "checking"
+        assert Decimal(data["initial_balance"]) == Decimal("0.00")
+        assert data["is_archived"] is False
+
+    def test_list_accounts(self, client):
+        token = _register_and_get_token(client)
+        _create_account(client, token, name="Wallet")
+        _create_account(client, token, name="Savings", type="savings", initial_balance="500.00")
+        resp = client.get(
+            "/financial/accounts", headers=_auth_header(token)
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert len(data) == 2
+
+    def test_update_account(self, client):
+        token = _register_and_get_token(client)
+        account = _create_account(client, token, name="Old Name")
+        resp = client.put(
+            f"/financial/accounts/{account['id']}",
+            json={"name": "New Name", "initial_balance": "100.50"},
+            headers=_auth_header(token),
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["name"] == "New Name"
+        assert Decimal(data["initial_balance"]) == Decimal("100.50")
+
+    def test_archive_account(self, client):
+        token = _register_and_get_token(client)
+        account = _create_account(client, token)
+        resp = client.delete(
+            f"/financial/accounts/{account['id']}",
+            headers=_auth_header(token),
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["is_archived"] is True
+
+    def test_account_not_found(self, client):
+        token = _register_and_get_token(client)
+        resp = client.put(
+            "/financial/accounts/99999",
+            json={"name": "Nope"},
+            headers=_auth_header(token),
+        )
+        assert resp.status_code == 404
+
+    def test_account_not_found_delete(self, client):
+        token = _register_and_get_token(client)
+        resp = client.delete(
+            "/financial/accounts/99999",
+            headers=_auth_header(token),
+        )
+        assert resp.status_code == 404
+
+    def test_duplicate_account_name(self, client):
+        token = _register_and_get_token(client)
+        _create_account(client, token, name="Dupe")
+        resp = client.post(
+            "/financial/accounts",
+            json={"name": "Dupe", "type": "checking"},
+            headers=_auth_header(token),
+        )
+        assert resp.status_code == 409
+
+    def test_invalid_account_type(self, client):
+        token = _register_and_get_token(client)
+        resp = client.post(
+            "/financial/accounts",
+            json={"name": "Bad", "type": "invalid_type"},
+            headers=_auth_header(token),
+        )
+        assert resp.status_code == 422
+
+    def test_balance_precision(self, client):
+        token = _register_and_get_token(client)
+        data = _create_account(
+            client, token, name="Precise", initial_balance="12345.67"
+        )
+        assert Decimal(data["initial_balance"]) == Decimal("12345.67")
+
+    def test_user_isolation_accounts(self, client):
+        token_a = _register_and_get_token(client, email="a@test.com", name="User A")
+        token_b = _register_and_get_token(client, email="b@test.com", name="User B")
+        _create_account(client, token_a, name="A Account")
+        _create_account(client, token_b, name="B Account")
+
+        resp_a = client.get("/financial/accounts", headers=_auth_header(token_a))
+        resp_b = client.get("/financial/accounts", headers=_auth_header(token_b))
+        assert len(resp_a.json()) == 1
+        assert len(resp_b.json()) == 1
+        assert resp_a.json()[0]["name"] == "A Account"
+        assert resp_b.json()[0]["name"] == "B Account"
+
+    def test_user_b_cannot_update_user_a_account(self, client):
+        token_a = _register_and_get_token(client, email="a@test.com", name="User A")
+        token_b = _register_and_get_token(client, email="b@test.com", name="User B")
+        account_a = _create_account(client, token_a, name="A Only")
+        resp = client.put(
+            f"/financial/accounts/{account_a['id']}",
+            json={"name": "Hijacked"},
+            headers=_auth_header(token_b),
+        )
+        assert resp.status_code == 404
+
+
+class TestCategories:
+    def test_create_category(self, client):
+        token = _register_and_get_token(client)
+        resp = client.post(
+            "/financial/categories",
+            json={"name": "Food", "color": "#FF0000"},
+            headers=_auth_header(token),
+        )
+        assert resp.status_code == 201
+        data = resp.json()
+        assert data["name"] == "Food"
+        assert data["color"] == "#FF0000"
+        assert data["parent_id"] is None
+        assert data["is_archived"] is False
+
+    def test_create_category_with_parent(self, client):
+        token = _register_and_get_token(client)
+        parent = client.post(
+            "/financial/categories",
+            json={"name": "Groceries"},
+            headers=_auth_header(token),
+        ).json()
+        child = client.post(
+            "/financial/categories",
+            json={"name": "Fruits", "parent_id": parent["id"]},
+            headers=_auth_header(token),
+        )
+        assert child.status_code == 201
+        assert child.json()["parent_id"] == parent["id"]
+
+    def test_category_tree(self, client):
+        token = _register_and_get_token(client)
+        food = client.post(
+            "/financial/categories",
+            json={"name": "Food"},
+            headers=_auth_header(token),
+        ).json()
+        client.post(
+            "/financial/categories",
+            json={"name": "Fruits", "parent_id": food["id"]},
+            headers=_auth_header(token),
+        )
+        client.post(
+            "/financial/categories",
+            json={"name": "Vegetables", "parent_id": food["id"]},
+            headers=_auth_header(token),
+        )
+        client.post(
+            "/financial/categories",
+            json={"name": "Transport"},
+            headers=_auth_header(token),
+        )
+
+        resp = client.get("/financial/categories", headers=_auth_header(token))
+        assert resp.status_code == 200
+        data = resp.json()
+        roots = [c for c in data if c["parent_id"] is None]
+        assert len(roots) == 2
+
+        food_node = next(c for c in roots if c["name"] == "Food")
+        assert len(food_node["children"]) == 2
+        child_names = {c["name"] for c in food_node["children"]}
+        assert child_names == {"Fruits", "Vegetables"}
+
+    def test_update_category(self, client):
+        token = _register_and_get_token(client)
+        cat = client.post(
+            "/financial/categories",
+            json={"name": "Old"},
+            headers=_auth_header(token),
+        ).json()
+        resp = client.put(
+            f"/financial/categories/{cat['id']}",
+            json={"name": "Updated", "icon": "shopping-cart"},
+            headers=_auth_header(token),
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["name"] == "Updated"
+        assert data["icon"] == "shopping-cart"
+
+    def test_update_category_can_remove_parent(self, client):
+        token = _register_and_get_token(client)
+        parent = client.post(
+            "/financial/categories",
+            json={"name": "Parent"},
+            headers=_auth_header(token),
+        ).json()
+        child = client.post(
+            "/financial/categories",
+            json={"name": "Child", "parent_id": parent["id"]},
+            headers=_auth_header(token),
+        ).json()
+
+        response = client.put(
+            f"/financial/categories/{child['id']}",
+            json={"parent_id": None},
+            headers=_auth_header(token),
+        )
+
+        assert response.status_code == 200
+        assert response.json()["parent_id"] is None
+
+    def test_delete_category_archives(self, client):
+        token = _register_and_get_token(client)
+        cat = client.post(
+            "/financial/categories",
+            json={"name": "ToArchive"},
+            headers=_auth_header(token),
+        ).json()
+        resp = client.delete(
+            f"/financial/categories/{cat['id']}",
+            headers=_auth_header(token),
+        )
+        assert resp.status_code == 200
+        assert resp.json()["is_archived"] is True
+
+    def test_archiving_preserves_parent_child(self, client):
+        token = _register_and_get_token(client)
+        parent = client.post(
+            "/financial/categories",
+            json={"name": "Parent"},
+            headers=_auth_header(token),
+        ).json()
+        child = client.post(
+            "/financial/categories",
+            json={"name": "Child", "parent_id": parent["id"]},
+            headers=_auth_header(token),
+        ).json()
+        client.delete(
+            f"/financial/categories/{parent['id']}",
+            headers=_auth_header(token),
+        )
+
+        resp = client.get("/financial/categories", headers=_auth_header(token))
+        roots = resp.json()
+        assert len(roots) == 1
+        archived_parent = roots[0]
+        assert archived_parent["is_archived"] is True
+        assert len(archived_parent["children"]) == 1
+        assert archived_parent["children"][0]["name"] == "Child"
+
+    def test_duplicate_category_name(self, client):
+        token = _register_and_get_token(client)
+        client.post(
+            "/financial/categories",
+            json={"name": "Dupe"},
+            headers=_auth_header(token),
+        )
+        resp = client.post(
+            "/financial/categories",
+            json={"name": "Dupe"},
+            headers=_auth_header(token),
+        )
+        assert resp.status_code == 409
+
+    def test_category_not_found(self, client):
+        token = _register_and_get_token(client)
+        resp = client.put(
+            "/financial/categories/99999",
+            json={"name": "Nope"},
+            headers=_auth_header(token),
+        )
+        assert resp.status_code == 404
+
+    def test_cannot_set_self_as_parent(self, client):
+        token = _register_and_get_token(client)
+        cat = client.post(
+            "/financial/categories",
+            json={"name": "Self"},
+            headers=_auth_header(token),
+        ).json()
+        resp = client.put(
+            f"/financial/categories/{cat['id']}",
+            json={"parent_id": cat["id"]},
+            headers=_auth_header(token),
+        )
+        assert resp.status_code == 400
+        assert "own parent" in resp.json()["detail"]
+
+    def test_cannot_set_child_as_parent(self, client):
+        token = _register_and_get_token(client)
+        parent = client.post(
+            "/financial/categories",
+            json={"name": "Parent"},
+            headers=_auth_header(token),
+        ).json()
+        child = client.post(
+            "/financial/categories",
+            json={"name": "Child", "parent_id": parent["id"]},
+            headers=_auth_header(token),
+        ).json()
+        resp = client.put(
+            f"/financial/categories/{parent['id']}",
+            json={"parent_id": child["id"]},
+            headers=_auth_header(token),
+        )
+        assert resp.status_code == 400
+        assert "child category" in resp.json()["detail"].lower()
+
+    def test_user_isolation_categories(self, client):
+        token_a = _register_and_get_token(client, email="a@test.com", name="User A")
+        token_b = _register_and_get_token(client, email="b@test.com", name="User B")
+        client.post(
+            "/financial/categories",
+            json={"name": "A Cat"},
+            headers=_auth_header(token_a),
+        )
+        client.post(
+            "/financial/categories",
+            json={"name": "B Cat"},
+            headers=_auth_header(token_b),
+        )
+        resp_a = client.get("/financial/categories", headers=_auth_header(token_a))
+        resp_b = client.get("/financial/categories", headers=_auth_header(token_b))
+        names_a = [c["name"] for c in resp_a.json()]
+        names_b = [c["name"] for c in resp_b.json()]
+        assert "A Cat" in names_a
+        assert "B Cat" not in names_a
+        assert "B Cat" in names_b
+        assert "A Cat" not in names_b
+
+    def test_parent_not_found(self, client):
+        token = _register_and_get_token(client)
+        resp = client.post(
+            "/financial/categories",
+            json={"name": "Orphan", "parent_id": 99999},
+            headers=_auth_header(token),
+        )
+        assert resp.status_code == 404
+        assert "parent" in resp.json()["detail"].lower()
+
+    def test_multi_level_tree(self, client):
+        token = _register_and_get_token(client)
+        root = client.post(
+            "/financial/categories",
+            json={"name": "Root"},
+            headers=_auth_header(token),
+        ).json()
+        mid = client.post(
+            "/financial/categories",
+            json={"name": "Mid", "parent_id": root["id"]},
+            headers=_auth_header(token),
+        ).json()
+        client.post(
+            "/financial/categories",
+            json={"name": "Leaf", "parent_id": mid["id"]},
+            headers=_auth_header(token),
+        )
+
+        resp = client.get("/financial/categories", headers=_auth_header(token))
+        data = resp.json()
+        assert len(data) == 1
+        assert data[0]["name"] == "Root"
+        mid_children = data[0]["children"]
+        assert len(mid_children) == 1
+        assert mid_children[0]["name"] == "Mid"
+        leaf_children = mid_children[0]["children"]
+        assert len(leaf_children) == 1
+        assert leaf_children[0]["name"] == "Leaf"
+
+    def test_unauthenticated_access(self, client):
+        resp = client.get("/financial/accounts")
+        assert resp.status_code == 401
+        resp = client.get("/financial/categories")
+        assert resp.status_code == 401
+        resp = client.post(
+            "/financial/accounts",
+            json={"name": "Test", "type": "checking"},
+        )
+        assert resp.status_code == 401
+
+
+class TestTransactions:
+    def test_create_income_and_expense_updates_account_balance(self, client):
+        token = _register_and_get_token(client)
+        account = _create_account(
+            client, token, name="Checking", initial_balance="100.00"
+        )
+        category = _create_category(client, token, name="Food")
+
+        income = client.post(
+            "/financial/transactions",
+            json={
+                "type": "income",
+                "account_id": account["id"],
+                "amount": "250.00",
+                "description": "Salary",
+                "occurred_on": "2026-07-17",
+            },
+            headers=_auth_header(token),
+        )
+        expense = client.post(
+            "/financial/transactions",
+            json={
+                "type": "expense",
+                "account_id": account["id"],
+                "category_id": category["id"],
+                "amount": "45.50",
+                "description": "Groceries",
+                "occurred_on": "2026-07-17",
+            },
+            headers=_auth_header(token),
+        )
+        balance = client.get(
+            f"/financial/accounts/{account['id']}/balance",
+            headers=_auth_header(token),
+        )
+
+        assert income.status_code == 201
+        assert expense.status_code == 201
+        assert Decimal(balance.json()["current_balance"]) == Decimal("304.50")
+
+    def test_list_transactions_with_filters(self, client):
+        token = _register_and_get_token(client)
+        checking = _create_account(client, token, name="Checking")
+        wallet = _create_account(client, token, name="Wallet", type="wallet")
+
+        client.post(
+            "/financial/transactions",
+            json={
+                "type": "income",
+                "account_id": checking["id"],
+                "amount": "100.00",
+                "description": "Freelance",
+                "occurred_on": "2026-07-16",
+            },
+            headers=_auth_header(token),
+        )
+        client.post(
+            "/financial/transactions",
+            json={
+                "type": "expense",
+                "account_id": checking["id"],
+                "amount": "20.00",
+                "description": "Coffee",
+                "occurred_on": "2026-07-17",
+            },
+            headers=_auth_header(token),
+        )
+        client.post(
+            "/financial/transactions",
+            json={
+                "type": "expense",
+                "account_id": wallet["id"],
+                "amount": "15.00",
+                "description": "Snack",
+                "occurred_on": "2026-07-17",
+            },
+            headers=_auth_header(token),
+        )
+
+        resp = client.get(
+            f"/financial/transactions?type=expense&account_id={checking['id']}",
+            headers=_auth_header(token),
+        )
+
+        assert resp.status_code == 200
+        data = resp.json()
+        assert len(data) == 1
+        assert data[0]["description"] == "Coffee"
+
+    def test_soft_delete_transaction_removes_it_from_balance(self, client):
+        token = _register_and_get_token(client)
+        account = _create_account(
+            client, token, name="Checking", initial_balance="100.00"
+        )
+        tx = client.post(
+            "/financial/transactions",
+            json={
+                "type": "expense",
+                "account_id": account["id"],
+                "amount": "30.00",
+                "description": "Mistake",
+                "occurred_on": "2026-07-17",
+            },
+            headers=_auth_header(token),
+        ).json()
+
+        deleted = client.delete(
+            f"/financial/transactions/{tx['id']}",
+            headers=_auth_header(token),
+        )
+        balance = client.get(
+            f"/financial/accounts/{account['id']}/balance",
+            headers=_auth_header(token),
+        )
+
+        assert deleted.status_code == 200
+        assert deleted.json()["is_deleted"] is True
+        assert Decimal(balance.json()["current_balance"]) == Decimal("100.00")
+
+    def test_user_b_cannot_use_user_a_account_or_category(self, client):
+        token_a = _register_and_get_token(client, email="a@test.com", name="User A")
+        token_b = _register_and_get_token(client, email="b@test.com", name="User B")
+        account_a = _create_account(client, token_a, name="A Account")
+        category_a = _create_category(client, token_a, name="A Category")
+
+        resp = client.post(
+            "/financial/transactions",
+            json={
+                "type": "expense",
+                "account_id": account_a["id"],
+                "category_id": category_a["id"],
+                "amount": "10.00",
+                "description": "Should fail",
+                "occurred_on": "2026-07-17",
+            },
+            headers=_auth_header(token_b),
+        )
+
+        assert resp.status_code == 404
+        resp = client.post(
+            "/financial/categories",
+            json={"name": "Test"},
+        )
+        assert resp.status_code == 401
+
+
+class TestTransfers:
+    def test_transfer_moves_money_between_accounts_without_changing_net_worth(self, client):
+        token = _register_and_get_token(client)
+        checking = _create_account(
+            client, token, name="Checking", initial_balance="500.00"
+        )
+        wallet = _create_account(
+            client, token, name="Wallet", type="wallet", initial_balance="50.00"
+        )
+
+        resp = client.post(
+            "/financial/transfers",
+            json={
+                "from_account_id": checking["id"],
+                "to_account_id": wallet["id"],
+                "amount": "125.50",
+                "description": "ATM cash",
+                "occurred_on": "2026-07-17",
+            },
+            headers=_auth_header(token),
+        )
+
+        checking_balance = client.get(
+            f"/financial/accounts/{checking['id']}/balance",
+            headers=_auth_header(token),
+        ).json()
+        wallet_balance = client.get(
+            f"/financial/accounts/{wallet['id']}/balance",
+            headers=_auth_header(token),
+        ).json()
+
+        assert resp.status_code == 201
+        data = resp.json()
+        assert data["from_account_id"] == checking["id"]
+        assert data["to_account_id"] == wallet["id"]
+        assert Decimal(checking_balance["current_balance"]) == Decimal("374.50")
+        assert Decimal(wallet_balance["current_balance"]) == Decimal("175.50")
+        assert (
+            Decimal(checking_balance["current_balance"])
+            + Decimal(wallet_balance["current_balance"])
+        ) == Decimal("550.00")
+
+    def test_transfer_creates_linked_transactions_that_are_not_income_or_expense(self, client):
+        token = _register_and_get_token(client)
+        checking = _create_account(client, token, name="Checking")
+        wallet = _create_account(client, token, name="Wallet", type="wallet")
+
+        transfer = client.post(
+            "/financial/transfers",
+            json={
+                "from_account_id": checking["id"],
+                "to_account_id": wallet["id"],
+                "amount": "25.00",
+                "description": "Pocket money",
+                "occurred_on": "2026-07-17",
+            },
+            headers=_auth_header(token),
+        ).json()
+
+        all_transactions = client.get(
+            "/financial/transactions", headers=_auth_header(token)
+        ).json()
+        income_transactions = client.get(
+            "/financial/transactions?type=income", headers=_auth_header(token)
+        ).json()
+        expense_transactions = client.get(
+            "/financial/transactions?type=expense", headers=_auth_header(token)
+        ).json()
+
+        assert transfer["out_transaction_id"] is not None
+        assert transfer["in_transaction_id"] is not None
+        assert {tx["type"] for tx in all_transactions} == {
+            "transfer_out",
+            "transfer_in",
+        }
+        assert income_transactions == []
+        assert expense_transactions == []
+
+    def test_list_transfers_is_scoped_to_current_user(self, client):
+        token_a = _register_and_get_token(client, email="a@test.com", name="User A")
+        token_b = _register_and_get_token(client, email="b@test.com", name="User B")
+        checking_a = _create_account(client, token_a, name="A Checking")
+        wallet_a = _create_account(client, token_a, name="A Wallet", type="wallet")
+        checking_b = _create_account(client, token_b, name="B Checking")
+        wallet_b = _create_account(client, token_b, name="B Wallet", type="wallet")
+
+        client.post(
+            "/financial/transfers",
+            json={
+                "from_account_id": checking_a["id"],
+                "to_account_id": wallet_a["id"],
+                "amount": "10.00",
+                "occurred_on": "2026-07-17",
+            },
+            headers=_auth_header(token_a),
+        )
+        client.post(
+            "/financial/transfers",
+            json={
+                "from_account_id": checking_b["id"],
+                "to_account_id": wallet_b["id"],
+                "amount": "20.00",
+                "occurred_on": "2026-07-17",
+            },
+            headers=_auth_header(token_b),
+        )
+
+        resp_a = client.get("/financial/transfers", headers=_auth_header(token_a))
+        resp_b = client.get("/financial/transfers", headers=_auth_header(token_b))
+
+        assert len(resp_a.json()) == 1
+        assert Decimal(resp_a.json()[0]["amount"]) == Decimal("10.00")
+        assert len(resp_b.json()) == 1
+        assert Decimal(resp_b.json()[0]["amount"]) == Decimal("20.00")
+
+    def test_user_cannot_transfer_from_another_users_account(self, client):
+        token_a = _register_and_get_token(client, email="a@test.com", name="User A")
+        token_b = _register_and_get_token(client, email="b@test.com", name="User B")
+        account_a = _create_account(client, token_a, name="A Account")
+        account_b = _create_account(client, token_b, name="B Account")
+
+        resp = client.post(
+            "/financial/transfers",
+            json={
+                "from_account_id": account_a["id"],
+                "to_account_id": account_b["id"],
+                "amount": "10.00",
+                "occurred_on": "2026-07-17",
+            },
+            headers=_auth_header(token_b),
+        )
+
+        assert resp.status_code == 404
+
+
+class TestCreditCards:
+    def test_update_credit_card(self, client):
+        token = _register_and_get_token(client)
+        checking = _create_account(client, token, name="Checking")
+        savings = _create_account(client, token, name="Savings")
+        card = client.post(
+            "/financial/credit-cards",
+            json={
+                "name": "Main Card",
+                "limit_amount": "500.00",
+                "closing_day": 10,
+                "due_day": 20,
+                "payment_account_id": checking["id"],
+            },
+            headers=_auth_header(token),
+        ).json()
+
+        response = client.put(
+            f"/financial/credit-cards/{card['id']}",
+            json={
+                "name": "Updated Card",
+                "limit_amount": "750.00",
+                "closing_day": 12,
+                "due_day": 22,
+                "payment_account_id": savings["id"],
+            },
+            headers=_auth_header(token),
+        )
+
+        assert response.status_code == 200
+        assert response.json()["name"] == "Updated Card"
+        assert Decimal(response.json()["limit_amount"]) == Decimal("750.00")
+        assert response.json()["payment_account_id"] == savings["id"]
+
+    def test_cannot_reduce_card_limit_below_used_amount(self, client):
+        token = _register_and_get_token(client)
+        checking = _create_account(client, token, name="Checking")
+        card = client.post(
+            "/financial/credit-cards",
+            json={
+                "name": "Main Card",
+                "limit_amount": "500.00",
+                "closing_day": 10,
+                "due_day": 20,
+                "payment_account_id": checking["id"],
+            },
+            headers=_auth_header(token),
+        ).json()
+        client.post(
+            f"/financial/credit-cards/{card['id']}/purchases",
+            json={
+                "amount": "200.00",
+                "description": "Phone",
+                "occurred_on": "2026-07-17",
+            },
+            headers=_auth_header(token),
+        )
+
+        response = client.put(
+            f"/financial/credit-cards/{card['id']}",
+            json={"limit_amount": "100.00"},
+            headers=_auth_header(token),
+        )
+
+        assert response.status_code == 409
+        assert "used limit" in response.json()["detail"].lower()
+
+    def test_archived_card_preserves_history_and_rejects_new_purchases(self, client):
+        token = _register_and_get_token(client)
+        checking = _create_account(client, token, name="Checking")
+        card = client.post(
+            "/financial/credit-cards",
+            json={
+                "name": "Main Card",
+                "limit_amount": "500.00",
+                "closing_day": 10,
+                "due_day": 20,
+                "payment_account_id": checking["id"],
+            },
+            headers=_auth_header(token),
+        ).json()
+
+        archived = client.delete(
+            f"/financial/credit-cards/{card['id']}",
+            headers=_auth_header(token),
+        )
+        purchase = client.post(
+            f"/financial/credit-cards/{card['id']}/purchases",
+            json={
+                "amount": "10.00",
+                "description": "Blocked purchase",
+                "occurred_on": "2026-07-17",
+            },
+            headers=_auth_header(token),
+        )
+
+        assert archived.status_code == 200
+        assert archived.json()["is_archived"] is True
+        assert purchase.status_code == 409
+
+    def test_card_purchase_reduces_available_limit_but_not_bank_balance(self, client):
+        token = _register_and_get_token(client)
+        checking = _create_account(
+            client, token, name="Checking", initial_balance="1000.00"
+        )
+        category = _create_category(client, token, name="Food")
+        card = client.post(
+            "/financial/credit-cards",
+            json={
+                "name": "Main Card",
+                "limit_amount": "500.00",
+                "closing_day": 10,
+                "due_day": 20,
+                "payment_account_id": checking["id"],
+            },
+            headers=_auth_header(token),
+        )
+        purchase = client.post(
+            f"/financial/credit-cards/{card.json()['id']}/purchases",
+            json={
+                "amount": "123.45",
+                "description": "Groceries on card",
+                "category_id": category["id"],
+                "occurred_on": "2026-07-17",
+            },
+            headers=_auth_header(token),
+        )
+        balance = client.get(
+            f"/financial/accounts/{checking['id']}/balance",
+            headers=_auth_header(token),
+        ).json()
+        card_after = client.get(
+            "/financial/credit-cards", headers=_auth_header(token)
+        ).json()[0]
+
+        assert card.status_code == 201
+        assert purchase.status_code == 201
+        assert Decimal(balance["current_balance"]) == Decimal("1000.00")
+        assert Decimal(card_after["used_limit"]) == Decimal("123.45")
+        assert Decimal(card_after["available_limit"]) == Decimal("376.55")
+
+    def test_statement_payment_reduces_bank_balance_without_new_expense(self, client):
+        token = _register_and_get_token(client)
+        checking = _create_account(
+            client, token, name="Checking", initial_balance="1000.00"
+        )
+        card = client.post(
+            "/financial/credit-cards",
+            json={
+                "name": "Main Card",
+                "limit_amount": "500.00",
+                "closing_day": 10,
+                "due_day": 20,
+                "payment_account_id": checking["id"],
+            },
+            headers=_auth_header(token),
+        ).json()
+        purchase = client.post(
+            f"/financial/credit-cards/{card['id']}/purchases",
+            json={
+                "amount": "200.00",
+                "description": "Phone",
+                "occurred_on": "2026-07-17",
+            },
+            headers=_auth_header(token),
+        ).json()
+
+        payment = client.post(
+            f"/financial/statements/{purchase['statement_id']}/pay",
+            json={"paid_on": "2026-07-20"},
+            headers=_auth_header(token),
+        )
+        balance = client.get(
+            f"/financial/accounts/{checking['id']}/balance",
+            headers=_auth_header(token),
+        ).json()
+        expenses = client.get(
+            "/financial/transactions?type=expense", headers=_auth_header(token)
+        ).json()
+
+        assert payment.status_code == 200
+        assert payment.json()["status"] == "paid"
+        assert Decimal(balance["current_balance"]) == Decimal("800.00")
+        assert expenses == []
+
+    def test_user_cannot_create_card_with_another_users_payment_account(self, client):
+        token_a = _register_and_get_token(client, email="a@test.com", name="User A")
+        token_b = _register_and_get_token(client, email="b@test.com", name="User B")
+        account_a = _create_account(client, token_a, name="A Account")
+
+        resp = client.post(
+            "/financial/credit-cards",
+            json={
+                "name": "Bad Card",
+                "limit_amount": "100.00",
+                "closing_day": 10,
+                "due_day": 20,
+                "payment_account_id": account_a["id"],
+            },
+            headers=_auth_header(token_b),
+        )
+
+        assert resp.status_code == 404
+
+
+class TestInstallmentsAndRecurring:
+    def test_installment_plan_creates_pending_installments_without_changing_balance(self, client):
+        token = _register_and_get_token(client)
+        account = _create_account(
+            client, token, name="Checking", initial_balance="1000.00"
+        )
+
+        plan = client.post(
+            "/financial/installment-plans",
+            json={
+                "type": "expense",
+                "account_id": account["id"],
+                "amount": "300.00",
+                "installments_count": 3,
+                "description": "Appliance",
+                "first_due_on": "2026-08-05",
+            },
+            headers=_auth_header(token),
+        )
+        balance = client.get(
+            f"/financial/accounts/{account['id']}/balance",
+            headers=_auth_header(token),
+        ).json()
+
+        assert plan.status_code == 201
+        data = plan.json()
+        assert len(data["installments"]) == 3
+        assert {item["status"] for item in data["installments"]} == {"pending"}
+        assert Decimal(data["installments"][0]["amount"]) == Decimal("100.00")
+        assert Decimal(balance["current_balance"]) == Decimal("1000.00")
+
+    def test_confirm_installment_creates_effective_transaction_once(self, client):
+        token = _register_and_get_token(client)
+        account = _create_account(
+            client, token, name="Checking", initial_balance="1000.00"
+        )
+        plan = client.post(
+            "/financial/installment-plans",
+            json={
+                "type": "expense",
+                "account_id": account["id"],
+                "amount": "300.00",
+                "installments_count": 3,
+                "description": "Appliance",
+                "first_due_on": "2026-08-05",
+            },
+            headers=_auth_header(token),
+        ).json()
+        installment_id = plan["installments"][0]["id"]
+
+        first = client.post(
+            f"/financial/installments/{installment_id}/confirm",
+            headers=_auth_header(token),
+        )
+        second = client.post(
+            f"/financial/installments/{installment_id}/confirm",
+            headers=_auth_header(token),
+        )
+        balance = client.get(
+            f"/financial/accounts/{account['id']}/balance",
+            headers=_auth_header(token),
+        ).json()
+
+        assert first.status_code == 200
+        assert second.status_code == 200
+        assert first.json()["status"] == "confirmed"
+        assert second.json()["transaction_id"] == first.json()["transaction_id"]
+        assert Decimal(balance["current_balance"]) == Decimal("900.00")
+
+    def test_recurring_rule_confirmation_creates_transaction_and_advances_rule(self, client):
+        token = _register_and_get_token(client)
+        account = _create_account(
+            client, token, name="Checking", initial_balance="1000.00"
+        )
+
+        rule = client.post(
+            "/financial/recurring-rules",
+            json={
+                "type": "expense",
+                "account_id": account["id"],
+                "amount": "80.00",
+                "description": "Internet",
+                "frequency": "monthly",
+                "next_occurrence_on": "2026-08-10",
+            },
+            headers=_auth_header(token),
+        )
+        before = client.get(
+            f"/financial/accounts/{account['id']}/balance",
+            headers=_auth_header(token),
+        ).json()
+        confirmation = client.post(
+            f"/financial/recurring-rules/{rule.json()['id']}/confirm",
+            json={"amount": "75.00", "occurred_on": "2026-08-10"},
+            headers=_auth_header(token),
+        )
+        after = client.get(
+            f"/financial/accounts/{account['id']}/balance",
+            headers=_auth_header(token),
+        ).json()
+
+        assert rule.status_code == 201
+        assert Decimal(before["current_balance"]) == Decimal("1000.00")
+        assert confirmation.status_code == 200
+        assert confirmation.json()["last_transaction_id"] is not None
+        assert confirmation.json()["next_occurrence_on"] == "2026-09-10"
+        assert Decimal(after["current_balance"]) == Decimal("925.00")
+
+    def test_user_cannot_confirm_another_users_recurring_rule(self, client):
+        token_a = _register_and_get_token(client, email="a@test.com", name="User A")
+        token_b = _register_and_get_token(client, email="b@test.com", name="User B")
+        account_a = _create_account(client, token_a, name="A Account")
+        rule = client.post(
+            "/financial/recurring-rules",
+            json={
+                "type": "expense",
+                "account_id": account_a["id"],
+                "amount": "80.00",
+                "description": "Internet",
+                "frequency": "monthly",
+                "next_occurrence_on": "2026-08-10",
+            },
+            headers=_auth_header(token_a),
+        ).json()
+
+        resp = client.post(
+            f"/financial/recurring-rules/{rule['id']}/confirm",
+            json={"amount": "75.00", "occurred_on": "2026-08-10"},
+            headers=_auth_header(token_b),
+        )
+
+        assert resp.status_code == 404
+
+
+class TestDashboard:
+    def test_dashboard_returns_real_monthly_cash_flow_and_statement_total(self, client):
+        token = _register_and_get_token(client)
+        checking = _create_account(
+            client, token, name="Checking", initial_balance="1000.00"
+        )
+        for transaction_type, amount, occurred_on in [
+            ("income", "500.00", "2026-05-10"),
+            ("expense", "120.00", "2026-05-11"),
+            ("income", "700.00", "2026-07-02"),
+            ("expense", "80.00", "2026-07-03"),
+        ]:
+            client.post(
+                "/financial/transactions",
+                json={
+                    "type": transaction_type,
+                    "account_id": checking["id"],
+                    "amount": amount,
+                    "occurred_on": occurred_on,
+                },
+                headers=_auth_header(token),
+            )
+
+        response = client.get(
+            "/financial/dashboard?start_date=2026-07-01&end_date=2026-07-31&months=3",
+            headers=_auth_header(token),
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["cash_flow"] == [
+            {"month": "2026-05", "income": "500.00", "expense": "120.00"},
+            {"month": "2026-06", "income": "0.00", "expense": "0.00"},
+            {"month": "2026-07", "income": "700.00", "expense": "80.00"},
+        ]
+        assert Decimal(data["open_statement_total"]) == Decimal("0.00")
+
+    def test_dashboard_summarizes_balance_spending_statements_and_recent_transactions(self, client):
+        token = _register_and_get_token(client)
+        checking = _create_account(
+            client, token, name="Checking", initial_balance="500.00"
+        )
+        category = _create_category(client, token, name="General")
+        card = client.post(
+            "/financial/credit-cards",
+            json={
+                "name": "Main Card",
+                "limit_amount": "500.00",
+                "closing_day": 10,
+                "due_day": 20,
+                "payment_account_id": checking["id"],
+            },
+            headers=_auth_header(token),
+        ).json()
+        client.post(
+            "/financial/transactions",
+            json={
+                "type": "income",
+                "account_id": checking["id"],
+                "amount": "100.00",
+                "description": "Bonus",
+                "occurred_on": "2026-07-17",
+            },
+            headers=_auth_header(token),
+        )
+        client.post(
+            "/financial/transactions",
+            json={
+                "type": "expense",
+                "account_id": checking["id"],
+                "category_id": category["id"],
+                "amount": "50.00",
+                "description": "Groceries",
+                "occurred_on": "2026-07-17",
+            },
+            headers=_auth_header(token),
+        )
+        client.post(
+            f"/financial/credit-cards/{card['id']}/purchases",
+            json={
+                "amount": "25.00",
+                "description": "Card lunch",
+                "occurred_on": "2026-07-17",
+            },
+            headers=_auth_header(token),
+        )
+
+        resp = client.get(
+            "/financial/dashboard?start_date=2026-07-01&end_date=2026-07-31",
+            headers=_auth_header(token),
+        )
+
+        assert resp.status_code == 200
+        data = resp.json()
+        assert Decimal(data["total_balance"]) == Decimal("550.00")
+        assert Decimal(data["period_income"]) == Decimal("100.00")
+        assert Decimal(data["period_expenses"]) == Decimal("75.00")
+        assert len(data["accounts"]) == 1
+        assert len(data["open_statements"]) == 1
+        assert Decimal(data["open_statements"][0]["total_amount"]) == Decimal("25.00")
+        assert len(data["recent_transactions"]) == 3
+
+    def test_dashboard_is_scoped_to_current_user(self, client):
+        token_a = _register_and_get_token(client, email="a@test.com", name="User A")
+        token_b = _register_and_get_token(client, email="b@test.com", name="User B")
+        _create_account(client, token_a, name="A Checking", initial_balance="100.00")
+        _create_account(client, token_b, name="B Checking", initial_balance="999.00")
+
+        resp = client.get("/financial/dashboard", headers=_auth_header(token_a))
+
+        assert resp.status_code == 200
+        data = resp.json()
+        assert Decimal(data["total_balance"]) == Decimal("100.00")
+        assert data["accounts"][0]["name"] == "A Checking"

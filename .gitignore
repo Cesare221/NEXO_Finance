@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+venv/
+.venv/
+*.db
+node_modules/
+.next/
+.next-stale-*/
+dist/
+*.egg
+.Python
+*.log
+.vercel/
+.railway/
+.superpowers/sdd/
