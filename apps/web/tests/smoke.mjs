@@ -49,6 +49,7 @@ const requiredFiles = [
   "app/api/assistant/message/route.ts",
   "app/api/assistant/proposals/route.ts",
   "app/api/financial/dashboard/route.ts",
+  "app/api/financial/demo-dataset/route.ts",
   "app/api/financial/accounts/route.ts",
   "app/api/financial/accounts/[accountId]/route.ts",
   "app/api/financial/categories/route.ts",
@@ -261,6 +262,35 @@ for (const marker of [
 ]) {
   if (!categories.includes(marker)) {
     throw new Error(`Functional categories manager must include ${marker}`);
+  }
+}
+
+const demoDatasetRoute = readFileSync(
+  join(root, "app/api/financial/demo-dataset/route.ts"),
+  "utf8"
+);
+for (const marker of [
+  "/financial/demo-dataset",
+  "validateRequestOrigin",
+  "export async function GET",
+  "export async function POST",
+  "export async function DELETE",
+  "data, tokens, status"
+]) {
+  if (!demoDatasetRoute.includes(marker)) {
+    throw new Error(`Demo dataset BFF must include ${marker}`);
+  }
+}
+
+const financialTypes = readFileSync(join(root, "lib/financial-types.ts"), "utf8");
+for (const marker of [
+  "DemoDatasetState",
+  "CategoryDeleteResult",
+  'action: "deleted" | "archived"',
+  "recurring_rules"
+]) {
+  if (!financialTypes.includes(marker)) {
+    throw new Error(`Financial contracts must include ${marker}`);
   }
 }
 

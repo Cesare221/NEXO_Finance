@@ -22,7 +22,11 @@ export class BackendApiError extends Error {
   }
 }
 
-async function backendRequest<T>(path: string, init: RequestInit): Promise<T> {
+async function backendRequest<T>(
+  path: string,
+  init: RequestInit,
+  onResponse?: (response: Response) => void
+): Promise<T> {
   const headers = new Headers(init.headers);
   headers.set("Content-Type", "application/json");
 
@@ -31,6 +35,7 @@ async function backendRequest<T>(path: string, init: RequestInit): Promise<T> {
     headers,
     cache: "no-store"
   });
+  onResponse?.(response);
 
   if (!response.ok) {
     const body = (await response.json().catch(() => ({}))) as { detail?: unknown };
@@ -91,6 +96,7 @@ export async function authenticatedBackendRequest<T>(
 ) {
   let currentAccessToken = accessToken;
   let refreshedTokens: AuthTokens | undefined;
+  let responseStatus = 200;
 
   if (!currentAccessToken && refreshToken) {
     refreshedTokens = await refreshSession(refreshToken);
@@ -103,19 +109,25 @@ export async function authenticatedBackendRequest<T>(
   const requestWithAuthorization = (token: string) => {
     const headers = new Headers(init.headers);
     headers.set("Authorization", `Bearer ${token}`);
-    return backendRequest<T>(path, { ...init, headers });
+    return backendRequest<T>(
+      path,
+      { ...init, headers },
+      (response) => {
+        responseStatus = response.status;
+      }
+    );
   };
 
   try {
     const data = await requestWithAuthorization(currentAccessToken);
-    return { data, tokens: refreshedTokens };
+    return { data, tokens: refreshedTokens, status: responseStatus };
   } catch (error) {
     if (!(error instanceof BackendApiError) || error.status !== 401 || !refreshToken) {
       throw error;
     }
     refreshedTokens = await refreshSession(refreshToken);
     const data = await requestWithAuthorization(refreshedTokens.access_token);
-    return { data, tokens: refreshedTokens };
+    return { data, tokens: refreshedTokens, status: responseStatus };
   }
 }
 

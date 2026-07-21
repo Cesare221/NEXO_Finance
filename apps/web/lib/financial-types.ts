@@ -65,6 +65,24 @@ export type FinancialCategory = {
   children: FinancialCategory[];
 };
 
+export type DemoDatasetState = {
+  active: boolean;
+  version: string;
+  installed_at: string | null;
+  summary: {
+    accounts: number;
+    cards: number;
+    categories: number;
+    transactions: number;
+    recurring_rules: number;
+  };
+};
+
+export type CategoryDeleteResult = {
+  action: "deleted" | "archived";
+  category: FinancialCategory;
+};
+
 export type FinancialTransaction = {
   id: number;
   user_id: number;
