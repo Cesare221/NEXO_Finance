@@ -79,8 +79,9 @@ const requiredFiles = [
   "public/icons/nexo-apple-180.png",
   "public/brand/nexo-logo.webp",
   "public/brand/nexo-logo-dark.webp",
-  "public/brand/fin-mascot.webp",
-  "public/brand/fin-avatar.webp"
+  "public/brand/fin-mascot-v2.png",
+  "public/brand/fin-mascot-v2.webp",
+  "public/brand/fin-avatar-v2.webp"
 ];
 
 const missing = requiredFiles.filter((file) => !existsSync(join(root, file)));
@@ -198,8 +199,8 @@ for (const marker of [
   "/icons/nexo-maskable-512.png",
   "/brand/nexo-logo.webp",
   "/brand/nexo-logo-dark.webp",
-  "/brand/fin-mascot.webp",
-  "/brand/fin-avatar.webp",
+  "/brand/fin-mascot-v2.webp",
+  "/brand/fin-avatar-v2.webp",
   'variant?: "full" | "avatar"',
   'variant="avatar"'
 ]) {

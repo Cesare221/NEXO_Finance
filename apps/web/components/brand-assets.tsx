@@ -51,10 +51,10 @@ export function FinMascot({ className = "", priority = false, variant = "full" }
   return (
     <Image
       className={`fin-mascot ${className}`.trim()}
-      src={isAvatar ? "/brand/fin-avatar.webp" : "/brand/fin-mascot.webp"}
+      src={isAvatar ? "/brand/fin-avatar-v2.webp" : "/brand/fin-mascot-v2.webp"}
       alt="Fin, agente financeiro do Nexo"
       width={isAvatar ? 512 : 640}
-      height={isAvatar ? 512 : 960}
+      height={isAvatar ? 512 : 888}
       priority={priority}
     />
   );
