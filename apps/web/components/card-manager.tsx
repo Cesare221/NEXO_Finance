@@ -12,6 +12,7 @@ import {
   X
 } from "lucide-react";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { CreditCardForm } from "@/components/credit-card-form";
 import type {
   DashboardData,
   FinancialAccount,
@@ -60,13 +61,8 @@ export function CardManager() {
   const [categories, setCategories] = useState<FinancialCategory[]>([]);
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [mode, setMode] = useState<"card" | "purchase" | null>(null);
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingCard, setEditingCard] = useState<FinancialCreditCard | null>(null);
   const [selectedCardId, setSelectedCardId] = useState("");
-  const [name, setName] = useState("");
-  const [limitAmount, setLimitAmount] = useState("");
-  const [closingDay, setClosingDay] = useState("10");
-  const [dueDay, setDueDay] = useState("20");
-  const [paymentAccountId, setPaymentAccountId] = useState("");
   const [purchaseAmount, setPurchaseAmount] = useState("");
   const [description, setDescription] = useState("");
   const [categoryId, setCategoryId] = useState("");
@@ -107,7 +103,6 @@ export function CardManager() {
       setCategories(categoryData);
       setDashboard(dashboardData);
       setSelectedCardId((current) => current || String(activeCards[0]?.id ?? ""));
-      setPaymentAccountId((current) => current || String(activeAccounts[0]?.id ?? ""));
     } catch (loadError) {
       setError(loadError instanceof Error ? loadError.message : "Não foi possível carregar os cartões.");
     } finally {
@@ -121,64 +116,24 @@ export function CardManager() {
 
   function closeForm() {
     setMode(null);
-    setEditingId(null);
-    setName("");
-    setLimitAmount("");
+    setEditingCard(null);
     setDescription("");
     setPurchaseAmount("");
     setCategoryId("");
   }
 
   function startEdit(card: FinancialCreditCard) {
-    setEditingId(card.id);
-    setName(card.name);
-    setLimitAmount(String(card.limit_amount).replace(".", ","));
-    setClosingDay(String(card.closing_day));
-    setDueDay(String(card.due_day));
-    setPaymentAccountId(String(card.payment_account_id));
+    setEditingCard(card);
     setError("");
     setSuccess("");
     setMode("card");
   }
 
-  async function createCard(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  function startCreateCard() {
+    setEditingCard(null);
     setError("");
     setSuccess("");
-    if (!paymentAccountId) {
-      setError("Adicione uma conta antes de cadastrar o cartão.");
-      return;
-    }
-    if (name.trim().length < 2 || parseAmount(limitAmount) <= 0) {
-      setError("Informe o nome e um limite maior que zero.");
-      return;
-    }
-    setSaving(true);
-    try {
-      const response = await fetch(
-        editingId ? `/api/financial/credit-cards/${editingId}` : "/api/financial/credit-cards",
-        {
-        method: editingId ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: name.trim(),
-          limit_amount: parseAmount(limitAmount).toFixed(2),
-          closing_day: Number(closingDay),
-          due_day: Number(dueDay),
-          payment_account_id: Number(paymentAccountId)
-        })
-        }
-      );
-      if (!response.ok) throw new Error(await readError(response));
-      closeForm();
-      setSuccess(editingId ? "Cartão atualizado." : "Cartão adicionado ao Nexo.");
-      await loadData();
-      window.dispatchEvent(new Event("nexo:financial-data-changed"));
-    } catch (saveError) {
-      setError(saveError instanceof Error ? saveError.message : "Não foi possível salvar o cartão.");
-    } finally {
-      setSaving(false);
-    }
+    setMode("card");
   }
 
   async function createPurchase(event: FormEvent<HTMLFormElement>) {
@@ -262,27 +217,26 @@ export function CardManager() {
           <button className="button secondary" type="button" disabled={cards.length === 0} onClick={() => setMode("purchase")}>
             <ReceiptText size={18} aria-hidden="true" />Registrar compra
           </button>
-          <button className="button" type="button" onClick={() => setMode("card")}>
+          <button className="button" type="button" onClick={startCreateCard}>
             <Plus size={18} aria-hidden="true" />Novo cartão
           </button>
         </div>
       </section>
 
       {mode === "card" && (
-        <form className="card form resource-form" onSubmit={createCard}>
-          <div className="resource-heading">
-            <div><span className="section-kicker">{editingId ? "Edição" : "Cadastro"}</span><h2>{editingId ? "Editar cartão" : "Novo cartão"}</h2></div>
-            <button className="icon-button" type="button" aria-label="Fechar formulário" onClick={closeForm}><X size={19} aria-hidden="true" /></button>
-          </div>
-          <div className="resource-form-grid">
-            <div className="field"><label htmlFor="card-name">Nome do cartão</label><input className="input" id="card-name" value={name} onChange={(event) => setName(event.target.value)} required /></div>
-            <div className="field"><label htmlFor="card-limit">Limite total</label><input className="input" id="card-limit" inputMode="decimal" value={limitAmount} onChange={(event) => setLimitAmount(event.target.value)} placeholder="0,00" required /></div>
-            <div className="field"><label htmlFor="closing-day">Dia de fechamento</label><input className="input" id="closing-day" type="number" min="1" max="31" value={closingDay} onChange={(event) => setClosingDay(event.target.value)} required /></div>
-            <div className="field"><label htmlFor="due-day">Dia de vencimento</label><input className="input" id="due-day" type="number" min="1" max="31" value={dueDay} onChange={(event) => setDueDay(event.target.value)} required /></div>
-            <div className="field"><label htmlFor="payment-account">Conta de pagamento</label><select className="input" id="payment-account" value={paymentAccountId} onChange={(event) => setPaymentAccountId(event.target.value)} required><option value="">Selecione</option>{accounts.map((account) => <option key={account.id} value={account.id}>{account.name}</option>)}</select></div>
-          </div>
-          <div className="resource-form-actions"><button className="button secondary" type="button" onClick={closeForm}>Cancelar</button><button className="button" type="submit" disabled={saving}>{saving ? <LoaderCircle className="spin" size={18} aria-hidden="true" /> : <CheckCircle2 size={18} aria-hidden="true" />}{saving ? "Salvando" : "Salvar cartão"}</button></div>
-        </form>
+        <CreditCardForm
+          key={editingCard?.id ?? "new"}
+          accounts={accounts}
+          card={editingCard ?? undefined}
+          onCancel={closeForm}
+          onSaved={async () => {
+            const wasEditing = Boolean(editingCard);
+            closeForm();
+            setSuccess(wasEditing ? "Cartão atualizado." : "Cartão adicionado ao Nexo.");
+            await loadData();
+            window.dispatchEvent(new Event("nexo:financial-data-changed"));
+          }}
+        />
       )}
 
       {mode === "purchase" && (
@@ -307,7 +261,7 @@ export function CardManager() {
       {loading ? (
         <section className="card resource-state"><LoaderCircle className="spin" aria-hidden="true" /><p>Carregando cartões...</p></section>
       ) : cards.length === 0 ? (
-        <section className="card resource-state"><CreditCard aria-hidden="true" /><h2>Nenhum cartão cadastrado</h2><p>Adicione um cartão para acompanhar limite e fatura sem duplicar as despesas.</p><button className="button" type="button" onClick={() => setMode("card")}>Adicionar cartão</button></section>
+        <section className="card resource-state"><CreditCard aria-hidden="true" /><h2>Nenhum cartão cadastrado</h2><p>Adicione um cartão para acompanhar limite e fatura sem duplicar as despesas.</p><button className="button" type="button" onClick={startCreateCard}>Adicionar cartão</button></section>
       ) : (
         <section className="card-grid" aria-label="Cartões ativos">
           {cards.map((card) => {

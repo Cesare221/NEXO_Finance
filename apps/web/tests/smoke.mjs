@@ -36,6 +36,8 @@ const requiredFiles = [
   "components/account-manager.tsx",
   "components/category-manager.tsx",
   "components/card-manager.tsx",
+  "components/currency-input.tsx",
+  "components/credit-card-form.tsx",
   "components/brand-assets.tsx",
   "components/ui/cash-flow-chart.tsx",
   "components/ui/financial-score-cards.tsx",
@@ -353,6 +355,27 @@ for (const marker of [
 ]) {
   if (!cards.includes(marker)) {
     throw new Error(`Functional cards manager must include ${marker}`);
+  }
+}
+
+const cardForm =
+  readFileSync(join(root, "components/currency-input.tsx"), "utf8") +
+  readFileSync(join(root, "components/credit-card-form.tsx"), "utf8") +
+  readFileSync(join(root, "components/card-manager.tsx"), "utf8");
+for (const marker of [
+  "CurrencyInput",
+  "CreditCardForm",
+  "Identifica",
+  "Ciclo e pagamento",
+  "via do cart",
+  "aria-describedby",
+  "field-error",
+  "toFixed(2)",
+  "saving",
+  'href="/contas"'
+]) {
+  if (!cardForm.includes(marker)) {
+    throw new Error(`Refined credit card form must include ${marker}`);
   }
 }
 for (const fakeValue of ["R$ 3.851,10", "R$ 1.148,90", "20/07/2026"]) {
