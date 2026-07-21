@@ -36,6 +36,8 @@
   --danger-border: #efb8b3;
   --info-soft: #eee9ff;
   --info: #59439c;
+  --chart-income: #176b60;
+  --chart-expense: #b85d45;
   --shadow-soft: 0 10px 30px rgba(20, 20, 20, 0.06);
   --sidebar-width: 248px;
   --mobile-bar-height: 72px;
@@ -78,6 +80,8 @@
   --danger-border: #84404f;
   --info-soft: #292442;
   --info: #c4b5fd;
+  --chart-income: #5eead4;
+  --chart-expense: #fda4af;
   --shadow-soft: 0 14px 36px rgba(0, 0, 0, 0.28);
 }
 

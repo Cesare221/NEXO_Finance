@@ -128,7 +128,16 @@ for (const fakeValue of ["R$ 5.420,80", "R$ 8.200,00", "R$ 2.779,20", "R$ 1.148,
 }
 
 const chart = readFileSync(join(root, "components/ui/cash-flow-chart.tsx"), "utf8");
-for (const marker of ["AreaChart", "ResponsiveContainer", "Tooltip", "accessibilityLayer", "sr-only"]) {
+for (const marker of [
+  "AreaChart",
+  "ResponsiveContainer",
+  "Tooltip",
+  "accessibilityLayer",
+  "sr-only",
+  "var(--chart-income)",
+  "var(--chart-expense)",
+  'strokeDasharray="7 4"'
+]) {
   if (!chart.includes(marker)) {
     throw new Error(`Accessible cash flow chart must include ${marker}`);
   }

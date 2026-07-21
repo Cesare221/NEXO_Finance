@@ -41,6 +41,8 @@ const themeScript = `
     var resolved = preference === "system" ? (systemDark ? "dark" : "light") : preference;
     document.documentElement.dataset.theme = resolved;
     document.documentElement.style.colorScheme = resolved;
+    var themeMeta = document.querySelector('meta[name="theme-color"]');
+    if (themeMeta) themeMeta.setAttribute("content", resolved === "dark" ? "#071817" : "#f5f7fa");
   } catch (error) {}
 })();`;
 

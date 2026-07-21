@@ -53,40 +53,42 @@ export function CashFlowChart({ data }: { data: CashFlowPoint[] }) {
           >
             <defs>
               <linearGradient id="income-area" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#176b60" stopOpacity={0.28} />
-                <stop offset="95%" stopColor="#176b60" stopOpacity={0.02} />
+                <stop offset="5%" stopColor="var(--chart-income)" stopOpacity={0.28} />
+                <stop offset="95%" stopColor="var(--chart-income)" stopOpacity={0.02} />
               </linearGradient>
               <linearGradient id="expense-area" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#b85d45" stopOpacity={0.22} />
-                <stop offset="95%" stopColor="#b85d45" stopOpacity={0.02} />
+                <stop offset="5%" stopColor="var(--chart-expense)" stopOpacity={0.22} />
+                <stop offset="95%" stopColor="var(--chart-expense)" stopOpacity={0.02} />
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} stroke="#dedbd2" strokeDasharray="3 5" />
+            <CartesianGrid vertical={false} stroke="var(--hairline)" strokeDasharray="3 5" />
             <XAxis
               dataKey="month"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#68665f", fontSize: 12 }}
+              tick={{ fill: "var(--muted)", fontSize: 12 }}
               dy={8}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#68665f", fontSize: 11 }}
+              tick={{ fill: "var(--muted)", fontSize: 11 }}
               tickFormatter={(value) => compactCurrency.format(Number(value))}
               width={62}
             />
             <Tooltip
-              cursor={{ stroke: "#8e8a80", strokeDasharray: "3 3" }}
+              cursor={{ stroke: "var(--muted)", strokeDasharray: "3 3" }}
               formatter={(value, name) => [
                 currency.format(Number(value)),
                 name === "income" ? "Receitas" : "Despesas"
               ]}
               labelFormatter={(label) => `Mês: ${label}`}
               contentStyle={{
-                border: "1px solid #dedbd2",
+                border: "1px solid var(--hairline)",
                 borderRadius: 8,
-                boxShadow: "0 10px 30px rgba(20, 20, 20, 0.1)",
+                backgroundColor: "var(--surface)",
+                color: "var(--text)",
+                boxShadow: "var(--shadow-soft)",
                 fontSize: 13
               }}
             />
@@ -94,16 +96,16 @@ export function CashFlowChart({ data }: { data: CashFlowPoint[] }) {
               iconType="circle"
               iconSize={8}
               formatter={(value) => (value === "income" ? "Receitas" : "Despesas")}
-              wrapperStyle={{ fontSize: 12, paddingTop: 10 }}
+              wrapperStyle={{ color: "var(--muted)", fontSize: 12, paddingTop: 10 }}
             />
             <Area
               type="monotone"
               dataKey="income"
               name="income"
-              stroke="#176b60"
+              stroke="var(--chart-income)"
               strokeWidth={3}
               fill="url(#income-area)"
-              dot={{ r: 3, fill: "#ffffff", strokeWidth: 2 }}
+              dot={{ r: 3, fill: "var(--surface)", strokeWidth: 2 }}
               activeDot={{ r: 6 }}
               isAnimationActive={false}
             />
@@ -111,10 +113,11 @@ export function CashFlowChart({ data }: { data: CashFlowPoint[] }) {
               type="monotone"
               dataKey="expense"
               name="expense"
-              stroke="#b85d45"
+              stroke="var(--chart-expense)"
               strokeWidth={2.5}
+              strokeDasharray="7 4"
               fill="url(#expense-area)"
-              dot={{ r: 3, fill: "#ffffff", strokeWidth: 2 }}
+              dot={{ r: 3, fill: "var(--surface)", strokeWidth: 2 }}
               activeDot={{ r: 6 }}
               isAnimationActive={false}
             />
