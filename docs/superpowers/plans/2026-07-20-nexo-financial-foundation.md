@@ -193,15 +193,18 @@ def _month_shift(day: date, months: int) -> date:
 
 def _statement_cycle(occurred_on: date, closing_day: int, due_day: int) -> tuple[date, date, date]:
     current_close = _valid_day(occurred_on.year, occurred_on.month, closing_day)
+    next_month = _month_shift(current_close, 1)
     period_end = current_close if occurred_on <= current_close else _valid_day(
-        _month_shift(current_close, 1).year,
-        _month_shift(current_close, 1).month,
-        closing_day,
+        next_month.year, next_month.month, closing_day
     )
     previous_month = _month_shift(period_end, -1)
     period_start = _valid_day(previous_month.year, previous_month.month, closing_day) + timedelta(days=1)
-    due_month = period_end if due_day > period_end.day else _month_shift(period_end, 1)
-    due_on = _valid_day(due_month.year, due_month.month, due_day)
+    same_month_due = _valid_day(period_end.year, period_end.month, due_day)
+    if same_month_due > period_end:
+        due_on = same_month_due
+    else:
+        following_month = _month_shift(period_end, 1)
+        due_on = _valid_day(following_month.year, following_month.month, due_day)
     return period_start, period_end, due_on
 ```
 
