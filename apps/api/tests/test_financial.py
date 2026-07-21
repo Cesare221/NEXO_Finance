@@ -1,4 +1,11 @@
 from decimal import Decimal
+from unittest.mock import Mock
+
+import pytest
+from fastapi import HTTPException
+from app.models.user import User
+from app.services import financial_service
+from tests.conftest import TestingSessionLocal
 
 
 def _register_and_get_token(client, email="test@example.com", name="Test User") -> str:
@@ -891,6 +898,98 @@ class TestCreditCards:
 
         assert archived.status_code == 200
         assert replacement.status_code == 201
+
+    def test_duplicate_active_card_allows_archived_rename_but_rejects_reactivation(
+        self, client
+    ):
+        token = _register_and_get_token(client)
+        checking = _create_account(client, token, name="Checking")
+        _create_credit_card(client, token, checking["id"], name="Main Card")
+        archived_card = _create_credit_card(client, token, checking["id"], name="Old")
+        client.delete(
+            f"/financial/credit-cards/{archived_card['id']}",
+            headers=_auth_header(token),
+        )
+
+        renamed = client.put(
+            f"/financial/credit-cards/{archived_card['id']}",
+            json={"name": " main card "},
+            headers=_auth_header(token),
+        )
+        db = TestingSessionLocal()
+        try:
+            with pytest.raises(HTTPException) as error:
+                financial_service.update_credit_card(
+                    db,
+                    archived_card["user_id"],
+                    archived_card["id"],
+                    is_archived=False,
+                )
+        finally:
+            db.close()
+
+        assert renamed.status_code == 200
+        assert error.value.status_code == 409
+
+    def test_duplicate_active_card_lock_contract_uses_user_row_for_update(self):
+        query = Mock()
+        query.filter.return_value = query
+        query.with_for_update.return_value = query
+        query.first.return_value = object()
+        db = Mock()
+        db.query.return_value = query
+
+        lock_namespace = getattr(
+            financial_service, "_lock_card_name_namespace", None
+        )
+
+        assert lock_namespace is not None
+        lock_namespace(db, user_id=42)
+        db.query.assert_called_once_with(User)
+        query.with_for_update.assert_called_once_with()
+
+    def test_duplicate_active_card_locks_namespace_before_create_and_rename_checks(
+        self, client, monkeypatch
+    ):
+        token = _register_and_get_token(client)
+        checking = _create_account(client, token, name="Checking")
+        existing = _create_credit_card(client, token, checking["id"], name="Existing")
+        events = []
+        original_conflict_check = financial_service._has_active_card_name_conflict
+
+        def record_lock(db, user_id):
+            events.append(("lock", user_id))
+
+        def record_conflict_check(db, user_id, name, card_id=None):
+            events.append(("check", user_id))
+            return original_conflict_check(db, user_id, name, card_id)
+
+        monkeypatch.setattr(
+            financial_service,
+            "_lock_card_name_namespace",
+            record_lock,
+            raising=False,
+        )
+        monkeypatch.setattr(
+            financial_service,
+            "_has_active_card_name_conflict",
+            record_conflict_check,
+        )
+
+        created = _create_credit_card(client, token, checking["id"], name="Second")
+        renamed = client.put(
+            f"/financial/credit-cards/{created['id']}",
+            json={"name": "Renamed"},
+            headers=_auth_header(token),
+        )
+
+        assert renamed.status_code == 200
+        assert events == [
+            ("lock", existing["user_id"]),
+            ("check", existing["user_id"]),
+            ("lock", existing["user_id"]),
+            ("check", existing["user_id"]),
+        ]
 
     def test_statement_cycle_preserves_existing_statement_after_card_edit(self, client):
         token = _register_and_get_token(client)

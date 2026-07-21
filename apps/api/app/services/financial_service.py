@@ -14,6 +14,7 @@ from app.models.installment_plan import InstallmentPlan
 from app.models.recurring_rule import RecurringRule
 from app.models.transaction import Transaction
 from app.models.transfer import Transfer
+from app.models.user import User
 
 ACCOUNT_TYPES = {"checking", "savings", "wallet", "investment"}
 TRANSACTION_TYPES = {
@@ -624,6 +625,15 @@ def _has_active_card_name_conflict(
     )
 
 
+def _lock_card_name_namespace(db: Session, user_id: int) -> None:
+    (
+        db.query(User)
+        .filter(User.id == user_id)
+        .with_for_update()
+        .first()
+    )
+
+
 def create_credit_card(
     db: Session,
     user_id: int,
@@ -634,6 +644,7 @@ def create_credit_card(
     payment_account_id: int,
 ) -> dict:
     get_account(db, user_id, payment_account_id)
+    _lock_card_name_namespace(db, user_id)
     if _has_active_card_name_conflict(db, user_id, name):
         raise _conflict("Credit card", name)
     card = CreditCard(
@@ -664,9 +675,12 @@ def update_credit_card(
     db: Session, user_id: int, card_id: int, **kwargs
 ) -> dict:
     card = _get_card(db, user_id, card_id)
-    if "name" in kwargs and kwargs["name"] is not None:
-        if _has_active_card_name_conflict(db, user_id, kwargs["name"], card_id):
-            raise _conflict("Credit card", kwargs["name"])
+    resulting_is_archived = kwargs.get("is_archived", card.is_archived)
+    if not resulting_is_archived and ("name" in kwargs or card.is_archived):
+        resulting_name = kwargs.get("name") or card.name
+        _lock_card_name_namespace(db, user_id)
+        if _has_active_card_name_conflict(db, user_id, resulting_name, card_id):
+            raise _conflict("Credit card", resulting_name)
     if "payment_account_id" in kwargs:
         get_account(db, user_id, kwargs["payment_account_id"])
     if "limit_amount" in kwargs:
