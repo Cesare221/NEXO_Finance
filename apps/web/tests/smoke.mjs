@@ -583,9 +583,40 @@ for (const marker of [
 }
 
 const serviceWorker = readFileSync(join(root, "public/sw.js"), "utf8");
-for (const marker of ["install", "activate", "fetch", "/offline"]) {
+for (const marker of [
+  "install",
+  "activate",
+  "fetch",
+  "/offline",
+  "/brand/fin-mascot-v2.webp",
+  "/brand/fin-avatar-v2.webp"
+]) {
   if (!serviceWorker.includes(marker)) {
     throw new Error(`Service worker must include ${marker}`);
+  }
+}
+if (serviceWorker.includes("/brand/fin-mascot.webp") || serviceWorker.includes("/brand/fin-avatar.webp")) {
+  throw new Error("Service worker must cache the Fin v2 assets only");
+}
+
+const manifest = readFileSync(join(root, "app/manifest.ts"), "utf8");
+for (const marker of [
+  'name: "Nexo - Controle financeiro"',
+  'start_url: "/dashboard"',
+  'display: "standalone"',
+  'theme_color: "#101a19"',
+  'purpose: "maskable"'
+]) {
+  if (!manifest.includes(marker)) {
+    throw new Error(`PWA manifest must include ${marker}`);
+  }
+}
+
+const onboarding = readFileSync(join(root, "app/onboarding/page.tsx"), "utf8");
+const themeSettings = readFileSync(join(root, "components/theme-settings.tsx"), "utf8");
+for (const source of [onboarding, themeSettings]) {
+  if (/>[^<{]*\\u[0-9a-f]{4}/i.test(source)) {
+    throw new Error("JSX text must not render Unicode escape sequences literally");
   }
 }
 

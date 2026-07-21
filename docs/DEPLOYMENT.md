@@ -55,6 +55,23 @@ Execute também:
 5. Instalação PWA em Android e iOS.
 6. Verificação em 375 px, 768 px e desktop.
 
+## Rollout Financeiro
+
+Execute as migrations antes de iniciar uma nova versão da API. O rollout financeiro deve terminar no único head `b81f4c6d2a10`:
+
+```powershell
+cd apps/api
+python -m alembic heads
+python -m alembic upgrade head
+python -m alembic current
+```
+
+Os endpoints autenticados do dataset demonstrativo são `GET`, `POST` e `DELETE /financial/demo-dataset`; clientes do navegador devem usar o BFF equivalente em `/api/financial/demo-dataset`. A instalação exige confirmação explícita do usuário. Nunca instale dados de exemplo automaticamente durante cadastro, login, onboarding, ativação do service worker ou instalação do PWA.
+
+`DELETE /financial/demo-dataset` remove somente recursos marcados como demonstrativos. Recursos adotados por movimentações financeiras reais são preservados, e a resposta informa as contagens removidas e preservadas.
+
+O perfil do usuário armazena `theme_preference` como `system`, `light` ou `dark`. Atualize-o por `PATCH /auth/me` ou pelo BFF `PATCH /api/auth/profile`; aplique-o no carregamento inicial para evitar flash de tema.
+
 ## Backups
 
 - Ative backups diários do PostgreSQL antes de aceitar usuários reais.
@@ -69,6 +86,7 @@ Execute também:
 3. Restaure o banco apenas quando houver perda ou corrupção confirmada.
 4. Não execute downgrade de migration automaticamente. Cada downgrade deve ser revisado conforme os dados envolvidos.
 5. Valide `/ready`, login e uma leitura do dashboard antes de reabrir o tráfego.
+6. Quando uma migration já estiver aplicada, prefira uma migration corretiva aditiva. Execute `alembic downgrade` somente com plano revisado, backup restaurável e janela de manutenção; ele não é rollback automático de deploy.
 
 ## Checklist De Produção
 

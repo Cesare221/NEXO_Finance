@@ -71,3 +71,22 @@ uv export --locked --extra dev --no-emit-project --format requirements-txt --out
 As instruções completas, variáveis, smoke tests, backups e rollback estão em [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 Nunca publique arquivos `.env`, logs locais, tokens ou credenciais do banco.
+
+## Rollout Financeiro
+
+O rollout financeiro deve terminar no único head Alembic `b81f4c6d2a10`:
+
+```powershell
+cd apps/api
+python -m alembic heads
+python -m alembic upgrade head
+python -m alembic current
+```
+
+Dados de exemplo são estritamente opcionais e nunca são instalados durante cadastro, login, onboarding ou instalação do PWA. O ciclo autenticado do dataset é:
+
+- `GET /financial/demo-dataset` retorna o estado do dataset.
+- `POST /financial/demo-dataset` instala o dataset após confirmação explícita do usuário.
+- `DELETE /financial/demo-dataset` remove somente recursos demonstrativos e preserva recursos adotados por movimentações reais.
+
+O BFF do Next.js expõe o mesmo ciclo em `/api/financial/demo-dataset`. `theme_preference` pertence ao perfil do usuário e aceita `system`, `light` ou `dark` por `PATCH /auth/me` (ou pelo BFF em `/api/auth/profile`); ela é aplicada antes da renderização para evitar flash de tema.

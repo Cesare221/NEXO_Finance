@@ -1,4 +1,4 @@
-const CACHE_NAME = "nexo-shell-v4";
+const CACHE_NAME = "nexo-shell-v5";
 const OFFLINE_URL = "/offline";
 const APP_SHELL = [
   OFFLINE_URL,
@@ -9,8 +9,8 @@ const APP_SHELL = [
   "/icons/nexo-apple-180.png",
   "/brand/nexo-logo.webp",
   "/brand/nexo-logo-dark.webp",
-  "/brand/fin-mascot.webp",
-  "/brand/fin-avatar.webp"
+  "/brand/fin-mascot-v2.webp",
+  "/brand/fin-avatar-v2.webp"
 ];
 
 self.addEventListener("install", (event) => {

@@ -64,9 +64,9 @@ export function ThemeSettings() {
     <section className="card theme-settings" aria-labelledby="theme-settings-title">
       <div className="settings-section-heading">
         <div>
-          <span className="section-kicker">Apar\u00eancia</span>
+          <span className="section-kicker">{"Apar\u00eancia"}</span>
           <h2 id="theme-settings-title">Tema do Nexo</h2>
-          <p>Escolha como o aplicativo aparece neste e nos pr\u00f3ximos acessos.</p>
+          <p>{"Escolha como o aplicativo aparece neste e nos pr\u00f3ximos acessos."}</p>
         </div>
       </div>
 

@@ -23,8 +23,8 @@ export default function OnboardingPage() {
       <section className="onboarding-demo" aria-labelledby="onboarding-demo-title">
         <div>
           <span className="section-kicker">Opcional</span>
-          <h2 id="onboarding-demo-title">Conhe\u00e7a o Nexo antes de cadastrar tudo</h2>
-          <p>Use um conjunto remov\u00edvel para explorar saldos, gr\u00e1ficos, cart\u00f5es e o Fin.</p>
+          <h2 id="onboarding-demo-title">{"Conhe\u00e7a o Nexo antes de cadastrar tudo"}</h2>
+          <p>{"Use um conjunto remov\u00edvel para explorar saldos, gr\u00e1ficos, cart\u00f5es e o Fin."}</p>
         </div>
         <DemoDatasetControl variant="install" />
       </section>
