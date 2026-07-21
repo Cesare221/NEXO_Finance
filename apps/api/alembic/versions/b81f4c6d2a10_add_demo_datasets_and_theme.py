@@ -40,6 +40,7 @@ def upgrade() -> None:
         ),
         sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("id", "user_id", name="uq_demo_datasets_id_user_id"),
     )
     op.create_index("ix_demo_datasets_user_id", "demo_datasets", ["user_id"])
     op.create_index(
@@ -51,15 +52,15 @@ def upgrade() -> None:
         sqlite_where=sa.text("status = 'active'"),
     )
 
-    op.add_column(
-        "users",
-        sa.Column(
-            "theme_preference",
-            sa.String(length=10),
-            server_default="system",
-            nullable=False,
-        ),
-    )
+    with op.batch_alter_table("users") as batch_op:
+        batch_op.add_column(
+            sa.Column(
+                "theme_preference",
+                sa.String(length=10),
+                server_default="system",
+                nullable=False,
+            )
+        )
 
     for table_name in (
         "financial_accounts",
@@ -69,20 +70,26 @@ def upgrade() -> None:
         "transactions",
         "recurring_rules",
     ):
-        op.add_column(
-            table_name,
-            sa.Column(
-                "demo_dataset_id",
-                sa.Integer(),
-                sa.ForeignKey("demo_datasets.id", ondelete="SET NULL"),
-                nullable=True,
-            ),
-        )
-        op.create_index(
-            f"ix_{table_name}_demo_dataset_id",
-            table_name,
-            ["demo_dataset_id"],
-        )
+        with op.batch_alter_table(table_name) as batch_op:
+            batch_op.add_column(
+                sa.Column("demo_dataset_id", sa.Integer(), nullable=True)
+            )
+            batch_op.create_index(
+                f"ix_{table_name}_demo_dataset_id", ["demo_dataset_id"]
+            )
+            batch_op.create_foreign_key(
+                f"fk_{table_name}_demo_dataset",
+                "demo_datasets",
+                ["demo_dataset_id"],
+                ["id"],
+                ondelete="SET NULL",
+            )
+            batch_op.create_foreign_key(
+                f"fk_{table_name}_demo_dataset_user",
+                "demo_datasets",
+                ["demo_dataset_id", "user_id"],
+                ["id", "user_id"],
+            )
 
 
 def downgrade() -> None:
@@ -94,10 +101,18 @@ def downgrade() -> None:
         "categories",
         "financial_accounts",
     ):
-        op.drop_index(f"ix_{table_name}_demo_dataset_id", table_name=table_name)
-        op.drop_column(table_name, "demo_dataset_id")
+        with op.batch_alter_table(table_name) as batch_op:
+            batch_op.drop_constraint(
+                f"fk_{table_name}_demo_dataset_user", type_="foreignkey"
+            )
+            batch_op.drop_constraint(
+                f"fk_{table_name}_demo_dataset", type_="foreignkey"
+            )
+            batch_op.drop_index(f"ix_{table_name}_demo_dataset_id")
+            batch_op.drop_column("demo_dataset_id")
 
-    op.drop_column("users", "theme_preference")
+    with op.batch_alter_table("users") as batch_op:
+        batch_op.drop_column("theme_preference")
     op.drop_index("uq_demo_datasets_active_user_version", table_name="demo_datasets")
     op.drop_index("ix_demo_datasets_user_id", table_name="demo_datasets")
     op.drop_table("demo_datasets")

@@ -1,6 +1,14 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, func
+from sqlalchemy import (
+    Boolean,
+    DateTime,
+    ForeignKey,
+    ForeignKeyConstraint,
+    Integer,
+    String,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -8,17 +16,25 @@ from app.core.database import Base
 
 class Category(Base):
     __tablename__ = "categories"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["demo_dataset_id"],
+            ["demo_datasets.id"],
+            name="fk_categories_demo_dataset",
+            ondelete="SET NULL",
+        ),
+        ForeignKeyConstraint(
+            ["demo_dataset_id", "user_id"],
+            ["demo_datasets.id", "demo_datasets.user_id"],
+            name="fk_categories_demo_dataset_user",
+        ),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    demo_dataset_id: Mapped[int | None] = mapped_column(
-        Integer,
-        ForeignKey("demo_datasets.id", ondelete="SET NULL"),
-        nullable=True,
-        index=True,
-    )
+    demo_dataset_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     parent_id: Mapped[int | None] = mapped_column(
         Integer, ForeignKey("categories.id", ondelete="SET NULL"), nullable=True

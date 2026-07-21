@@ -1,7 +1,16 @@
 from datetime import date, datetime
 from decimal import Decimal
 
-from sqlalchemy import Date, DateTime, ForeignKey, Integer, Numeric, String, func
+from sqlalchemy import (
+    Date,
+    DateTime,
+    ForeignKey,
+    ForeignKeyConstraint,
+    Integer,
+    Numeric,
+    String,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
@@ -9,17 +18,25 @@ from app.core.database import Base
 
 class BillingStatement(Base):
     __tablename__ = "billing_statements"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["demo_dataset_id"],
+            ["demo_datasets.id"],
+            name="fk_billing_statements_demo_dataset",
+            ondelete="SET NULL",
+        ),
+        ForeignKeyConstraint(
+            ["demo_dataset_id", "user_id"],
+            ["demo_datasets.id", "demo_datasets.user_id"],
+            name="fk_billing_statements_demo_dataset_user",
+        ),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    demo_dataset_id: Mapped[int | None] = mapped_column(
-        Integer,
-        ForeignKey("demo_datasets.id", ondelete="SET NULL"),
-        nullable=True,
-        index=True,
-    )
+    demo_dataset_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
     credit_card_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("credit_cards.id", ondelete="CASCADE"), nullable=False, index=True
     )
