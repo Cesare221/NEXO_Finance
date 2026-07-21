@@ -17,6 +17,9 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     phone: Mapped[str | None] = mapped_column(String(32), nullable=True)
     avatar_data_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    theme_preference: Mapped[str] = mapped_column(
+        String(10), nullable=False, default="system", server_default="system"
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

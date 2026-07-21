@@ -14,6 +14,12 @@ class Transaction(Base):
     user_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
+    demo_dataset_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("demo_datasets.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
     account_id: Mapped[int] = mapped_column(
         Integer,
         ForeignKey("financial_accounts.id", ondelete="RESTRICT"),

@@ -12,6 +12,7 @@ from app.models.recurring_rule import RecurringRule
 from app.models.action_proposal import ActionProposal
 from app.models.action_execution import ActionExecution
 from app.models.audit_event import AuditEvent
+from app.models.demo_dataset import DemoDataset
 
 __all__ = [
     "User",
@@ -28,4 +29,5 @@ __all__ = [
     "ActionProposal",
     "ActionExecution",
     "AuditEvent",
+    "DemoDataset",
 ]
