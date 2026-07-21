@@ -1,6 +1,6 @@
 from datetime import date
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
@@ -22,6 +22,7 @@ from app.schemas.financial import (
     CreditCardResponse,
     CreditCardUpdate,
     DashboardResponse,
+    DemoDatasetResponse,
     InstallmentPlanCreate,
     InstallmentPlanResponse,
     InstallmentResponse,
@@ -35,8 +36,36 @@ from app.schemas.financial import (
     TransferResponse,
 )
 from app.services import financial_service as fs
+from app.services import demo_dataset_service as demo_service
 
 router = APIRouter(prefix="/financial", tags=["financial"])
+
+
+@router.get("/demo-dataset", response_model=DemoDatasetResponse)
+def get_demo_dataset(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return demo_service.get_demo_dataset_status(db, current_user.id)
+
+
+@router.post("/demo-dataset", response_model=DemoDatasetResponse, status_code=201)
+def install_demo_dataset(
+    response: Response,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    state, created = demo_service.install_demo_dataset(db, current_user.id)
+    response.status_code = 201 if created else 200
+    return state
+
+
+@router.delete("/demo-dataset", response_model=DemoDatasetResponse)
+def clean_demo_dataset(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return demo_service.clean_demo_dataset(db, current_user.id)
 
 
 @router.get("/dashboard", response_model=DashboardResponse)

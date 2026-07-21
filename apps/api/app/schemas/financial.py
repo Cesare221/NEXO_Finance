@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Literal
 
@@ -89,6 +89,21 @@ class CategoryResponse(BaseModel):
 class CategoryDeleteResponse(BaseModel):
     action: Literal["deleted", "archived"]
     category: CategoryResponse
+
+
+class DemoDatasetSummary(BaseModel):
+    accounts: int
+    cards: int
+    categories: int
+    transactions: int
+    recurring_rules: int
+
+
+class DemoDatasetResponse(BaseModel):
+    active: bool
+    version: str
+    installed_at: datetime | None
+    summary: DemoDatasetSummary
 
 
 class TransactionCreate(BaseModel):
