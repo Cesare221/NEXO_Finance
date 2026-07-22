@@ -37,6 +37,15 @@ export function CashFlowChart({ data }: { data: CashFlowPoint[] }) {
   }, null);
   const hasMovement = data.some((item) => item.income !== 0 || item.expense !== 0);
 
+  if (!hasMovement) {
+    return (
+      <div className="cashflow-empty" role="status">
+        <strong>Sem movimentações neste período</strong>
+        <span>O gráfico aparecerá quando houver receitas ou despesas no intervalo selecionado.</span>
+      </div>
+    );
+  }
+
   return (
     <div className="cashflow-chart-shell">
       <p className="sr-only">

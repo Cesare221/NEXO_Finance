@@ -2,6 +2,7 @@
 
 import { Eye, EyeOff, LoaderCircle, LockKeyhole } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { FormEvent, useState } from "react";
 
 type AuthFormProps = {
@@ -25,6 +26,10 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
     const endpoint = isRegister ? "/api/auth/register" : "/api/auth/login";
     const payload = {
       ...(isRegister ? { name: String(formData.get("name") ?? "").trim() } : {}),
+      ...(isRegister ? {
+        privacy_accepted: formData.get("privacy_accepted") === "on",
+        ai_data_processing_consent: formData.get("ai_data_processing_consent") === "on"
+      } : {}),
       email: String(formData.get("email") ?? "").trim(),
       password: String(formData.get("password") ?? "")
     };
@@ -84,6 +89,19 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
           autoFocus
         />
       </div>
+
+      {isRegister ? (
+        <div className="auth-consents">
+          <label className="checkbox-row">
+            <input type="checkbox" name="privacy_accepted" required />
+            <span>Li e aceito o <Link href="/privacidade" target="_blank">Aviso de Privacidade</Link>.</span>
+          </label>
+          <label className="checkbox-row">
+            <input type="checkbox" name="ai_data_processing_consent" />
+            <span>Permito que o Fin envie somente o contexto necessário à Groq. Posso revogar depois.</span>
+          </label>
+        </div>
+      ) : null}
 
       <div className="field">
         <label htmlFor="password">Senha</label>

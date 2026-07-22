@@ -101,7 +101,8 @@ for (const label of ["Confirmar", "Editar", "Cancelar"]) {
 
 const dashboard =
   readFileSync(join(root, "app/dashboard/page.tsx"), "utf8") +
-  readFileSync(join(root, "components/dashboard-view.tsx"), "utf8");
+  readFileSync(join(root, "components/dashboard-view.tsx"), "utf8") +
+  readFileSync(join(root, "components/date-range-picker.tsx"), "utf8");
 for (const label of ["Saldo total", "Receitas", "Despesas", "Faturas"]) {
   if (!dashboard.includes(label)) {
     throw new Error(`Dashboard must include ${label}`);
@@ -123,6 +124,11 @@ for (const marker of ["CashFlowChart", "FinancialScoreCards", "FinancialDashboar
 for (const marker of ["/api/financial/dashboard", "DashboardSkeleton", "dashboard-empty", "recent_transactions"]) {
   if (!dashboard.includes(marker)) {
     throw new Error(`Real dashboard must include ${marker}`);
+  }
+}
+for (const marker of ["DateRangePicker", 'type="date"', "Últimos 30 dias", "Aplicar período"]) {
+  if (!dashboard.includes(marker)) {
+    throw new Error(`Dashboard period selector must include ${marker}`);
   }
 }
 
@@ -414,15 +420,22 @@ for (const fakeValue of ["R$ 3.851,10", "R$ 1.148,90", "20/07/2026"]) {
 }
 
 const authCookies = readFileSync(join(root, "lib/auth-cookies.ts"), "utf8");
+const authMiddleware = readFileSync(join(root, "middleware.ts"), "utf8");
 for (const marker of [
-  "fin_access_token",
-  "fin_refresh_token",
+  "__Host-nexo",
+  "_access_token",
+  "_refresh_token",
   "httpOnly: true",
-  'sameSite: "lax"',
+  'sameSite: "strict"',
   "secure: process.env.NODE_ENV === \"production\""
 ]) {
   if (!authCookies.includes(marker)) {
     throw new Error(`Auth cookies must include ${marker}`);
+  }
+}
+for (const marker of ["__Host-nexo", "_access_token", "_refresh_token"]) {
+  if (!authMiddleware.includes(marker)) {
+    throw new Error(`Auth middleware must use the current cookie contract: ${marker}`);
   }
 }
 
@@ -459,7 +472,7 @@ for (const marker of [
 }
 
 const middleware = readFileSync(join(root, "middleware.ts"), "utf8");
-for (const marker of ["protectedRoutes", "fin_access_token", "fin_refresh_token", "/login"]) {
+for (const marker of ["protectedRoutes", "__Host-nexo", "_access_token", "_refresh_token", "/login"]) {
   if (!middleware.includes(marker)) {
     throw new Error(`Route protection must include ${marker}`);
   }
@@ -639,6 +652,25 @@ for (const source of [onboarding, themeSettings]) {
 const settings = readFileSync(join(root, "app/configuracoes/page.tsx"), "utf8");
 if (!settings.includes("InstallAppButton")) {
   throw new Error("Settings must expose the PWA installation action");
+}
+const privacyExperience =
+  readFileSync(join(root, "components/privacy-settings.tsx"), "utf8") +
+  readFileSync(join(root, "app/privacidade/page.tsx"), "utf8") +
+  readFileSync(join(root, "app/api/auth/data-export/route.ts"), "utf8") +
+  readFileSync(join(root, "app/api/auth/account/route.ts"), "utf8");
+for (const marker of ["ai_data_processing_consent", "/api/auth/data-export", "/api/auth/account", "Aviso de Privacidade", "EXCLUIR"]) {
+  if (!privacyExperience.includes(marker)) {
+    throw new Error(`Privacy controls must include ${marker}`);
+  }
+}
+const securityExperience =
+  readFileSync(join(root, "components/security-settings.tsx"), "utf8") +
+  readFileSync(join(root, "app/api/auth/sessions/route.ts"), "utf8") +
+  readFileSync(join(root, "app/api/auth/sessions/[sessionId]/route.ts"), "utf8");
+for (const marker of ["Sessões ativas", "/api/auth/sessions", "validateRequestOrigin", "Encerrar sessão"]) {
+  if (!securityExperience.includes(marker)) {
+    throw new Error(`Session security controls must include ${marker}`);
+  }
 }
 
 const themeExperience =

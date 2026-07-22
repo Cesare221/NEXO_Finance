@@ -1,7 +1,8 @@
 import type { NextResponse } from "next/server";
 
-export const ACCESS_COOKIE = "fin_access_token";
-export const REFRESH_COOKIE = "fin_refresh_token";
+const COOKIE_PREFIX = process.env.NODE_ENV === "production" ? "__Host-nexo" : "nexo";
+export const ACCESS_COOKIE = `${COOKIE_PREFIX}_access_token`;
+export const REFRESH_COOKIE = `${COOKIE_PREFIX}_refresh_token`;
 
 export type AuthTokens = {
   access_token: string;
@@ -11,7 +12,7 @@ export type AuthTokens = {
 
 const baseCookieOptions = {
   httpOnly: true,
-  sameSite: "lax" as const,
+  sameSite: "strict" as const,
   secure: process.env.NODE_ENV === "production",
   path: "/"
 };

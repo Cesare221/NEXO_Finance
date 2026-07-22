@@ -3,9 +3,10 @@ import uuid
 from datetime import datetime, timedelta, timezone
 
 import bcrypt
+import jwt
 from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError, VerifyMismatchError
-from jose import JWTError, jwt
+from jwt.exceptions import InvalidTokenError
 
 from app.core.config import settings
 
@@ -37,15 +38,23 @@ def fingerprint_token(token: str) -> str:
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
 
-def _make_token(user_id: int, token_type: str, expire_delta: timedelta) -> str:
+def _make_token(
+    user_id: int,
+    token_type: str,
+    expire_delta: timedelta,
+    family_id: str | None = None,
+) -> str:
+    claims = {
+        "sub": str(user_id),
+        "jti": uuid.uuid4().hex,
+        "iat": datetime.now(timezone.utc),
+        "exp": datetime.now(timezone.utc) + expire_delta,
+        "type": token_type,
+    }
+    if family_id is not None:
+        claims["family_id"] = family_id
     return jwt.encode(
-        {
-            "sub": str(user_id),
-            "jti": uuid.uuid4().hex,
-            "iat": datetime.now(timezone.utc),
-            "exp": datetime.now(timezone.utc) + expire_delta,
-            "type": token_type,
-        },
+        claims,
         settings.secret_key,
         algorithm=ALGORITHM,
     )
@@ -57,14 +66,17 @@ def create_access_token(user_id: int) -> str:
     )
 
 
-def create_refresh_token(user_id: int) -> str:
+def create_refresh_token(user_id: int, family_id: str) -> str:
     return _make_token(
-        user_id, "refresh", timedelta(days=settings.refresh_token_expire_days)
+        user_id,
+        "refresh",
+        timedelta(days=settings.refresh_token_expire_days),
+        family_id,
     )
 
 
 def decode_token(token: str) -> dict:
     try:
         return jwt.decode(token, settings.secret_key, algorithms=[ALGORITHM])
-    except JWTError:
+    except InvalidTokenError:
         return {}

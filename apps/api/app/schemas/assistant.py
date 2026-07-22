@@ -1,13 +1,26 @@
-from datetime import datetime
+from datetime import date, datetime
+from decimal import Decimal
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
 
+class TransactionProposalPayload(BaseModel):
+    type: Literal["income", "expense"]
+    account_id: int = Field(..., gt=0)
+    category_id: int | None = Field(None, gt=0)
+    amount: Decimal = Field(..., gt=0, le=Decimal("9999999999999999.99"))
+    description: str | None = Field(None, min_length=2, max_length=500)
+    occurred_on: date
+    origin: Literal["fin", "fin_ai", "recognized"] = "fin"
+
+    model_config = {"extra": "forbid"}
+
+
 class ActionProposalCreate(BaseModel):
     conversation_id: str | None = Field(None, max_length=100)
-    action_type: str = Field(..., max_length=100)
-    payload: dict[str, Any]
+    action_type: Literal["create_transaction"]
+    payload: TransactionProposalPayload
     human_summary: str = Field(..., min_length=1, max_length=1000)
     previous_state_snapshot: dict[str, Any] = Field(default_factory=dict)
     expires_at: datetime | None = None
@@ -15,7 +28,7 @@ class ActionProposalCreate(BaseModel):
 
 
 class ActionProposalUpdate(BaseModel):
-    payload: dict[str, Any] | None = None
+    payload: TransactionProposalPayload | None = None
     human_summary: str | None = Field(None, min_length=1, max_length=1000)
 
 

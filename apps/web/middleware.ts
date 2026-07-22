@@ -11,14 +11,18 @@ const protectedRoutes = [
   "/configuracoes"
 ];
 
+const cookiePrefix = process.env.NODE_ENV === "production" ? "__Host-nexo" : "nexo";
+const accessCookie = `${cookiePrefix}_access_token`;
+const refreshCookie = `${cookiePrefix}_refresh_token`;
+
 export function middleware(request: NextRequest) {
   const protectedRoute = protectedRoutes.some(
     (route) => request.nextUrl.pathname === route || request.nextUrl.pathname.startsWith(`${route}/`)
   );
   if (!protectedRoute) return NextResponse.next();
 
-  const accessToken = request.cookies.get("fin_access_token")?.value;
-  const refreshToken = request.cookies.get("fin_refresh_token")?.value;
+  const accessToken = request.cookies.get(accessCookie)?.value;
+  const refreshToken = request.cookies.get(refreshCookie)?.value;
   if (accessToken || refreshToken) return NextResponse.next();
 
   const loginUrl = new URL("/login", request.url);

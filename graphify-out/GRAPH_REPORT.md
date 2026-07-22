@@ -1,16 +1,16 @@
 # Graph Report - NEXO_finance  (2026-07-21)
 
 ## Corpus Check
-- 146 files · ~217,277 words
+- 159 files · ~224,037 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1108 nodes · 2102 edges · 87 communities (72 shown, 15 thin omitted)
-- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 104 edges (avg confidence: 0.67)
+- 1207 nodes · 2324 edges · 90 communities (77 shown, 13 thin omitted)
+- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 133 edges (avg confidence: 0.65)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1eef7327`
+- Built from commit: `b67a0bd1`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -84,16 +84,17 @@
 - [[_COMMUNITY_Community 84|Community 84]]
 - [[_COMMUNITY_Community 85|Community 85]]
 - [[_COMMUNITY_Community 86|Community 86]]
+- [[_COMMUNITY_Community 89|Community 89]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `_auth_header()` - 65 edges
 2. `_register_and_get_token()` - 64 edges
-3. `_create_account()` - 46 edges
-4. `setAuthCookies()` - 44 edges
-5. `publicAuthError()` - 43 edges
-6. `clearAuthCookies()` - 41 edges
-7. `validateRequestOrigin()` - 40 edges
-8. `authenticatedBackendRequest()` - 37 edges
+3. `publicAuthError()` - 51 edges
+4. `setAuthCookies()` - 50 edges
+5. `clearAuthCookies()` - 49 edges
+6. `_create_account()` - 46 edges
+7. `validateRequestOrigin()` - 44 edges
+8. `authenticatedBackendRequest()` - 42 edges
 9. `TestCategories` - 24 edges
 10. `TestCreditCards` - 24 edges
 
@@ -102,37 +103,37 @@
   apps/api/app/models/billing_statement.py → C:/Users/Usuario/Desktop/PROJETOS/Fin/apps/api/app/core/database.py
 - `Category` --uses--> `Base`  [INFERRED]
   apps/api/app/models/category.py → C:/Users/Usuario/Desktop/PROJETOS/Fin/apps/api/app/core/database.py
-- `CreditCard` --uses--> `Base`  [INFERRED]
-  apps/api/app/models/credit_card.py → C:/Users/Usuario/Desktop/PROJETOS/Fin/apps/api/app/core/database.py
-- `DemoDataset` --uses--> `Base`  [INFERRED]
-  apps/api/app/models/demo_dataset.py → C:/Users/Usuario/Desktop/PROJETOS/Fin/apps/api/app/core/database.py
-- `Transaction` --uses--> `Base`  [INFERRED]
-  apps/api/app/models/transaction.py → C:/Users/Usuario/Desktop/PROJETOS/Fin/apps/api/app/core/database.py
+- `InstallmentPlan` --uses--> `Base`  [INFERRED]
+  apps/api/app/models/installment_plan.py → C:/Users/Usuario/Desktop/PROJETOS/Fin/apps/api/app/core/database.py
+- `RecurringRule` --uses--> `Base`  [INFERRED]
+  apps/api/app/models/recurring_rule.py → C:/Users/Usuario/Desktop/PROJETOS/Fin/apps/api/app/core/database.py
+- `UserSession` --uses--> `Base`  [INFERRED]
+  apps/api/app/models/session.py → C:/Users/Usuario/Desktop/PROJETOS/Fin/apps/api/app/core/database.py
 
-## Communities (87 total, 15 thin omitted)
+## Communities (90 total, 13 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.08
 Nodes (16): ActionProposal, AuditEvent, User, _auth_header(), _create_account(), _create_category(), _create_credit_card(), _register_and_get_token() (+8 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.10
-Nodes (28): _check_rate_limit(), _client_host(), login(), logout(), me(), refresh(), register(), update_me() (+20 more)
+Cohesion: 0.09
+Nodes (40): _check_rate_limit(), _client_host(), delete_me(), _device_name(), export_me(), login(), logout(), me() (+32 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.16
-Nodes (20): archive_account(), archive_category(), archive_credit_card(), _card_response(), _card_used_limit(), _category_snapshot(), _conflict(), create_credit_card() (+12 more)
+Cohesion: 0.17
+Nodes (19): archive_account(), archive_category(), archive_credit_card(), _card_response(), _card_used_limit(), _category_snapshot(), _conflict(), create_category() (+11 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.09
-Nodes (48): BaseModel, ActionExecutionResponse, ActionProposalCreate, ActionProposalResponse, ActionProposalUpdate, AssistantMessageRequest, AssistantMessageResponse, AuditEventResponse (+40 more)
+Nodes (50): BaseModel, ActionExecutionResponse, ActionProposalCreate, ActionProposalResponse, ActionProposalUpdate, AssistantMessageRequest, AssistantMessageResponse, AuditEventResponse (+42 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.12
 Nodes (26): archive_account(), archive_credit_card(), confirm_installment(), confirm_recurring_rule(), create_account(), create_card_purchase(), create_category(), create_credit_card() (+18 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.15
+Cohesion: 0.12
 Nodes (23): _register_theme_user(), test_authorization_isolation(), test_cors_rejects_unconfigured_origin(), test_login_invalid_password(), test_login_is_rate_limited(), test_login_success(), test_logout(), test_me_authenticated() (+15 more)
 
 ### Community 6 - "Community 6"
@@ -144,8 +145,12 @@ Cohesion: 0.60
 Nodes (3): client(), override_get_db(), setup_db()
 
 ### Community 9 - "Community 9"
-Cohesion: 0.40
-Nodes (3): BaseSettings, cors_origins(), Settings
+Cohesion: 0.24
+Nodes (5): AuthRateLimiter, _key(), RateLimitExceeded, RateLimitUnavailable, Exception
+
+### Community 13 - "Community 13"
+Cohesion: 0.25
+Nodes (4): Installment, InstallmentPlan, _add_months(), create_installment_plan()
 
 ### Community 14 - "Community 14"
 Cohesion: 0.60
@@ -168,44 +173,44 @@ Cohesion: 0.06
 Nodes (37): Banco E Migrations, code:powershell (cd apps/api), code:powershell (cd apps/web), code:powershell (cd apps/api), code:powershell (cd apps/api), code:powershell (cd apps/api), code:text (http://localhost:3000), code:powershell (cd apps/api) (+29 more)
 
 ### Community 26 - "Community 26"
-Cohesion: 0.56
-Nodes (12): _auth_header(), _create_account(), _register_and_get_token(), test_cancel_proposal_does_not_execute(), test_confirm_proposal_executes_once_and_records_audit(), test_expired_proposal_does_not_execute(), test_list_proposals_filters_status_exposes_created_at_and_isolates_user(), test_message_creates_proposal_without_mutating_balance() (+4 more)
+Cohesion: 0.46
+Nodes (15): _auth_header(), _create_account(), _register_and_get_token(), test_cancel_proposal_does_not_execute(), test_confirm_proposal_executes_once_and_records_audit(), test_expired_proposal_does_not_execute(), test_external_ai_is_not_called_without_user_consent(), test_groq_provider_can_only_prepare_a_pending_proposal() (+7 more)
 
 ### Community 27 - "Community 27"
-Cohesion: 0.39
-Nodes (7): cancel_proposal(), confirm_proposal(), create_proposal(), list_audit_events(), list_proposals(), send_message(), update_proposal()
+Cohesion: 0.44
+Nodes (8): cancel_proposal(), confirm_proposal(), create_proposal(), _limit(), list_audit_events(), list_proposals(), send_message(), update_proposal()
 
 ### Community 28 - "Community 28"
 Cohesion: 0.33
 Nodes (4): ADR 0001: Phase 1 Modular Monolith, Consequences, Context, Decision
 
 ### Community 33 - "Community 33"
-Cohesion: 0.20
-Nodes (12): initials(), SessionContext, SessionContextValue, SessionProfile(), SessionProvider(), SessionUser, useSession(), useTheme() (+4 more)
+Cohesion: 0.17
+Nodes (13): PrivacySettings(), initials(), SessionContext, SessionContextValue, SessionProfile(), SessionProvider(), SessionUser, useSession() (+5 more)
 
 ### Community 34 - "Community 34"
 Cohesion: 0.10
 Nodes (19): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+11 more)
 
 ### Community 35 - "Community 35"
-Cohesion: 0.11
-Nodes (21): dependencies, lucide-react, next, react, react-dom, recharts, @types/node, @types/react (+13 more)
+Cohesion: 0.10
+Nodes (22): dependencies, lucide-react, next, react, react-dom, recharts, @types/node, @types/react (+14 more)
 
 ### Community 36 - "Community 36"
-Cohesion: 0.08
-Nodes (25): authCookies, authRoutes, chart, creditCardFeedback, dashboard, demoDatasetRoute, financialDashboard, financialMutationFeedback (+17 more)
+Cohesion: 0.07
+Nodes (26): authCookies, authMiddleware, authRoutes, chart, creditCardFeedback, dashboard, demoDatasetRoute, financialDashboard (+18 more)
 
 ### Community 37 - "Community 37"
-Cohesion: 0.15
-Nodes (10): chartData, metrics, activities, currency, FinancialDashboard(), quickActions, services, FinancialScore (+2 more)
+Cohesion: 0.12
+Nodes (14): chartData, metrics, CashFlowChart(), CashFlowPoint, compactCurrency, currency, activities, currency (+6 more)
 
 ### Community 40 - "Community 40"
 Cohesion: 0.18
 Nodes (11): build, builder, dockerfilePath, deploy, healthcheckPath, healthcheckTimeout, preDeployCommand, restartPolicyMaxRetries (+3 more)
 
 ### Community 41 - "Community 41"
-Cohesion: 0.11
-Nodes (57): DELETE(), mutateAccount(), PUT(), errorResponse(), GET(), POST(), requestBackend(), POST() (+49 more)
+Cohesion: 0.10
+Nodes (61): DELETE(), DELETE(), mutateAccount(), PUT(), errorResponse(), GET(), POST(), requestBackend() (+53 more)
 
 ### Community 42 - "Community 42"
 Cohesion: 0.50
@@ -220,7 +225,7 @@ Cohesion: 0.50
 Nodes (3): APP_SHELL, copy, url
 
 ### Community 48 - "Community 48"
-Cohesion: 0.24
+Cohesion: 0.21
 Nodes (6): AuthForm(), AuthFormProps, BrandAssetProps, FinMascotProps, NexoLogo(), NexoMark()
 
 ### Community 49 - "Community 49"
@@ -256,8 +261,8 @@ Cohesion: 0.25
 Nodes (6): AppShellContent(), currency, dateFormatter, MovementReviewInbox(), ProposalGroup, usePendingProposals()
 
 ### Community 58 - "Community 58"
-Cohesion: 0.20
-Nodes (9): brlFormatter, CreditCardForm(), CreditCardFormProps, FieldErrors, brlFormatter, CurrencyInput(), CurrencyInputProps, formatDecimal() (+1 more)
+Cohesion: 0.11
+Nodes (11): CardManager(), CategoryOption, brlFormatter, CreditCardForm(), CreditCardFormProps, FieldErrors, brlFormatter, CurrencyInput() (+3 more)
 
 ### Community 59 - "Community 59"
 Cohesion: 0.29
@@ -268,8 +273,8 @@ Cohesion: 0.53
 Nodes (4): buildCommand, framework, installCommand, $schema
 
 ### Community 62 - "Community 62"
-Cohesion: 0.80
-Nodes (3): production_settings(), test_production_rejects_insecure_origins(), test_production_requires_a_strong_secret()
+Cohesion: 0.44
+Nodes (7): production_settings(), test_production_rejects_insecure_origins(), test_production_rejects_wildcard_hosts(), test_production_requires_a_strong_secret(), test_production_requires_distributed_rate_limiting(), test_production_requires_groq_key_when_provider_is_enabled(), test_valid_production_settings_pass_runtime_validation()
 
 ### Community 64 - "Community 64"
 Cohesion: 0.08
@@ -283,41 +288,45 @@ Nodes (37): code:python (def test_demo_dataset_and_theme_are_mapped():), code:py
 Cohesion: 0.15
 Nodes (8): CategoryManager(), CategoryRow, CategoryDeleteResult, DashboardAccount, DashboardCashFlowPoint, DashboardStatement, DashboardTransaction, FinancialCategory
 
+### Community 67 - "Community 67"
+Cohesion: 0.25
+Nodes (7): Bloqueadores Antes Da Producao Publica, Controles Implementados, Direitos Do Titular, Fronteira De Confianca Do Fin, Resposta A Incidentes, Retencao Recomendada, Seguranca E LGPD Do Nexo
+
 ### Community 68 - "Community 68"
 Cohesion: 0.18
 Nodes (9): links, mobileLinks, moreLinks, pageTitles, primaryLinks, FinChatPanel(), links, NavigationDrawer() (+1 more)
 
 ### Community 69 - "Community 69"
-Cohesion: 0.13
-Nodes (8): Base, get_db(), DeclarativeBase, FinancialAccount, Installment, InstallmentPlan, RecurringRule, create_account()
+Cohesion: 0.18
+Nodes (7): Base, get_db(), DeclarativeBase, CreditCard, DemoDataset, FinancialAccount, create_account()
 
 ### Community 70 - "Community 70"
-Cohesion: 0.23
-Nodes (13): CreditCard, DemoDataset, _active_dataset(), _audit(), _build_resources(), clean_demo_dataset(), get_demo_dataset_status(), _has_row() (+5 more)
+Cohesion: 0.36
+Nodes (11): _active_dataset(), _audit(), _build_resources(), clean_demo_dataset(), get_demo_dataset_status(), _has_row(), install_demo_dataset(), _lock_namespace() (+3 more)
 
 ### Community 71 - "Community 71"
-Cohesion: 0.23
-Nodes (15): Transaction, _add_months(), confirm_installment(), confirm_recurring_rule(), create_card_purchase(), create_installment_plan(), create_recurring_rule(), create_transaction() (+7 more)
+Cohesion: 0.38
+Nodes (9): Transaction, confirm_installment(), confirm_recurring_rule(), create_card_purchase(), create_transaction(), _get_card(), _not_found(), pay_statement() (+1 more)
 
 ### Community 72 - "Community 72"
-Cohesion: 0.15
-Nodes (9): currency, DashboardView(), dateFormatter, money(), monthFormatter, CashFlowChart(), CashFlowPoint, compactCurrency (+1 more)
+Cohesion: 0.12
+Nodes (17): currency, DashboardView(), dateFormatter, initialPeriod(), money(), monthFormatter, periodFormatter, periodSummary() (+9 more)
 
 ### Community 73 - "Community 73"
 Cohesion: 0.60
 Nodes (3): _run_migration(), _task_one_migration(), test_alembic_migration_round_trips_sqlite_schema_and_dataset_ownership()
 
 ### Community 81 - "Community 81"
-Cohesion: 0.25
-Nodes (6): BeforeInstallPromptEvent, InstallAppButton(), initials(), loadImage(), prepareAvatar(), ProfileSettings()
+Cohesion: 0.18
+Nodes (9): BeforeInstallPromptEvent, InstallAppButton(), initials(), loadImage(), prepareAvatar(), ProfileSettings(), dateTime, SecuritySettings() (+1 more)
 
 ### Community 82 - "Community 82"
 Cohesion: 0.22
 Nodes (6): AccountManager(), accountTypes, formatCurrency(), AppShell(), DashboardData, FinancialAccount
 
 ### Community 83 - "Community 83"
-Cohesion: 0.23
-Nodes (14): Category, create_category(), _assert_public_state(), _register(), test_builder_exception_rolls_back_every_resource_and_audit(), test_cleanup_deletes_only_demo_resources_and_is_repeatable(), test_cleanup_preserves_and_detaches_adopted_demo_graph(), test_cleanup_preserves_demo_parent_with_real_child_category() (+6 more)
+Cohesion: 0.08
+Nodes (27): BaseSettings, cors_origins(), Settings, Category, RuntimeError, AssistantProviderError, GroqAssistantProvider, _json_safe() (+19 more)
 
 ### Community 84 - "Community 84"
 Cohesion: 0.29
@@ -327,25 +336,29 @@ Nodes (7): BillingStatement, _due_date(), _get_or_create_statement(), _month_shi
 Cohesion: 0.18
 Nodes (11): metadata, viewport, PWARegistration(), ThemeContext, ThemeContextValue, ThemeProvider(), applyTheme(), isThemePreference() (+3 more)
 
+### Community 86 - "Community 86"
+Cohesion: 0.17
+Nodes (9): RecurringRule, Transfer, create_recurring_rule(), create_transfer(), get_account(), get_account_balance(), get_dashboard(), list_accounts() (+1 more)
+
 ## Knowledge Gaps
-- **269 isolated node(s):** `builder`, `dockerfilePath`, `preDeployCommand`, `startCommand`, `healthcheckPath` (+264 more)
+- **283 isolated node(s):** `builder`, `dockerfilePath`, `preDeployCommand`, `startCommand`, `healthcheckPath` (+278 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **15 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **13 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `AuditEvent` connect `Community 0` to `Community 1`, `Community 2`, `Community 69`, `Community 70`, `Community 22`?**
-  _High betweenness centrality (0.024) - this node is a cross-community bridge._
-- **Why does `Base` connect `Community 69` to `Community 0`, `Community 1`, `Community 70`, `Community 71`, `Community 83`, `Community 84`, `Community 22`, `Community 86`?**
-  _High betweenness centrality (0.018) - this node is a cross-community bridge._
-- **Why does `update_profile()` connect `Community 1` to `Community 0`?**
-  _High betweenness centrality (0.016) - this node is a cross-community bridge._
+- **Why does `Category` connect `Community 83` to `Community 1`, `Community 2`, `Community 69`, `Community 70`?**
+  _High betweenness centrality (0.036) - this node is a cross-community bridge._
+- **Why does `AuthError` connect `Community 1` to `Community 0`, `Community 69`, `Community 71`, `Community 9`, `Community 13`, `Community 83`, `Community 84`, `Community 22`, `Community 86`?**
+  _High betweenness centrality (0.027) - this node is a cross-community bridge._
+- **Why does `Transaction` connect `Community 71` to `Community 0`, `Community 1`, `Community 69`, `Community 70`, `Community 83`, `Community 86`?**
+  _High betweenness centrality (0.023) - this node is a cross-community bridge._
 - **What connects `builder`, `dockerfilePath`, `preDeployCommand` to the rest of the system?**
-  _271 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _285 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.08043775649794802 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.09595959595959595 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08708272859216255 - nodes in this community are weakly interconnected._
 - **Should `Community 3` be split into smaller, more focused modules?**
-  _Cohesion score 0.0936408106219427 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08896103896103896 - nodes in this community are weakly interconnected._

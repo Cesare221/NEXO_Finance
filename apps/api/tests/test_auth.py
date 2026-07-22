@@ -415,3 +415,96 @@ def test_login_is_rate_limited(client):
     )
     assert blocked.status_code == 429
     assert blocked.json()["detail"] == "Muitas tentativas. Aguarde um minuto e tente novamente."
+
+
+def test_refresh_token_reuse_revokes_the_entire_session_family(client):
+    registration = client.post(
+        "/auth/register",
+        json={
+            "name": "Reuse User",
+            "email": "reuse@example.com",
+            "password": STRONG_PASSWORD,
+        },
+    )
+    first_refresh = registration.json()["refresh_token"]
+    rotated = client.post("/auth/refresh", json={"refresh_token": first_refresh})
+    second_refresh = rotated.json()["refresh_token"]
+
+    replay = client.post("/auth/refresh", json={"refresh_token": first_refresh})
+    family_after_replay = client.post("/auth/refresh", json={"refresh_token": second_refresh})
+
+    assert replay.status_code == 401
+    assert "reuse" in replay.json()["detail"].lower()
+    assert family_after_replay.status_code == 401
+    with TestingSessionLocal() as db:
+        sessions = db.query(UserSession).all()
+        assert sessions
+        assert all(not session.is_active for session in sessions)
+        assert any(session.revocation_reason == "refresh_token_reuse" for session in sessions)
+
+
+def test_user_can_export_data_without_authentication_secrets(client):
+    registration = client.post(
+        "/auth/register",
+        json={
+            "name": "Export User",
+            "email": "export@example.com",
+            "password": STRONG_PASSWORD,
+            "privacy_accepted": True,
+            "ai_data_processing_consent": True,
+        },
+    )
+    headers = {"Authorization": f"Bearer {registration.json()['access_token']}"}
+
+    response = client.get("/auth/me/export", headers=headers)
+
+    assert response.status_code == 200
+    assert response.headers["cache-control"] == "no-store"
+    serialized = response.text
+    assert "password_hash" not in serialized
+    assert "refresh_token_hash" not in serialized
+    assert response.json()["profile"]["email"] == "export@example.com"
+
+
+def test_account_deletion_requires_password_and_removes_access(client):
+    registration = client.post(
+        "/auth/register",
+        json={
+            "name": "Delete User",
+            "email": "delete@example.com",
+            "password": STRONG_PASSWORD,
+        },
+    )
+    headers = {"Authorization": f"Bearer {registration.json()['access_token']}"}
+
+    denied = client.request("DELETE", "/auth/me", json={"password": "wrong"}, headers=headers)
+    deleted = client.request("DELETE", "/auth/me", json={"password": STRONG_PASSWORD}, headers=headers)
+    after_delete = client.get("/auth/me", headers=headers)
+
+    assert denied.status_code == 401
+    assert deleted.status_code == 204
+    assert after_delete.status_code == 401
+
+
+def test_user_can_list_and_revoke_only_their_own_sessions(client):
+    registration_a = client.post(
+        "/auth/register",
+        json={"name": "Session A", "email": "session-a@example.com", "password": STRONG_PASSWORD},
+        headers={"User-Agent": "Mozilla/5.0 Windows Chrome/130.0"},
+    )
+    registration_b = client.post(
+        "/auth/register",
+        json={"name": "Session B", "email": "session-b@example.com", "password": STRONG_PASSWORD},
+    )
+    headers_a = {"Authorization": f"Bearer {registration_a.json()['access_token']}"}
+    headers_b = {"Authorization": f"Bearer {registration_b.json()['access_token']}"}
+    session_a = client.get("/auth/sessions", headers=headers_a).json()[0]
+
+    forbidden = client.request("DELETE", f"/auth/sessions/{session_a['id']}", headers=headers_b)
+    revoked = client.request("DELETE", f"/auth/sessions/{session_a['id']}", headers=headers_a)
+    remaining = client.get("/auth/sessions", headers=headers_a)
+
+    assert session_a["device_name"] == "Chrome em Windows"
+    assert forbidden.status_code == 404
+    assert revoked.status_code == 204
+    assert remaining.json() == []

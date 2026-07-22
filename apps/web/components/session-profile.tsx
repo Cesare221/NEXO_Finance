@@ -21,6 +21,9 @@ type SessionUser = {
   phone: string | null;
   avatar_data_url: string | null;
   theme_preference: ThemePreference;
+  privacy_policy_version: string | null;
+  privacy_accepted_at: string | null;
+  ai_data_processing_consent: boolean;
 };
 
 type SessionContextValue = {

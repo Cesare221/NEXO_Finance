@@ -113,7 +113,7 @@
 .transactions-layout {
   display: grid;
   grid-template-columns: minmax(360px, 0.82fr) minmax(440px, 1.18fr);
-  align-items: start;
+  align-items: flex-start;
   gap: 16px;
 }
 
@@ -900,6 +900,104 @@ p {
   border-radius: 8px;
   background: var(--surface);
   color: var(--body);
+  font: inherit;
+  cursor: pointer;
+}
+
+.date-range-picker {
+  position: relative;
+}
+
+.date-range-picker .period-select span {
+  white-space: nowrap;
+}
+
+.date-range-popover {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 8px);
+  right: 0;
+  width: min(360px, calc(100vw - 32px));
+  padding: 14px;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 18px 46px rgb(0 24 24 / 18%);
+}
+
+.date-range-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.date-range-presets button {
+  min-height: 34px;
+  padding: 6px 9px;
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  background: var(--surface-soft);
+  color: var(--body);
+  cursor: pointer;
+}
+
+.date-range-custom {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.date-range-custom label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.date-range-custom input {
+  min-width: 0;
+  min-height: 42px;
+  padding: 8px;
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  background: var(--canvas);
+  color: var(--body);
+  color-scheme: light dark;
+}
+
+.date-range-error {
+  margin: 9px 0 0;
+  color: var(--danger);
+  font-size: 12px;
+}
+
+.date-range-apply {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.cashflow-empty {
+  min-height: 280px;
+  display: grid;
+  place-content: center;
+  gap: 6px;
+  padding: 24px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.cashflow-empty strong {
+  color: var(--body);
+}
+
+.cashflow-empty span {
+  max-width: 420px;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .period-select select {
@@ -1484,6 +1582,33 @@ textarea.input {
 
 .auth-form {
   gap: 18px;
+}
+
+.auth-consents {
+  display: grid;
+  gap: 10px;
+}
+
+.checkbox-row {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: flex-start;
+  gap: 9px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.checkbox-row input {
+  width: 17px;
+  height: 17px;
+  margin: 1px 0 0;
+  accent-color: var(--primary);
+}
+
+.checkbox-row a {
+  color: var(--primary-strong);
+  font-weight: 700;
 }
 
 .password-field {
@@ -2317,6 +2442,209 @@ textarea.input {
   flex: 1;
 }
 
+.privacy-settings {
+  display: grid;
+  gap: 20px;
+}
+
+.security-settings {
+  display: grid;
+  gap: 16px;
+}
+
+.security-settings-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.security-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--muted);
+}
+
+.session-list {
+  display: grid;
+}
+
+.session-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  border-top: 1px solid var(--hairline);
+}
+
+.session-row > div {
+  display: grid;
+  gap: 3px;
+}
+
+.session-row span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.privacy-settings .settings-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.privacy-control-row,
+.privacy-actions {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 0;
+  border-top: 1px solid var(--hairline);
+}
+
+.privacy-actions {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.privacy-control-row > div,
+.privacy-actions > div,
+.privacy-delete > div {
+  display: grid;
+  gap: 3px;
+}
+
+.privacy-control-row span,
+.privacy-actions span,
+.privacy-delete span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.switch-control {
+  position: relative;
+  width: 46px;
+  height: 26px;
+  cursor: pointer;
+}
+
+.switch-control input {
+  position: absolute;
+  opacity: 0;
+}
+
+.switch-control > span[aria-hidden] {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  transition: background-color 180ms ease;
+}
+
+.switch-control > span[aria-hidden]::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition: transform 180ms ease, background-color 180ms ease;
+}
+
+.switch-control input:checked + span {
+  background: var(--primary-soft);
+}
+
+.switch-control input:checked + span::after {
+  transform: translateX(20px);
+  background: var(--primary);
+}
+
+.switch-control input:focus-visible + span {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.privacy-delete {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(160px, .7fr) minmax(150px, .55fr) auto;
+  align-items: end;
+  gap: 10px;
+  padding-top: 18px;
+  border-top: 1px solid var(--danger-border);
+}
+
+.legal-page {
+  width: min(820px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 72px;
+}
+
+.legal-page > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--hairline);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.legal-page .nexo-logo {
+  width: 150px;
+}
+
+.legal-page article {
+  padding-top: 34px;
+}
+
+.legal-page h1 {
+  margin: 0 0 24px;
+  font-size: 38px;
+}
+
+.legal-page h2 {
+  margin: 30px 0 8px;
+  font-size: 20px;
+}
+
+.legal-page p {
+  margin: 0;
+  color: var(--body);
+  line-height: 1.7;
+}
+
+@media (max-width: 760px) {
+  .privacy-control-row,
+  .privacy-actions,
+  .privacy-delete {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .privacy-control-row > svg {
+    display: none;
+  }
+
+  .privacy-control-row .button,
+  .privacy-actions .button,
+  .privacy-delete .button {
+    width: 100%;
+  }
+
+  .legal-page h1 {
+    font-size: 30px;
+  }
+}
+
 .theme-settings {
   display: grid;
   gap: 20px;
@@ -2612,6 +2940,15 @@ textarea.input {
   .period-select,
   .header-actions .button {
     width: 100%;
+  }
+
+  .date-range-picker {
+    width: 100%;
+  }
+
+  .date-range-popover {
+    right: auto;
+    left: 0;
   }
 
   .period-select select {

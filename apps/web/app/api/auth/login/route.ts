@@ -14,7 +14,7 @@ export async function POST(request: Request) {
 
   try {
     const body = (await request.json()) as { email?: string; password?: string };
-    const tokens = await authenticate("/auth/login", body);
+    const tokens = await authenticate("/auth/login", body, request.headers.get("user-agent"));
     const user = await fetchCurrentUser(tokens.access_token);
     const response = NextResponse.json({ user });
     setAuthCookies(response, tokens);

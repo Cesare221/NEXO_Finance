@@ -1,4 +1,8 @@
 from decimal import Decimal
+from datetime import date
+
+from app.core.config import settings
+from app.services.assistant_provider import ProviderResult, TransactionDraft
 
 
 def _register_and_get_token(client, email="test@example.com", name="Test User") -> str:
@@ -291,3 +295,100 @@ def test_transaction_message_without_account_requests_clarification(client):
     assert response.json()["kind"] == "clarification"
     assert response.json()["proposal"] is None
     assert "conta" in response.json()["message"].lower()
+
+
+def test_groq_provider_can_only_prepare_a_pending_proposal(client, monkeypatch):
+    registration = client.post(
+        "/auth/register",
+        json={
+            "name": "AI User",
+            "email": "ai-user@example.com",
+            "password": "FinSeguro123!",
+            "ai_data_processing_consent": True,
+        },
+    )
+    token = registration.json()["access_token"]
+    account = _create_account(client, token, name="Conta principal")
+    monkeypatch.setattr(settings, "fin_ai_provider", "groq")
+    monkeypatch.setattr(settings, "groq_api_key", "test-key")
+
+    def fake_response(provider, db, user_id, message):
+        return ProviderResult(
+            message="Preparei a proposta para sua revisão.",
+            draft=TransactionDraft(
+                transaction_type="expense",
+                account_id=account["id"],
+                account_name="Conta principal",
+                category_id=None,
+                category_name=None,
+                amount=Decimal("42.90"),
+                description="Almoço",
+                occurred_on=date(2026, 7, 21),
+            ),
+        )
+
+    monkeypatch.setattr(
+        "app.services.assistant_service.GroqAssistantProvider.respond",
+        fake_response,
+    )
+    response = client.post(
+        "/assistant/messages",
+        json={
+            "message": "Gastei 42,90 no almoço",
+            "client_message_id": "groq-message-1",
+        },
+        headers=_auth_header(token),
+    )
+
+    assert response.status_code == 200
+    assert response.json()["kind"] == "proposal"
+    assert response.json()["proposal"]["payload"]["origin"] == "fin_ai"
+    assert response.json()["proposal"]["status"] == "proposed"
+    transactions = client.get("/financial/transactions", headers=_auth_header(token))
+    assert transactions.json() == []
+
+
+def test_external_ai_is_not_called_without_user_consent(client, monkeypatch):
+    token = _register_and_get_token(client, email="no-ai-consent@example.com")
+    _create_account(client, token, initial_balance="250.00")
+    monkeypatch.setattr(settings, "fin_ai_provider", "groq")
+    monkeypatch.setattr(settings, "groq_api_key", "test-key")
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("Groq must not be called without consent")
+
+    monkeypatch.setattr(
+        "app.services.assistant_service.GroqAssistantProvider.respond",
+        forbidden,
+    )
+    response = client.post(
+        "/assistant/messages",
+        json={"message": "qual meu saldo?", "client_message_id": "local-message-1"},
+        headers=_auth_header(token),
+    )
+
+    assert response.status_code == 200
+    assert "250,00" in response.json()["message"]
+
+
+def test_public_proposal_endpoint_rejects_unknown_action_and_extra_payload(client):
+    token = _register_and_get_token(client, email="strict-proposal@example.com")
+    account = _create_account(client, token)
+    response = client.post(
+        "/assistant/proposals",
+        json={
+            "action_type": "delete_account",
+            "payload": {
+                "type": "expense",
+                "account_id": account["id"],
+                "amount": "10.00",
+                "occurred_on": "2026-07-21",
+                "admin": True,
+            },
+            "human_summary": "Operação inválida",
+            "idempotency_key": "invalid-action",
+        },
+        headers=_auth_header(token),
+    )
+
+    assert response.status_code == 422

@@ -4,7 +4,6 @@ import Link from "next/link";
 import {
   ArrowDownRight,
   ArrowUpRight,
-  CalendarDays,
   ChevronRight,
   CircleDollarSign,
   CreditCard,
@@ -20,11 +19,17 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { CashFlowChart } from "@/components/ui/cash-flow-chart";
 import { MovementReviewInbox } from "@/components/movement-review-inbox";
 import { DemoDatasetControl } from "@/components/demo-dataset-control";
+import {
+  DateRangePicker,
+  defaultDashboardPeriod,
+  type DateRange
+} from "@/components/date-range-picker";
 import type { DashboardData, DashboardTransaction } from "@/lib/financial-types";
 
 const currency = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 const monthFormatter = new Intl.DateTimeFormat("pt-BR", { month: "short", timeZone: "UTC" });
 const dateFormatter = new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short", timeZone: "UTC" });
+const periodFormatter = new Intl.DateTimeFormat("pt-BR", { month: "short", year: "numeric", timeZone: "UTC" });
 
 function money(value: string | number) {
   return currency.format(Number(value));
@@ -42,24 +47,49 @@ function transactionIcon(transaction: DashboardTransaction) {
   return ReceiptText;
 }
 
-function currentPeriodQuery() {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-  const day = String(today.getDate()).padStart(2, "0");
-  return `months=6&start_date=${year}-${month}-01&end_date=${year}-${month}-${day}`;
+function initialPeriod(): DateRange {
+  const fallback = defaultDashboardPeriod();
+  if (typeof window === "undefined") return fallback;
+  const params = new URLSearchParams(window.location.search);
+  const start = params.get("inicio");
+  const end = params.get("fim");
+  return /^\d{4}-\d{2}-\d{2}$/.test(start ?? "") && /^\d{4}-\d{2}-\d{2}$/.test(end ?? "")
+    ? { start: start!, end: end! }
+    : fallback;
+}
+
+function periodQuery(period: DateRange) {
+  const start = new Date(`${period.start}T00:00:00Z`);
+  const end = new Date(`${period.end}T00:00:00Z`);
+  const months = Math.min(24, Math.max(1,
+    (end.getUTCFullYear() - start.getUTCFullYear()) * 12
+      + end.getUTCMonth() - start.getUTCMonth() + 1
+  ));
+  const query = new URLSearchParams({
+    months: String(months),
+    start_date: period.start,
+    end_date: period.end
+  });
+  return query.toString();
+}
+
+function periodSummary(period: DateRange) {
+  const start = periodFormatter.format(new Date(`${period.start}T00:00:00Z`)).replace(".", "");
+  const end = periodFormatter.format(new Date(`${period.end}T00:00:00Z`)).replace(".", "");
+  return start === end ? start : `${start} a ${end}`;
 }
 
 export function DashboardView() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [period, setPeriod] = useState<DateRange>(initialPeriod);
 
   const loadDashboard = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const response = await fetch(`/api/financial/dashboard?${currentPeriodQuery()}`, { cache: "no-store" });
+      const response = await fetch(`/api/financial/dashboard?${periodQuery(period)}`, { cache: "no-store" });
       const body = (await response.json().catch(() => ({}))) as DashboardData & { detail?: string };
       if (!response.ok) throw new Error(body.detail ?? "Não foi possível carregar o dashboard.");
       setData(body);
@@ -68,6 +98,14 @@ export function DashboardView() {
     } finally {
       setLoading(false);
     }
+  }, [period]);
+
+  const changePeriod = useCallback((nextPeriod: DateRange) => {
+    setPeriod(nextPeriod);
+    const url = new URL(window.location.href);
+    url.searchParams.set("inicio", nextPeriod.start);
+    url.searchParams.set("fim", nextPeriod.end);
+    window.history.replaceState({}, "", url);
   }, []);
 
   useEffect(() => {
@@ -109,7 +147,7 @@ export function DashboardView() {
   const expenseRatio = income > 0 ? Math.round((expenses / income) * 100) : 0;
   const metrics = [
     { label: "Saldo total", value: money(data.total_balance), detail: `${data.accounts.length} conta${data.accounts.length === 1 ? "" : "s"}`, tone: "teal", icon: WalletCards },
-    { label: "Receitas", value: money(data.period_income), detail: "no período atual", tone: "mint", icon: TrendingUp },
+    { label: "Receitas", value: money(data.period_income), detail: "no período selecionado", tone: "mint", icon: TrendingUp },
     { label: "Despesas", value: money(data.period_expenses), detail: income > 0 ? `${expenseRatio}% da receita` : "sem receitas no período", tone: "peach", icon: TrendingDown },
     { label: "Faturas", value: money(data.open_statement_total), detail: `${data.open_statements.length} em aberto`, tone: "lavender", icon: CreditCard }
   ];
@@ -124,7 +162,7 @@ export function DashboardView() {
           <p>{data.accounts.length ? "Dados atualizados com suas movimentações." : "Comece criando sua primeira conta."}</p>
         </div>
         <div className="header-actions">
-          <span className="period-select" aria-label="Período atual"><CalendarDays size={18} aria-hidden="true" /> Mês atual</span>
+          <DateRangePicker value={period} onChange={changePeriod} disabled={loading} />
           <Link className="button" href="/transacoes"><Plus size={18} aria-hidden="true" />Nova transação</Link>
         </div>
       </header>
@@ -158,7 +196,7 @@ export function DashboardView() {
 
       <section className="dashboard-grid">
         <article className="card cashflow-card">
-          <div className="section-heading"><div><span className="eyebrow">Últimos 6 meses</span><h2>Fluxo de caixa</h2></div></div>
+          <div className="section-heading"><div><span className="eyebrow">{periodSummary(period)}</span><h2>Fluxo de caixa</h2></div></div>
           <CashFlowChart data={chartData} />
         </article>
         <article className="card insight-card">

@@ -20,12 +20,23 @@ ENVIRONMENT=production
 DATABASE_URL=${{Postgres.DATABASE_URL}}
 SECRET_KEY=<valor-aleatorio-com-64-ou-mais-caracteres>
 ALLOWED_ORIGINS=https://app.seudominio.com
+ALLOWED_HOSTS=api.seudominio.com
+REDIS_URL=${{Redis.REDIS_URL}}
 ACCESS_TOKEN_EXPIRE_MINUTES=15
 REFRESH_TOKEN_EXPIRE_DAYS=7
 DATABASE_POOL_SIZE=5
 DATABASE_MAX_OVERFLOW=10
 DATABASE_POOL_TIMEOUT=30
 DATABASE_POOL_RECYCLE=1800
+FIN_AI_PROVIDER=groq
+FIN_AI_MODEL=openai/gpt-oss-20b
+FIN_AI_TIMEOUT_SECONDS=12
+FIN_AI_MAX_TOOL_ROUNDS=3
+FIN_AI_MESSAGES_PER_MINUTE=12
+FIN_AI_MESSAGES_PER_DAY=200
+GROQ_API_KEY=<segredo-configurado-somente-na-api>
+GROQ_BASE_URL=https://api.groq.com/openai/v1
+TRUSTED_PROXY_IPS=<ips-dos-proxies-que-podem-enviar-x-forwarded-for>
 ```
 
 Não use `*`, HTTP ou endereços locais em `ALLOWED_ORIGINS` na produção.
@@ -57,7 +68,7 @@ Execute também:
 
 ## Rollout Financeiro
 
-Execute as migrations antes de iniciar uma nova versão da API. O rollout financeiro deve terminar no único head `b81f4c6d2a10`:
+Execute as migrations antes de iniciar uma nova versão da API. O rollout financeiro deve terminar no único head `c91d4e7a2f10`:
 
 ```powershell
 cd apps/api
@@ -98,3 +109,8 @@ O perfil do usuário armazena `theme_preference` como `system`, `light` ou `dark
 - [ ] Monitoramento de erros e alertas configurados.
 - [ ] Política de privacidade e exclusão de conta publicadas.
 - [ ] Smoke test completo aprovado.
+- [ ] Identificacao do operador, encarregado e canal LGPD preenchidos no aviso.
+- [ ] Redis gerenciado configurado e testado em mais de uma instancia.
+- [ ] Zero Data Retention habilitado na Groq e termos de tratamento revisados.
+- [ ] Verificacao de e-mail, recuperacao de senha e MFA/passkeys ativos.
+- [ ] WAF, alertas de abuso e plano de resposta a incidentes testados.

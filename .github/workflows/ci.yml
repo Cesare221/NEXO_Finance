@@ -45,6 +45,7 @@ jobs:
       - run: python -m alembic upgrade head
       - run: python -m alembic current
       - run: python -m pytest tests -q
+      - run: python -m pip_audit -r requirements.lock --disable-pip
 
   web:
     runs-on: ubuntu-latest
@@ -62,4 +63,29 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
       - run: npm ci
       - run: npm test
+      - run: npm audit --audit-level=high
       - run: npm run build
+
+  codeql:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      matrix:
+        language: [python, javascript-typescript]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+      - uses: github/codeql-action/analyze@v3
+
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/dependency-review-action@v4

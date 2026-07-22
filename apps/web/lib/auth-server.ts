@@ -10,6 +10,9 @@ export type SessionUser = {
   phone: string | null;
   avatar_data_url: string | null;
   theme_preference: "system" | "light" | "dark";
+  privacy_policy_version: string | null;
+  privacy_accepted_at: string | null;
+  ai_data_processing_consent: boolean;
 };
 
 export class BackendApiError extends Error {
@@ -59,10 +62,12 @@ async function backendRequest<T>(
 
 export function authenticate(
   path: "/auth/login" | "/auth/register",
-  credentials: Record<string, unknown>
+  credentials: Record<string, unknown>,
+  userAgent?: string | null
 ) {
   return backendRequest<AuthTokens>(path, {
     method: "POST",
+    headers: userAgent ? { "User-Agent": userAgent } : undefined,
     body: JSON.stringify(credentials)
   });
 }

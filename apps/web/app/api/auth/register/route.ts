@@ -17,8 +17,10 @@ export async function POST(request: Request) {
       name?: string;
       email?: string;
       password?: string;
+      privacy_accepted?: boolean;
+      ai_data_processing_consent?: boolean;
     };
-    const tokens = await authenticate("/auth/register", body);
+    const tokens = await authenticate("/auth/register", body, request.headers.get("user-agent"));
     const user = await fetchCurrentUser(tokens.access_token);
     const response = NextResponse.json({ user }, { status: 201 });
     setAuthCookies(response, tokens);

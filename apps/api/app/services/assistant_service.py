@@ -7,11 +7,13 @@ import unicodedata
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.models.action_execution import ActionExecution
 from app.models.action_proposal import ActionProposal
 from app.models.audit_event import AuditEvent
 from app.models.category import Category
 from app.services import financial_service as fs
+from app.services.assistant_provider import AssistantProviderError, GroqAssistantProvider
 
 
 def _now() -> datetime:
@@ -294,7 +296,69 @@ def handle_message(
     message: str,
     conversation_id: str | None,
     client_message_id: str,
+    allow_external_ai: bool = False,
 ) -> dict:
+    if allow_external_ai and settings.fin_ai_provider == "groq" and settings.groq_api_key:
+        try:
+            result = GroqAssistantProvider().respond(db, user_id, message)
+            _audit(
+                db,
+                user_id,
+                "assistant_response_generated",
+                "AssistantProvider",
+                None,
+                {
+                    "provider": result.provider,
+                    "model": result.model,
+                    "outcome": "proposal" if result.draft else "answer",
+                },
+            )
+            if result.draft is None:
+                db.commit()
+                return {"kind": "answer", "message": result.message, "proposal": None}
+
+            draft = result.draft
+            type_label = "despesa" if draft.transaction_type == "expense" else "receita"
+            category_label = f" em {draft.category_name}" if draft.category_name else ""
+            summary = (
+                f"Criar {type_label} de {_format_currency(draft.amount)}{category_label} "
+                f"na conta {draft.account_name}."
+            )
+            idempotency_key = hashlib.sha256(
+                f"{user_id}:{client_message_id}".encode("utf-8")
+            ).hexdigest()
+            proposal = create_proposal(
+                db=db,
+                user_id=user_id,
+                conversation_id=conversation_id,
+                action_type="create_transaction",
+                payload={
+                    "type": draft.transaction_type,
+                    "account_id": draft.account_id,
+                    "category_id": draft.category_id,
+                    "amount": str(draft.amount),
+                    "description": draft.description,
+                    "occurred_on": draft.occurred_on.isoformat(),
+                    "origin": "fin_ai",
+                },
+                human_summary=summary,
+                previous_state_snapshot={},
+                expires_at=None,
+                idempotency_key=idempotency_key,
+            )
+            return {"kind": "proposal", "message": result.message, "proposal": proposal}
+        except AssistantProviderError:
+            db.rollback()
+            _audit(
+                db,
+                user_id,
+                "assistant_provider_fallback",
+                "AssistantProvider",
+                None,
+                {"provider": "groq", "model": settings.fin_ai_model},
+            )
+            db.commit()
+
     normalized = _normalize_text(message)
     amount = _extract_amount(message)
     expense_words = ("gastei", "paguei", "comprei", "despesa", "debito")

@@ -175,13 +175,16 @@ def get_dashboard(
         .order_by(BillingStatement.due_on.asc())
         .all()
     )
+    recent_query = db.query(Transaction).filter(
+        Transaction.user_id == user_id,
+        Transaction.is_deleted.is_(False),
+    )
+    if start_date is not None:
+        recent_query = recent_query.filter(Transaction.occurred_on >= start_date)
+    if end_date is not None:
+        recent_query = recent_query.filter(Transaction.occurred_on <= end_date)
     recent_transactions = (
-        db.query(Transaction)
-        .filter(
-            Transaction.user_id == user_id,
-            Transaction.is_deleted.is_(False),
-        )
-        .order_by(Transaction.occurred_on.desc(), Transaction.id.desc())
+        recent_query.order_by(Transaction.occurred_on.desc(), Transaction.id.desc())
         .limit(10)
         .all()
     )

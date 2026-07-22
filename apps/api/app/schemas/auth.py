@@ -1,5 +1,6 @@
 import base64
 import binascii
+from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
@@ -11,6 +12,8 @@ class RegisterRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     email: EmailStr
     password: str = Field(..., min_length=12, max_length=128)
+    privacy_accepted: bool = False
+    ai_data_processing_consent: bool = False
 
 
 class LoginRequest(BaseModel):
@@ -28,6 +31,20 @@ class RefreshRequest(BaseModel):
     refresh_token: str
 
 
+class DeleteAccountRequest(BaseModel):
+    password: str = Field(..., min_length=1, max_length=128)
+
+
+class UserSessionResponse(BaseModel):
+    id: int
+    device_name: str | None
+    created_at: datetime
+    last_used_at: datetime
+    expires_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
 class MeResponse(BaseModel):
     id: int
     name: str
@@ -35,6 +52,9 @@ class MeResponse(BaseModel):
     phone: str | None
     avatar_data_url: str | None
     theme_preference: ThemePreference
+    privacy_policy_version: str | None
+    privacy_accepted_at: str | None
+    ai_data_processing_consent: bool
 
 
 class ProfileUpdateRequest(BaseModel):
@@ -42,6 +62,7 @@ class ProfileUpdateRequest(BaseModel):
     phone: str | None = Field(None, min_length=8, max_length=32, pattern=r"^[0-9+() .-]+$")
     avatar_data_url: str | None = Field(None, max_length=350_000)
     theme_preference: ThemePreference | None = None
+    ai_data_processing_consent: bool | None = None
 
     @field_validator("name")
     @classmethod
