@@ -3,6 +3,9 @@ import pytest
 from app.core.config import Settings
 
 
+VALID_FERNET_KEY = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+
+
 def production_settings(**overrides):
     values = {
         "environment": "production",
@@ -15,7 +18,7 @@ def production_settings(**overrides):
         "resend_api_key": "re_test_key",
         "email_from": "Nexo <no-reply@nexo.example>",
         "public_web_url": "https://app.nexo.example",
-        "mfa_encryption_keys": "v1:test-key",
+        "mfa_encryption_keys": f"v1:{VALID_FERNET_KEY}",
         "mfa_active_key_version": "v1",
     }
     values.update(overrides)
@@ -61,7 +64,7 @@ def test_production_requires_groq_key_when_provider_is_enabled():
         settings.validate_runtime()
 
 
-def test_production_requires_resend_and_mfa_keys(monkeypatch):
+def test_production_requires_resend_and_mfa_keys():
     config = production_settings(
         mail_provider="resend",
         resend_api_key=None,
@@ -78,6 +81,25 @@ def test_production_rejects_non_https_public_web_url():
     config = production_settings(public_web_url="http://app.nexo.example")
     with pytest.raises(RuntimeError, match="PUBLIC_WEB_URL"):
         config.validate_runtime()
+
+
+def test_production_rejects_https_public_web_url_without_hostname():
+    config = production_settings(public_web_url="https://")
+
+    with pytest.raises(RuntimeError, match="PUBLIC_WEB_URL"):
+        config.validate_runtime()
+
+
+def test_production_rejects_any_invalid_mfa_encryption_key():
+    invalid_key = "invalid-key-material"
+    config = production_settings(
+        mfa_encryption_keys=f"v1:{VALID_FERNET_KEY},v2:{invalid_key}",
+    )
+
+    with pytest.raises(RuntimeError, match="MFA_ENCRYPTION_KEYS") as error:
+        config.validate_runtime()
+
+    assert invalid_key not in str(error.value)
 
 
 def test_valid_production_settings_pass_runtime_validation():

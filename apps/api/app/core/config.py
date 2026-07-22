@@ -1,3 +1,6 @@
+from urllib.parse import urlparse
+
+from cryptography.fernet import Fernet
 from pydantic_settings import BaseSettings
 
 
@@ -75,12 +78,18 @@ class Settings(BaseSettings):
             raise RuntimeError("MAIL_PROVIDER must be resend in production")
         if not self.resend_api_key:
             raise RuntimeError("RESEND_API_KEY is required when MAIL_PROVIDER=resend")
-        if not self.public_web_url.startswith("https://"):
+        public_web_url = urlparse(self.public_web_url)
+        if public_web_url.scheme != "https" or not public_web_url.hostname:
             raise RuntimeError("PUBLIC_WEB_URL must use HTTPS in production")
         if not self.email_from or self.email_from == "Nexo <no-reply@example.com>":
             raise RuntimeError("EMAIL_FROM must be explicitly configured in production")
         if self.mfa_active_key_version not in self.mfa_keyring:
             raise RuntimeError("MFA_ACTIVE_KEY_VERSION must be present in MFA_ENCRYPTION_KEYS")
+        try:
+            for key in self.mfa_keyring.values():
+                Fernet(key)
+        except (TypeError, ValueError):
+            raise RuntimeError("MFA_ENCRYPTION_KEYS must contain valid Fernet keys") from None
 
 
 settings = Settings()
