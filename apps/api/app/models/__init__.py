@@ -13,6 +13,10 @@ from app.models.action_proposal import ActionProposal
 from app.models.action_execution import ActionExecution
 from app.models.audit_event import AuditEvent
 from app.models.demo_dataset import DemoDataset
+from app.models.account_action_token import AccountActionToken
+from app.models.mfa_method import MfaMethod
+from app.models.mfa_recovery_code import MfaRecoveryCode
+from app.models.mfa_challenge import MfaChallenge
 
 __all__ = [
     "User",
@@ -30,4 +34,8 @@ __all__ = [
     "ActionExecution",
     "AuditEvent",
     "DemoDataset",
+    "AccountActionToken",
+    "MfaMethod",
+    "MfaRecoveryCode",
+    "MfaChallenge",
 ]
