@@ -23,6 +23,15 @@ class Settings(BaseSettings):
     groq_base_url: str = "https://api.groq.com/openai/v1"
     redis_url: str | None = None
     trusted_proxy_ips: str = ""
+    mail_provider: str = "console"
+    resend_api_key: str | None = None
+    email_from: str = "Nexo <no-reply@example.com>"
+    public_web_url: str = "http://localhost:3000"
+    email_verification_ttl_minutes: int = 30
+    password_reset_ttl_minutes: int = 20
+    mfa_challenge_ttl_minutes: int = 5
+    mfa_encryption_keys: str = ""
+    mfa_active_key_version: str = "v1"
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 
@@ -37,6 +46,10 @@ class Settings(BaseSettings):
     @property
     def host_allowlist(self) -> list[str]:
         return [value.strip() for value in self.allowed_hosts.split(",") if value.strip()]
+
+    @property
+    def mfa_keyring(self) -> dict[str, str]:
+        return dict(item.split(":", 1) for item in self.mfa_encryption_keys.split(",") if ":" in item)
 
     def validate_runtime(self) -> None:
         if self.environment.lower() != "production":
@@ -58,6 +71,16 @@ class Settings(BaseSettings):
             raise RuntimeError("GROQ_API_KEY is required when FIN_AI_PROVIDER=groq")
         if self.fin_ai_provider not in {"rules", "groq"}:
             raise RuntimeError("FIN_AI_PROVIDER must be rules or groq")
+        if self.mail_provider != "resend":
+            raise RuntimeError("MAIL_PROVIDER must be resend in production")
+        if not self.resend_api_key:
+            raise RuntimeError("RESEND_API_KEY is required when MAIL_PROVIDER=resend")
+        if not self.public_web_url.startswith("https://"):
+            raise RuntimeError("PUBLIC_WEB_URL must use HTTPS in production")
+        if not self.email_from or self.email_from == "Nexo <no-reply@example.com>":
+            raise RuntimeError("EMAIL_FROM must be explicitly configured in production")
+        if self.mfa_active_key_version not in self.mfa_keyring:
+            raise RuntimeError("MFA_ACTIVE_KEY_VERSION must be present in MFA_ENCRYPTION_KEYS")
 
 
 settings = Settings()

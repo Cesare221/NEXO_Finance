@@ -11,6 +11,12 @@ def production_settings(**overrides):
         "allowed_origins": "https://app.nexo.example",
         "allowed_hosts": "api.nexo.example",
         "redis_url": "redis://redis.internal:6379/0",
+        "mail_provider": "resend",
+        "resend_api_key": "re_test_key",
+        "email_from": "Nexo <no-reply@nexo.example>",
+        "public_web_url": "https://app.nexo.example",
+        "mfa_encryption_keys": "v1:test-key",
+        "mfa_active_key_version": "v1",
     }
     values.update(overrides)
     return Settings(_env_file=None, **values)
@@ -53,6 +59,25 @@ def test_production_requires_groq_key_when_provider_is_enabled():
 
     with pytest.raises(RuntimeError, match="GROQ_API_KEY"):
         settings.validate_runtime()
+
+
+def test_production_requires_resend_and_mfa_keys(monkeypatch):
+    config = production_settings(
+        mail_provider="resend",
+        resend_api_key=None,
+        email_from="Nexo <no-reply@nexo.example>",
+        public_web_url="https://app.nexo.example",
+        mfa_encryption_keys="",
+        mfa_active_key_version="v1",
+    )
+    with pytest.raises(RuntimeError, match="RESEND_API_KEY"):
+        config.validate_runtime()
+
+
+def test_production_rejects_non_https_public_web_url():
+    config = production_settings(public_web_url="http://app.nexo.example")
+    with pytest.raises(RuntimeError, match="PUBLIC_WEB_URL"):
+        config.validate_runtime()
 
 
 def test_valid_production_settings_pass_runtime_validation():
