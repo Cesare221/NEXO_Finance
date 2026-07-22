@@ -13,7 +13,7 @@ class MfaRecoveryCode(Base):
     method_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("mfa_methods.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    code_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    code_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     consumed_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )

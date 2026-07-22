@@ -68,7 +68,7 @@ def upgrade() -> None:
         "mfa_recovery_codes",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("method_id", sa.Integer(), nullable=False),
-        sa.Column("code_hash", sa.String(length=64), nullable=False),
+        sa.Column("code_hash", sa.String(length=255), nullable=False),
         sa.Column("consumed_at", sa.DateTime(timezone=True), nullable=True),
         sa.ForeignKeyConstraint(["method_id"], ["mfa_methods.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
