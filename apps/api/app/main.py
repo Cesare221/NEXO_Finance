@@ -1,3 +1,5 @@
+import logging
+import time
 from contextlib import asynccontextmanager
 import uuid
 
@@ -12,13 +14,19 @@ from app.api.assistant import router as assistant_router
 from app.api.financial import router as financial_router
 from app.api.health import router as health_router
 from app.core.config import settings
+from app.core.logging_config import _request_id_var, configure_logging
+from app.core.observability import init_observability
 from app.core.rate_limit import RateLimitExceeded, RateLimitUnavailable, auth_rate_limiter
 from app.core.security import fingerprint_token
+
+logger = logging.getLogger("nexo.api")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    configure_logging(environment=settings.environment)
     settings.validate_runtime()
+    init_observability()
     yield
 
 
@@ -52,6 +60,9 @@ async def api_security_headers(request: Request, call_next):
     except ValueError:
         request_id = str(uuid.uuid4())
 
+    _request_id_var.set(request_id)
+    start_time = time.monotonic()
+
     content_length = request.headers.get("content-length")
     try:
         body_size = int(content_length) if content_length else 0
@@ -83,6 +94,7 @@ async def api_security_headers(request: Request, call_next):
             )
 
     response = await call_next(request)
+    duration_ms = round((time.monotonic() - start_time) * 1000, 1)
     response.headers["X-Request-ID"] = request_id
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
@@ -91,6 +103,17 @@ async def api_security_headers(request: Request, call_next):
     response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
     if is_production:
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+
+    logger.info(
+        "request.complete",
+        extra={
+            "request_id": request_id,
+            "method": request.method,
+            "route": request.url.path,
+            "status_code": response.status_code,
+            "duration_ms": duration_ms,
+        },
+    )
     return response
 
 app.include_router(health_router)
