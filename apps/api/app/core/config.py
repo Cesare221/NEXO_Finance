@@ -35,6 +35,10 @@ class Settings(BaseSettings):
     mfa_challenge_ttl_minutes: int = 5
     mfa_encryption_keys: str = ""
     mfa_active_key_version: str = "v1"
+    sentry_dsn: str = ""
+    sentry_environment: str = "development"
+    sentry_release: str = ""
+    sentry_traces_sample_rate: float = 0.0
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 
@@ -90,6 +94,13 @@ class Settings(BaseSettings):
                 Fernet(key)
         except (TypeError, ValueError):
             raise RuntimeError("MFA_ENCRYPTION_KEYS must contain valid Fernet keys") from None
+        if self.sentry_dsn:
+            if not self.sentry_environment:
+                raise RuntimeError("SENTRY_ENVIRONMENT is required when SENTRY_DSN is set")
+            if not self.sentry_release:
+                raise RuntimeError("SENTRY_RELEASE is required when SENTRY_DSN is set")
+            if not (0.0 <= self.sentry_traces_sample_rate <= 1.0):
+                raise RuntimeError("SENTRY_TRACES_SAMPLE_RATE must be between 0.0 and 1.0")
 
 
 settings = Settings()

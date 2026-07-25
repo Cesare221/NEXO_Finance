@@ -20,6 +20,7 @@ dependencies = [
     "httpx>=0.28",
     "pyotp>=2.9",
     "redis>=5.2",
+    "sentry-sdk[fastapi]>=2.14,<3",
 ]
 
 [project.optional-dependencies]
