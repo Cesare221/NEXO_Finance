@@ -48,10 +48,14 @@ O usuario pode corrigir o perfil, revogar consentimento de IA, exportar os dados
 ## Retencao Recomendada
 
 - Dados ativos: enquanto a conta existir e forem necessarios ao servico.
+- Tokens de seguranca expirados: 30 dias, exclusao automatica via cron diario (`python -m app.maintenance purge-expired-security-records`, 03:17 UTC).
 - Logs tecnicos sem conteudo financeiro: 30 a 90 dias, conforme necessidade comprovada.
+- Sentry events (scrubbed): conforme plano (90 dias padrao).
 - Auditoria financeira: definir prazo com revisao juridica e obrigacao fiscal aplicavel.
 - Backups: retencao curta e documentada, com expiracao que tambem respeite exclusoes.
 - Prompts e respostas do Fin: nao registrar por padrao.
+
+Consulte `docs/DATA_RETENTION.md` para a politica completa e `docs/INCIDENT_RESPONSE.md` para o processo de resposta a incidentes.
 
 ## Controles De Identidade E MFA
 
