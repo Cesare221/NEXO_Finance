@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import { setAuthCookies } from "@/lib/auth-cookies";
 import {
-  authenticate,
-  fetchCurrentUser,
+  authenticateRegister,
   publicAuthError,
   validateRequestOrigin
 } from "@/lib/auth-server";
@@ -20,11 +18,11 @@ export async function POST(request: Request) {
       privacy_accepted?: boolean;
       ai_data_processing_consent?: boolean;
     };
-    const tokens = await authenticate("/auth/register", body, request.headers.get("user-agent"));
-    const user = await fetchCurrentUser(tokens.access_token);
-    const response = NextResponse.json({ user }, { status: 201 });
-    setAuthCookies(response, tokens);
-    return response;
+    const outcome = await authenticateRegister(body, request.headers.get("user-agent"));
+    return NextResponse.json(
+      { status: outcome.status, email: outcome.email },
+      { status: 201 }
+    );
   } catch (error) {
     const { status, message, retryAfter } = publicAuthError(error);
     const response = NextResponse.json({ detail: message }, { status });

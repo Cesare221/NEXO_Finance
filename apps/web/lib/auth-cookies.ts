@@ -3,6 +3,7 @@ import type { NextResponse } from "next/server";
 const COOKIE_PREFIX = process.env.NODE_ENV === "production" ? "__Host-nexo" : "nexo";
 export const ACCESS_COOKIE = `${COOKIE_PREFIX}_access_token`;
 export const REFRESH_COOKIE = `${COOKIE_PREFIX}_refresh_token`;
+export const MFA_CHALLENGE_COOKIE = `${COOKIE_PREFIX}_mfa_challenge`;
 
 export type AuthTokens = {
   access_token: string;
@@ -28,6 +29,20 @@ export function setAuthCookies(response: NextResponse, tokens: AuthTokens) {
   });
 }
 
+export function setMfaChallengeCookie(response: NextResponse, challengeToken: string) {
+  response.cookies.set(MFA_CHALLENGE_COOKIE, challengeToken, {
+    ...baseCookieOptions,
+    maxAge: 5 * 60
+  });
+}
+
+export function clearMfaChallengeCookie(response: NextResponse) {
+  response.cookies.set(MFA_CHALLENGE_COOKIE, "", {
+    ...baseCookieOptions,
+    maxAge: 0
+  });
+}
+
 export function clearAuthCookies(response: NextResponse) {
   response.cookies.set(ACCESS_COOKIE, "", {
     ...baseCookieOptions,
@@ -37,4 +52,5 @@ export function clearAuthCookies(response: NextResponse) {
     ...baseCookieOptions,
     maxAge: 0
   });
+  clearMfaChallengeCookie(response);
 }

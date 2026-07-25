@@ -15,6 +15,20 @@ export type SessionUser = {
   ai_data_processing_consent: boolean;
 };
 
+export type LoginBackendOutcome = {
+  status: "authenticated" | "mfa_required" | "email_verification_required";
+  access_token?: string;
+  refresh_token?: string;
+  token_type?: string;
+  challenge_token?: string;
+  email?: string;
+};
+
+export type RegistrationBackendOutcome = {
+  status: "verification_required";
+  email: string;
+};
+
 export class BackendApiError extends Error {
   constructor(
     message: string,
@@ -26,7 +40,7 @@ export class BackendApiError extends Error {
   }
 }
 
-async function backendRequest<T>(
+export async function backendRequest<T>(
   path: string,
   init: RequestInit,
   onResponse?: (response: Response) => void
@@ -60,12 +74,22 @@ async function backendRequest<T>(
   return response.json() as Promise<T>;
 }
 
-export function authenticate(
-  path: "/auth/login" | "/auth/register",
+export function authenticateLogin(
   credentials: Record<string, unknown>,
   userAgent?: string | null
 ) {
-  return backendRequest<AuthTokens>(path, {
+  return backendRequest<LoginBackendOutcome>("/auth/login", {
+    method: "POST",
+    headers: userAgent ? { "User-Agent": userAgent } : undefined,
+    body: JSON.stringify(credentials)
+  });
+}
+
+export function authenticateRegister(
+  credentials: Record<string, unknown>,
+  userAgent?: string | null
+) {
+  return backendRequest<RegistrationBackendOutcome>("/auth/register", {
     method: "POST",
     headers: userAgent ? { "User-Agent": userAgent } : undefined,
     body: JSON.stringify(credentials)
