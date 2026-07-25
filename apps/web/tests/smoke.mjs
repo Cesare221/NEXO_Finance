@@ -89,6 +89,13 @@ const requiredFiles = [
   "app/api/assistant/proposals/[proposalId]/route.ts",
   "app/api/assistant/proposals/[proposalId]/[action]/route.ts",
   "middleware.ts",
+  "instrumentation.ts",
+  "instrumentation-client.ts",
+  "sentry.server.config.ts",
+  "sentry.edge.config.ts",
+  "app/global-error.tsx",
+  "lib/sentry-scrub.ts",
+  "lib/runtime-config.ts",
   "public/sw.js",
   "public/favicon.ico",
   "public/icons/nexo-16.png",
@@ -809,6 +816,42 @@ for (const marker of [
 ]) {
   if (!profile.includes(marker)) {
     throw new Error(`Editable profile must include ${marker}`);
+  }
+}
+
+const sentryExperience =
+  readFileSync(join(root, "instrumentation.ts"), "utf8") +
+  readFileSync(join(root, "instrumentation-client.ts"), "utf8") +
+  readFileSync(join(root, "sentry.server.config.ts"), "utf8") +
+  readFileSync(join(root, "sentry.edge.config.ts"), "utf8") +
+  readFileSync(join(root, "app/global-error.tsx"), "utf8") +
+  readFileSync(join(root, "lib/sentry-scrub.ts"), "utf8") +
+  readFileSync(join(root, "next.config.ts"), "utf8");
+for (const marker of [
+  "sendDefaultPii: false",
+  "beforeSend",
+  "scrubEvent",
+  "NEXT_RUNTIME",
+  "SENTRY_DSN",
+  "NEXT_PUBLIC_SENTRY_DSN",
+  "GlobalError",
+  "reset()",
+  "withSentryConfig"
+]) {
+  if (!sentryExperience.includes(marker)) {
+    throw new Error(`Sentry integration must include ${marker}`);
+  }
+}
+
+const runtimeConfig = readFileSync(join(root, "lib/runtime-config.ts"), "utf8");
+for (const marker of [
+  "validateWebRuntime",
+  "API_URL",
+  "https://",
+  "startsWith"
+]) {
+  if (!runtimeConfig.includes(marker)) {
+    throw new Error(`Runtime config must include ${marker}`);
   }
 }
 

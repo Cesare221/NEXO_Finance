@@ -1,14 +1,18 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
+import { validateWebRuntime } from "./lib/runtime-config";
+
+validateWebRuntime();
 
 const isProduction = process.env.NODE_ENV === "production";
 const apiOrigin = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 const contentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self'${isProduction ? "" : " 'unsafe-eval'"} 'unsafe-inline'`,
+  `script-src 'self'${isProduction ? "" : " 'unsafe-eval'"} 'unsafe-inline' 'nonce-nexo-sentry'`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
-  `connect-src 'self' ${apiOrigin}${isProduction ? "" : " ws://localhost:*"}`,
+  `connect-src 'self' ${apiOrigin}${isProduction ? "" : " ws://localhost:*"} https://*.sentry.io`,
   "manifest-src 'self'",
   "worker-src 'self' blob:",
   "object-src 'none'",
@@ -49,4 +53,11 @@ const nextConfig: NextConfig = {
   }
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  silent: true,
+  sourcemaps: { disable: true },
+  disableLogger: true,
+});
