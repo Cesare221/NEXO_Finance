@@ -46,6 +46,10 @@ PASSWORD_RESET_TTL_MINUTES=20
 MFA_CHALLENGE_TTL_MINUTES=5
 MFA_ENCRYPTION_KEYS=v1:<chave-fernet-64-caracteres>
 MFA_ACTIVE_KEY_VERSION=v1
+SENTRY_DSN=<dsn-do-nexo-api>
+SENTRY_ENVIRONMENT=production
+SENTRY_RELEASE=<git-sha>
+SENTRY_TRACES_SAMPLE_RATE=0.1
 ```
 
 Não use `*`, HTTP ou endereços locais em `ALLOWED_ORIGINS` na produção.
@@ -109,6 +113,47 @@ O perfil do usuário armazena `theme_preference` como `system`, `light` ou `dark
 4. Não execute downgrade de migration automaticamente. Cada downgrade deve ser revisado conforme os dados envolvidos.
 5. Valide `/ready`, login e uma leitura do dashboard antes de reabrir o tráfego.
 6. Quando uma migration já estiver aplicada, prefira uma migration corretiva aditiva. Execute `alembic downgrade` somente com plano revisado, backup restaurável e janela de manutenção; ele não é rollback automático de deploy.
+
+## Sentry
+
+Crie dois projetos Sentry separados: `nexo-api` (Python) e `nexo-web` (Next.js).
+
+### Variaveis De Ambiente Sentry
+
+```text
+# API (Railway)
+SENTRY_DSN=<dsn-do-nexo-api>
+SENTRY_ENVIRONMENT=production
+SENTRY_RELEASE=<git-sha>
+SENTRY_TRACES_SAMPLE_RATE=0.1
+
+# Web (Vercel)
+NEXT_PUBLIC_SENTRY_DSN=<dsn-do-nexo-web>
+SENTRY_DSN=<dsn-do-nexo-web>
+SENTRY_ENVIRONMENT=production
+SENTRY_RELEASE=<git-sha>
+SENTRY_TRACES_SAMPLE_RATE=0.1
+SENTRY_AUTH_TOKEN=<token-build-only>
+```
+
+### Configuracao De Projetos
+
+- **Ambientes**: `staging` e `production` em cada projeto Sentry.
+- **Release naming**: Use o Git SHA (`git rev-parse --short HEAD`) como release.
+- **Scrubbing**: `send_default_pii=false`, cookies/authorization/email/phone/IP/amounts/tokens/chat content removidos antes do transporte. Sessions desabilitadas.
+
+### Regras De Alerta
+
+- **New regression**: Alerta quando um tipo de erro aparece pela primeira vez em um release.
+- **Error-rate spike**: Alerta quando a taxa de erros excede o baseline em 5x por 5 minutos.
+- **Readiness failure**: Alerta quando `/ready` retorna erro por 3 minutos consecutivos.
+- **Authentication-abuse spike**: Alerta quando tentativas de autenticacao 401/403 excedem 50/minuto.
+
+### Source Maps
+
+- Gere source maps no build do Next.js (`next build` gera automaticamente).
+- O `SENTRY_AUTH_TOKEN` e usado apenas no build (Vercel) e nunca exposto ao cliente.
+- Configure scoping do token para o projeto `nexo-web` apenas.
 
 ## Checklist De Produção
 

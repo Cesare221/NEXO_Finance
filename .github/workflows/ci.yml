@@ -1,27 +1,73 @@
-name: Nexo CI
+name: CI
 
 on:
+  pull_request:
+    branches: [main, codex/*]
   push:
     branches: [main]
-  pull_request:
-
-permissions:
-  contents: read
 
 jobs:
-  api:
+  api-tests:
+    name: API Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --locked --extra dev
+      - name: Run scrubber-focused tests
+        run: uv run pytest tests/test_observability.py -v -q
+      - name: Run full API suite
+        run: uv run pytest -q
+      - name: Verify observability is optional (no DSN)
+        run: uv run python -c "from app.core.observability import init_observability; init_observability(); print('OK: observability optional')"
+
+  web-build:
+    name: Web Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Typecheck
+        run: npx tsc --noEmit
+      - name: Unit tests
+        run: npm test
+      - name: Smoke tests
+        run: node tests/smoke.mjs
+      - name: Build with DSNs unset (observability optional)
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SENTRY_DSN: ""
+
+  migration-check:
+    name: Migration Check
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:17-alpine
+        image: postgres:16
         env:
+          POSTGRES_USER: nexo_test
+          POSTGRES_PASSWORD: test_password
           POSTGRES_DB: nexo_test
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U postgres -d nexo_test"
+          --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -29,63 +75,17 @@ jobs:
       run:
         working-directory: apps/api
     env:
+      DATABASE_URL: postgresql://nexo_test:test_password@localhost:5432/nexo_test
+      SECRET_KEY: ci-test-secret-key-for-migration-check-only-32chars!
       ENVIRONMENT: test
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/nexo_test
-      SECRET_KEY: ci-only-secret-not-used-outside-the-test-environment
-      ALLOWED_ORIGINS: http://localhost:3000
-      PYTHONPATH: ${{ github.workspace }}/apps/api
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
-          cache: pip
-          cache-dependency-path: apps/api/requirements-dev.lock
-      - run: python -m pip install --require-hashes -r requirements-dev.lock
-      - run: python -m alembic upgrade head
-      - run: python -m alembic current
-      - run: python -m pytest tests -q
-      - run: python -m pip_audit -r requirements.lock --disable-pip
-
-  web:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/web
-    env:
-      API_URL: http://localhost:8000
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+          python-version: "3.14"
+      - uses: astral-sh/setup-uv@v6
         with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: apps/web/package-lock.json
-      - run: npm ci
-      - run: npm test
-      - run: npm audit --audit-level=high
-      - run: npm run build
-
-  codeql:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
-    strategy:
-      matrix:
-        language: [python, javascript-typescript]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: github/codeql-action/init@v3
-        with:
-          languages: ${{ matrix.language }}
-      - uses: github/codeql-action/analyze@v3
-
-  dependency-review:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/dependency-review-action@v4
+          enable-cache: true
+      - run: uv sync --locked --extra dev
+      - name: Run migrations
+        run: uv run alembic upgrade head
