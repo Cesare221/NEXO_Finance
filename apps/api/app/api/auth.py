@@ -8,6 +8,7 @@ from app.core.config import settings
 from app.core.rate_limit import RateLimitExceeded, RateLimitUnavailable, auth_rate_limiter
 from app.core.security import fingerprint_token
 from app.models.user import User
+from app.schemas.account_security import RegistrationResponse
 from app.schemas.auth import (
     LoginRequest,
     DeleteAccountRequest,
@@ -18,6 +19,7 @@ from app.schemas.auth import (
     TokenResponse,
     UserSessionResponse,
 )
+from app.services.account_security_service import request_email_verification_for_user
 from app.services.auth_service import (
     AuthError,
     delete_user_account,
@@ -99,7 +101,7 @@ def _check_rate_limit(
         ) from exc
 
 
-@router.post("/register", response_model=TokenResponse, status_code=201)
+@router.post("/register", response_model=RegistrationResponse, status_code=201)
 def register(
     body: RegisterRequest,
     request: Request,
@@ -112,7 +114,7 @@ def register(
             detail="Voce precisa aceitar o Aviso de Privacidade para criar a conta.",
         )
     try:
-        register_user(
+        user = register_user(
             db,
             body.name,
             body.email,
@@ -120,10 +122,11 @@ def register(
             body.privacy_accepted,
             body.ai_data_processing_consent,
         )
-        access, refresh, _ = login_user(db, body.email, body.password, *_request_context(request))
+        _, ip_hash = _request_context(request)
+        request_email_verification_for_user(db, user, ip_hash)
     except AuthError as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
-    return TokenResponse(access_token=access, refresh_token=refresh)
+    return RegistrationResponse(status="verification_required", email=user.email)
 
 
 @router.post("/login", response_model=TokenResponse)

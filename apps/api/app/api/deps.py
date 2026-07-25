@@ -16,15 +16,27 @@ def get_current_user(
     payload = decode_token(credentials.credentials)
     user_id = payload.get("sub")
     token_type = payload.get("type")
-    if not user_id or token_type != "access":
+    token_ver = payload.get("ver")
+    if not user_id or token_type != "access" or token_ver is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired access token",
         )
     user = db.query(User).filter(User.id == int(user_id)).first()
-    if not user:
+    if not user or user.token_version != int(token_ver):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found",
+            detail="Invalid or expired access token",
         )
     return user
+
+
+def get_verified_user(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    if current_user.email_verified_at is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Email verification required",
+        )
+    return current_user

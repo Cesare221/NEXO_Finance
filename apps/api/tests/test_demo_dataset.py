@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 
 import pytest
@@ -23,9 +23,13 @@ def _register(client, email: str) -> tuple[dict[str, str], int]:
         json={"name": "Demo User", "email": email, "password": "FinSeguro123!"},
     )
     assert response.status_code == 201
-    headers = {"Authorization": f"Bearer {response.json()['access_token']}"}
     with TestingSessionLocal() as db:
-        user_id = db.query(User.id).filter(User.email == email).scalar()
+        user = db.query(User).filter(User.email == email).one()
+        user.email_verified_at = datetime.now(timezone.utc)
+        user_id = user.id
+        db.commit()
+    login_resp = client.post("/auth/login", json={"email": email, "password": "FinSeguro123!"})
+    headers = {"Authorization": f"Bearer {login_resp.json()['access_token']}"}
     return headers, user_id
 
 

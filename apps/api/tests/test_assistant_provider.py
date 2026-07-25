@@ -1,10 +1,11 @@
+from datetime import datetime, timezone
 from app.services.assistant_provider import GroqAssistantProvider
 from app.models.user import User
 from tests.conftest import TestingSessionLocal
 
 
 def test_groq_tool_loop_prepares_draft_without_writing_transaction(client, monkeypatch):
-    registration = client.post(
+    client.post(
         "/auth/register",
         json={
             "name": "Provider User",
@@ -12,7 +13,11 @@ def test_groq_tool_loop_prepares_draft_without_writing_transaction(client, monke
             "password": "FinSeguro123!",
         },
     )
-    token = registration.json()["access_token"]
+    with TestingSessionLocal() as db:
+        user = db.query(User).filter(User.email == "provider@example.com").one()
+        user.email_verified_at = datetime.now(timezone.utc)
+        db.commit()
+    token = client.post("/auth/login", json={"email": "provider@example.com", "password": "FinSeguro123!"}).json()["access_token"]
     account = client.post(
         "/financial/accounts",
         json={"name": "Conta principal", "type": "checking", "initial_balance": "100.00"},

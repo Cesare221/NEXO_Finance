@@ -15,11 +15,19 @@ from tests.conftest import TestingSessionLocal
 
 
 def _register_and_get_token(client, email="test@example.com", name="Test User") -> str:
-    resp = client.post(
+    client.post(
         "/auth/register",
         json={"name": name, "email": email, "password": "FinSeguro123!"},
     )
-    return resp.json()["access_token"]
+    with TestingSessionLocal() as db:
+        user = db.query(User).filter(User.email == email).one()
+        user.email_verified_at = datetime.now(timezone.utc)
+        db.commit()
+    login_resp = client.post(
+        "/auth/login",
+        json={"email": email, "password": "FinSeguro123!"},
+    )
+    return login_resp.json()["access_token"]
 
 
 def _auth_header(token: str) -> dict:

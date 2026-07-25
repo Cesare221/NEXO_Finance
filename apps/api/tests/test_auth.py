@@ -19,7 +19,12 @@ def _register_theme_user(client, email: str = "theme@example.com") -> dict[str, 
         json={"name": "Theme User", "email": email, "password": STRONG_PASSWORD},
     )
     assert response.status_code == 201
-    return {"Authorization": f"Bearer {response.json()['access_token']}"}
+    login_resp = client.post(
+        "/auth/login",
+        json={"email": email, "password": STRONG_PASSWORD},
+    )
+    assert login_resp.status_code == 200
+    return {"Authorization": f"Bearer {login_resp.json()['access_token']}"}
 
 
 def test_theme_preference_defaults_to_system_and_is_returned(client):
@@ -86,9 +91,9 @@ def test_register(client):
     )
     assert response.status_code == 201
     data = response.json()
-    assert "access_token" in data
-    assert "refresh_token" in data
-    assert data["token_type"] == "bearer"
+    assert data["status"] == "verification_required"
+    assert data["email"] == "test@example.com"
+    assert "access_token" not in data
 
 
 def test_register_duplicate_email(client):
@@ -148,7 +153,7 @@ def test_login_invalid_password(client):
 
 
 def test_me_authenticated(client):
-    reg = client.post(
+    client.post(
         "/auth/register",
         json={
             "name": "Me User",
@@ -156,7 +161,11 @@ def test_me_authenticated(client):
             "password": STRONG_PASSWORD,
         },
     )
-    token = reg.json()["access_token"]
+    login_resp = client.post(
+        "/auth/login",
+        json={"email": "me@example.com", "password": STRONG_PASSWORD},
+    )
+    token = login_resp.json()["access_token"]
     response = client.get(
         "/auth/me", headers={"Authorization": f"Bearer {token}"}
     )
@@ -171,7 +180,7 @@ def test_me_unauthenticated(client):
 
 
 def test_update_own_profile(client):
-    reg = client.post(
+    client.post(
         "/auth/register",
         json={
             "name": "Original Name",
@@ -179,7 +188,11 @@ def test_update_own_profile(client):
             "password": STRONG_PASSWORD,
         },
     )
-    token = reg.json()["access_token"]
+    login_resp = client.post(
+        "/auth/login",
+        json={"email": "profile@example.com", "password": STRONG_PASSWORD},
+    )
+    token = login_resp.json()["access_token"]
 
     response = client.patch(
         "/auth/me",
@@ -206,7 +219,7 @@ def test_update_own_profile(client):
 
 
 def test_update_profile_can_remove_phone_and_avatar(client):
-    reg = client.post(
+    client.post(
         "/auth/register",
         json={
             "name": "Profile User",
@@ -214,7 +227,11 @@ def test_update_profile_can_remove_phone_and_avatar(client):
             "password": STRONG_PASSWORD,
         },
     )
-    token = reg.json()["access_token"]
+    login_resp = client.post(
+        "/auth/login",
+        json={"email": "clear-profile@example.com", "password": STRONG_PASSWORD},
+    )
+    token = login_resp.json()["access_token"]
     headers = {"Authorization": f"Bearer {token}"}
     client.patch(
         "/auth/me",
@@ -234,7 +251,7 @@ def test_update_profile_can_remove_phone_and_avatar(client):
 
 
 def test_update_profile_rejects_invalid_phone_and_avatar(client):
-    reg = client.post(
+    client.post(
         "/auth/register",
         json={
             "name": "Profile User",
@@ -242,7 +259,11 @@ def test_update_profile_rejects_invalid_phone_and_avatar(client):
             "password": STRONG_PASSWORD,
         },
     )
-    token = reg.json()["access_token"]
+    login_resp = client.post(
+        "/auth/login",
+        json={"email": "invalid-profile@example.com", "password": STRONG_PASSWORD},
+    )
+    token = login_resp.json()["access_token"]
     headers = {"Authorization": f"Bearer {token}"}
 
     invalid_phone = client.patch(
@@ -266,7 +287,7 @@ def test_update_profile_requires_authentication(client):
 
 
 def test_refresh_token(client):
-    reg = client.post(
+    client.post(
         "/auth/register",
         json={
             "name": "Refresh",
@@ -274,7 +295,11 @@ def test_refresh_token(client):
             "password": STRONG_PASSWORD,
         },
     )
-    refresh = reg.json()["refresh_token"]
+    login_resp = client.post(
+        "/auth/login",
+        json={"email": "refresh@example.com", "password": STRONG_PASSWORD},
+    )
+    refresh = login_resp.json()["refresh_token"]
     response = client.post(
         "/auth/refresh", json={"refresh_token": refresh}
     )
@@ -286,7 +311,7 @@ def test_refresh_token(client):
 
 
 def test_logout(client):
-    reg = client.post(
+    client.post(
         "/auth/register",
         json={
             "name": "Logout",
@@ -294,8 +319,12 @@ def test_logout(client):
             "password": STRONG_PASSWORD,
         },
     )
-    access = reg.json()["access_token"]
-    refresh = reg.json()["refresh_token"]
+    login_resp = client.post(
+        "/auth/login",
+        json={"email": "logout@example.com", "password": STRONG_PASSWORD},
+    )
+    access = login_resp.json()["access_token"]
+    refresh = login_resp.json()["refresh_token"]
     response = client.post(
         "/auth/logout",
         json={"refresh_token": refresh},
@@ -309,7 +338,7 @@ def test_logout(client):
 
 
 def test_authorization_isolation(client):
-    reg_a = client.post(
+    client.post(
         "/auth/register",
         json={
             "name": "User A",
@@ -317,12 +346,12 @@ def test_authorization_isolation(client):
             "password": STRONG_PASSWORD,
         },
     )
-    token_a = reg_a.json()["access_token"]
+    token_a = client.post("/auth/login", json={"email": "a@example.com", "password": STRONG_PASSWORD}).json()["access_token"]
     me_a = client.get(
         "/auth/me", headers={"Authorization": f"Bearer {token_a}"}
     )
     assert me_a.json()["email"] == "a@example.com"
-    reg_b = client.post(
+    client.post(
         "/auth/register",
         json={
             "name": "User B",
@@ -330,7 +359,7 @@ def test_authorization_isolation(client):
             "password": STRONG_PASSWORD,
         },
     )
-    token_b = reg_b.json()["access_token"]
+    token_b = client.post("/auth/login", json={"email": "b@example.com", "password": STRONG_PASSWORD}).json()["access_token"]
     me_b = client.get(
         "/auth/me", headers={"Authorization": f"Bearer {token_b}"}
     )
@@ -379,7 +408,11 @@ def test_refresh_token_is_stored_as_fingerprint(client):
         },
     )
     assert response.status_code == 201
-    refresh_token = response.json()["refresh_token"]
+    login_resp = client.post(
+        "/auth/login",
+        json={"email": "fingerprint@example.com", "password": STRONG_PASSWORD},
+    )
+    refresh_token = login_resp.json()["refresh_token"]
 
     db = TestingSessionLocal()
     try:
@@ -418,7 +451,7 @@ def test_login_is_rate_limited(client):
 
 
 def test_refresh_token_reuse_revokes_the_entire_session_family(client):
-    registration = client.post(
+    client.post(
         "/auth/register",
         json={
             "name": "Reuse User",
@@ -426,7 +459,11 @@ def test_refresh_token_reuse_revokes_the_entire_session_family(client):
             "password": STRONG_PASSWORD,
         },
     )
-    first_refresh = registration.json()["refresh_token"]
+    login_resp = client.post(
+        "/auth/login",
+        json={"email": "reuse@example.com", "password": STRONG_PASSWORD},
+    )
+    first_refresh = login_resp.json()["refresh_token"]
     rotated = client.post("/auth/refresh", json={"refresh_token": first_refresh})
     second_refresh = rotated.json()["refresh_token"]
 
@@ -444,7 +481,7 @@ def test_refresh_token_reuse_revokes_the_entire_session_family(client):
 
 
 def test_user_can_export_data_without_authentication_secrets(client):
-    registration = client.post(
+    client.post(
         "/auth/register",
         json={
             "name": "Export User",
@@ -454,7 +491,11 @@ def test_user_can_export_data_without_authentication_secrets(client):
             "ai_data_processing_consent": True,
         },
     )
-    headers = {"Authorization": f"Bearer {registration.json()['access_token']}"}
+    login_resp = client.post(
+        "/auth/login",
+        json={"email": "export@example.com", "password": STRONG_PASSWORD},
+    )
+    headers = {"Authorization": f"Bearer {login_resp.json()['access_token']}"}
 
     response = client.get("/auth/me/export", headers=headers)
 
@@ -467,7 +508,7 @@ def test_user_can_export_data_without_authentication_secrets(client):
 
 
 def test_account_deletion_requires_password_and_removes_access(client):
-    registration = client.post(
+    client.post(
         "/auth/register",
         json={
             "name": "Delete User",
@@ -475,7 +516,11 @@ def test_account_deletion_requires_password_and_removes_access(client):
             "password": STRONG_PASSWORD,
         },
     )
-    headers = {"Authorization": f"Bearer {registration.json()['access_token']}"}
+    login_resp = client.post(
+        "/auth/login",
+        json={"email": "delete@example.com", "password": STRONG_PASSWORD},
+    )
+    headers = {"Authorization": f"Bearer {login_resp.json()['access_token']}"}
 
     denied = client.request("DELETE", "/auth/me", json={"password": "wrong"}, headers=headers)
     deleted = client.request("DELETE", "/auth/me", json={"password": STRONG_PASSWORD}, headers=headers)
@@ -487,17 +532,26 @@ def test_account_deletion_requires_password_and_removes_access(client):
 
 
 def test_user_can_list_and_revoke_only_their_own_sessions(client):
-    registration_a = client.post(
+    client.post(
         "/auth/register",
         json={"name": "Session A", "email": "session-a@example.com", "password": STRONG_PASSWORD},
         headers={"User-Agent": "Mozilla/5.0 Windows Chrome/130.0"},
     )
-    registration_b = client.post(
+    login_a = client.post(
+        "/auth/login",
+        json={"email": "session-a@example.com", "password": STRONG_PASSWORD},
+        headers={"User-Agent": "Mozilla/5.0 Windows Chrome/130.0"},
+    )
+    client.post(
         "/auth/register",
         json={"name": "Session B", "email": "session-b@example.com", "password": STRONG_PASSWORD},
     )
-    headers_a = {"Authorization": f"Bearer {registration_a.json()['access_token']}"}
-    headers_b = {"Authorization": f"Bearer {registration_b.json()['access_token']}"}
+    login_b = client.post(
+        "/auth/login",
+        json={"email": "session-b@example.com", "password": STRONG_PASSWORD},
+    )
+    headers_a = {"Authorization": f"Bearer {login_a.json()['access_token']}"}
+    headers_b = {"Authorization": f"Bearer {login_b.json()['access_token']}"}
     session_a = client.get("/auth/sessions", headers=headers_a).json()[0]
 
     forbidden = client.request("DELETE", f"/auth/sessions/{session_a['id']}", headers=headers_b)

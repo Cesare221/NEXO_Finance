@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
+from app.api.account_security import router as account_security_router
 from app.api.auth import router as auth_router
 from app.api.assistant import router as assistant_router
 from app.api.financial import router as financial_router
@@ -94,5 +95,6 @@ async def api_security_headers(request: Request, call_next):
 
 app.include_router(health_router)
 app.include_router(auth_router)
+app.include_router(account_security_router)
 app.include_router(financial_router)
 app.include_router(assistant_router)

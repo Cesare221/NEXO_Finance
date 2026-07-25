@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user
+from app.api.deps import get_verified_user
 from app.core.database import get_db
 from app.core.config import settings
 from app.core.rate_limit import RateLimitExceeded, RateLimitUnavailable, auth_rate_limiter
@@ -41,7 +41,7 @@ def _limit(bucket: str, user_id: int, limit: int, window_seconds: int) -> None:
 def send_message(
     body: AssistantMessageRequest,
     request: Request,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     _limit("assistant-minute", current_user.id, settings.fin_ai_messages_per_minute, 60)
@@ -62,7 +62,7 @@ def list_proposals(
         default=None,
         pattern="^(proposed|executed|cancelled|expired|failed)$",
     ),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return assistant_service.list_proposals(db, current_user.id, status)
@@ -71,7 +71,7 @@ def list_proposals(
 @router.post("/proposals", response_model=ActionProposalResponse, status_code=201)
 def create_proposal(
     body: ActionProposalCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     _limit("assistant-proposal-create", current_user.id, 20, 60)
@@ -92,7 +92,7 @@ def create_proposal(
 def update_proposal(
     proposal_id: int,
     body: ActionProposalUpdate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     _limit("assistant-proposal-update", current_user.id, 30, 60)
@@ -108,7 +108,7 @@ def update_proposal(
 @router.post("/proposals/{proposal_id}/cancel", response_model=ActionProposalResponse)
 def cancel_proposal(
     proposal_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     _limit("assistant-proposal-cancel", current_user.id, 30, 60)
@@ -118,7 +118,7 @@ def cancel_proposal(
 @router.post("/proposals/{proposal_id}/confirm", response_model=ConfirmProposalResponse)
 def confirm_proposal(
     proposal_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     _limit("assistant-proposal-confirm", current_user.id, 10, 60)
@@ -130,7 +130,7 @@ def confirm_proposal(
 
 @router.get("/audit-events", response_model=list[AuditEventResponse])
 def list_audit_events(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return assistant_service.list_audit_events(db, current_user.id)

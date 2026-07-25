@@ -43,6 +43,7 @@ def _make_token(
     token_type: str,
     expire_delta: timedelta,
     family_id: str | None = None,
+    token_version: int = 0,
 ) -> str:
     claims = {
         "sub": str(user_id),
@@ -50,6 +51,7 @@ def _make_token(
         "iat": datetime.now(timezone.utc),
         "exp": datetime.now(timezone.utc) + expire_delta,
         "type": token_type,
+        "ver": token_version,
     }
     if family_id is not None:
         claims["family_id"] = family_id
@@ -60,18 +62,22 @@ def _make_token(
     )
 
 
-def create_access_token(user_id: int) -> str:
+def create_access_token(user_id: int, token_version: int = 0) -> str:
     return _make_token(
-        user_id, "access", timedelta(minutes=settings.access_token_expire_minutes)
+        user_id,
+        "access",
+        timedelta(minutes=settings.access_token_expire_minutes),
+        token_version=token_version,
     )
 
 
-def create_refresh_token(user_id: int, family_id: str) -> str:
+def create_refresh_token(user_id: int, family_id: str, token_version: int = 0) -> str:
     return _make_token(
         user_id,
         "refresh",
         timedelta(days=settings.refresh_token_expire_days),
         family_id,
+        token_version=token_version,
     )
 
 

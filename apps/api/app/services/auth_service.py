@@ -83,9 +83,9 @@ def login_user(
         raise AuthError("Invalid email or password", 401)
     if password_needs_rehash(user.password_hash):
         user.password_hash = hash_password(password)
-    access_token = create_access_token(user.id)
+    access_token = create_access_token(user.id, user.token_version)
     family_id = str(uuid.uuid4())
-    refresh_token = create_refresh_token(user.id, family_id)
+    refresh_token = create_refresh_token(user.id, family_id, user.token_version)
     session = UserSession(
         user_id=user.id,
         refresh_token_hash=fingerprint_token(refresh_token),
@@ -110,7 +110,11 @@ def refresh_tokens(
     user_id = payload.get("sub")
     token_type = payload.get("type")
     family_id = payload.get("family_id")
-    if not user_id or token_type != "refresh" or not family_id:
+    token_ver = payload.get("ver")
+    if not user_id or token_type != "refresh" or not family_id or token_ver is None:
+        raise AuthError("Invalid refresh token", 401)
+    user = db.query(User).filter(User.id == int(user_id)).first()
+    if not user or user.token_version != int(token_ver):
         raise AuthError("Invalid refresh token", 401)
     token_hash = fingerprint_token(old_refresh_token)
     session = (
@@ -151,8 +155,8 @@ def refresh_tokens(
     session.is_active = False
     session.rotated_at = now
     session.last_used_at = now
-    new_access = create_access_token(int(user_id))
-    new_refresh = create_refresh_token(int(user_id), family_id)
+    new_access = create_access_token(int(user_id), user.token_version)
+    new_refresh = create_refresh_token(int(user_id), family_id, user.token_version)
     new_session = UserSession(
         user_id=int(user_id),
         refresh_token_hash=fingerprint_token(new_refresh),

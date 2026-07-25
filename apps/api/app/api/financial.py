@@ -3,7 +3,7 @@ from datetime import date
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user
+from app.api.deps import get_verified_user
 from app.core.database import get_db
 from app.models.user import User
 from app.schemas.financial import (
@@ -43,7 +43,7 @@ router = APIRouter(prefix="/financial", tags=["financial"])
 
 @router.get("/demo-dataset", response_model=DemoDatasetResponse)
 def get_demo_dataset(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return demo_service.get_demo_dataset_status(db, current_user.id)
@@ -52,7 +52,7 @@ def get_demo_dataset(
 @router.post("/demo-dataset", response_model=DemoDatasetResponse, status_code=201)
 def install_demo_dataset(
     response: Response,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     state, created = demo_service.install_demo_dataset(db, current_user.id)
@@ -62,7 +62,7 @@ def install_demo_dataset(
 
 @router.delete("/demo-dataset", response_model=DemoDatasetResponse)
 def clean_demo_dataset(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return demo_service.clean_demo_dataset(db, current_user.id)
@@ -73,7 +73,7 @@ def get_dashboard(
     start_date: date | None = None,
     end_date: date | None = None,
     months: int = Query(default=6, ge=1, le=24),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.get_dashboard(db, current_user.id, start_date, end_date, months)
@@ -81,7 +81,7 @@ def get_dashboard(
 
 @router.get("/accounts", response_model=list[AccountResponse])
 def list_accounts(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.list_accounts(db, current_user.id)
@@ -90,7 +90,7 @@ def list_accounts(
 @router.post("/accounts", response_model=AccountResponse, status_code=201)
 def create_account(
     body: AccountCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.create_account(
@@ -108,7 +108,7 @@ def create_account(
 def update_account(
     account_id: int,
     body: AccountUpdate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.update_account(
@@ -119,7 +119,7 @@ def update_account(
 @router.delete("/accounts/{account_id}", response_model=AccountResponse)
 def archive_account(
     account_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.archive_account(db, current_user.id, account_id)
@@ -128,7 +128,7 @@ def archive_account(
 @router.get("/accounts/{account_id}/balance", response_model=AccountBalanceResponse)
 def get_account_balance(
     account_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return {
@@ -139,7 +139,7 @@ def get_account_balance(
 
 @router.get("/categories", response_model=list[CategoryResponse])
 def get_categories(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     tree = fs.get_category_tree(db, current_user.id)
@@ -149,7 +149,7 @@ def get_categories(
 @router.post("/categories", response_model=CategoryResponse, status_code=201)
 def create_category(
     body: CategoryCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.create_category(
@@ -161,7 +161,7 @@ def create_category(
 def update_category(
     category_id: int,
     body: CategoryUpdate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.update_category(
@@ -172,7 +172,7 @@ def update_category(
 @router.delete("/categories/{category_id}", response_model=CategoryDeleteResponse)
 def delete_category(
     category_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.delete_or_archive_category(db, current_user.id, category_id)
@@ -185,7 +185,7 @@ def list_transactions(
     category_id: int | None = None,
     start_date: date | None = None,
     end_date: date | None = None,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.list_transactions(
@@ -202,7 +202,7 @@ def list_transactions(
 @router.post("/transactions", response_model=TransactionResponse, status_code=201)
 def create_transaction(
     body: TransactionCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.create_transaction(
@@ -221,7 +221,7 @@ def create_transaction(
 @router.delete("/transactions/{transaction_id}", response_model=TransactionResponse)
 def delete_transaction(
     transaction_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.delete_transaction(db, current_user.id, transaction_id)
@@ -229,7 +229,7 @@ def delete_transaction(
 
 @router.get("/transfers", response_model=list[TransferResponse])
 def list_transfers(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.list_transfers(db, current_user.id)
@@ -238,7 +238,7 @@ def list_transfers(
 @router.post("/transfers", response_model=TransferResponse, status_code=201)
 def create_transfer(
     body: TransferCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.create_transfer(
@@ -254,7 +254,7 @@ def create_transfer(
 
 @router.get("/credit-cards", response_model=list[CreditCardResponse])
 def list_credit_cards(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.list_credit_cards(db, current_user.id)
@@ -263,7 +263,7 @@ def list_credit_cards(
 @router.post("/credit-cards", response_model=CreditCardResponse, status_code=201)
 def create_credit_card(
     body: CreditCardCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.create_credit_card(
@@ -281,7 +281,7 @@ def create_credit_card(
 def update_credit_card(
     card_id: int,
     body: CreditCardUpdate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.update_credit_card(
@@ -292,7 +292,7 @@ def update_credit_card(
 @router.delete("/credit-cards/{card_id}", response_model=CreditCardResponse)
 def archive_credit_card(
     card_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.archive_credit_card(db, current_user.id, card_id)
@@ -306,7 +306,7 @@ def archive_credit_card(
 def create_card_purchase(
     card_id: int,
     body: CardPurchaseCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.create_card_purchase(
@@ -324,7 +324,7 @@ def create_card_purchase(
 def pay_statement(
     statement_id: int,
     body: StatementPaymentCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.pay_statement(db, current_user.id, statement_id, body.paid_on)
@@ -332,7 +332,7 @@ def pay_statement(
 
 @router.get("/installment-plans", response_model=list[InstallmentPlanResponse])
 def list_installment_plans(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.list_installment_plans(db, current_user.id)
@@ -343,7 +343,7 @@ def list_installment_plans(
 )
 def create_installment_plan(
     body: InstallmentPlanCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.create_installment_plan(
@@ -362,7 +362,7 @@ def create_installment_plan(
 @router.post("/installments/{installment_id}/confirm", response_model=InstallmentResponse)
 def confirm_installment(
     installment_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.confirm_installment(db, current_user.id, installment_id)
@@ -371,7 +371,7 @@ def confirm_installment(
 @router.post("/recurring-rules", response_model=RecurringRuleResponse, status_code=201)
 def create_recurring_rule(
     body: RecurringRuleCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.create_recurring_rule(
@@ -393,7 +393,7 @@ def create_recurring_rule(
 def confirm_recurring_rule(
     rule_id: int,
     body: RecurringRuleConfirm,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     return fs.confirm_recurring_rule(

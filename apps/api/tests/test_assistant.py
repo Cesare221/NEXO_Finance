@@ -1,16 +1,26 @@
 from decimal import Decimal
-from datetime import date
+from datetime import date, datetime, timezone
 
 from app.core.config import settings
+from app.models.user import User
 from app.services.assistant_provider import ProviderResult, TransactionDraft
+from tests.conftest import TestingSessionLocal
 
 
 def _register_and_get_token(client, email="test@example.com", name="Test User") -> str:
-    resp = client.post(
+    client.post(
         "/auth/register",
         json={"name": name, "email": email, "password": "FinSeguro123!"},
     )
-    return resp.json()["access_token"]
+    with TestingSessionLocal() as db:
+        user = db.query(User).filter(User.email == email).one()
+        user.email_verified_at = datetime.now(timezone.utc)
+        db.commit()
+    login_resp = client.post(
+        "/auth/login",
+        json={"email": email, "password": "FinSeguro123!"},
+    )
+    return login_resp.json()["access_token"]
 
 
 def _auth_header(token: str) -> dict:
@@ -298,7 +308,7 @@ def test_transaction_message_without_account_requests_clarification(client):
 
 
 def test_groq_provider_can_only_prepare_a_pending_proposal(client, monkeypatch):
-    registration = client.post(
+    client.post(
         "/auth/register",
         json={
             "name": "AI User",
@@ -307,7 +317,11 @@ def test_groq_provider_can_only_prepare_a_pending_proposal(client, monkeypatch):
             "ai_data_processing_consent": True,
         },
     )
-    token = registration.json()["access_token"]
+    with TestingSessionLocal() as db:
+        user = db.query(User).filter(User.email == "ai-user@example.com").one()
+        user.email_verified_at = datetime.now(timezone.utc)
+        db.commit()
+    token = client.post("/auth/login", json={"email": "ai-user@example.com", "password": "FinSeguro123!"}).json()["access_token"]
     account = _create_account(client, token, name="Conta principal")
     monkeypatch.setattr(settings, "fin_ai_provider", "groq")
     monkeypatch.setattr(settings, "groq_api_key", "test-key")
