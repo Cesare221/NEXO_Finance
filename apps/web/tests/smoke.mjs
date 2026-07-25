@@ -14,10 +14,19 @@ const requiredFiles = [
   "app/categorias/page.tsx",
   "app/fin/page.tsx",
   "app/configuracoes/page.tsx",
+  "app/verificar-email/page.tsx",
+  "app/recuperar-senha/page.tsx",
+  "app/redefinir-senha/page.tsx",
+  "app/mfa/page.tsx",
   "app/manifest.ts",
   "app/offline/page.tsx",
   "components/app-shell.tsx",
   "components/auth-form.tsx",
+  "components/email-verification-form.tsx",
+  "components/password-recovery-form.tsx",
+  "components/password-reset-form.tsx",
+  "components/mfa-challenge-form.tsx",
+  "components/mfa-settings.tsx",
   "components/session-profile.tsx",
   "components/theme-provider.tsx",
   "components/theme-toggle.tsx",
@@ -681,6 +690,75 @@ const securityExperience =
 for (const marker of ["Sessões ativas", "/api/auth/sessions", "validateRequestOrigin", "Encerrar sessão"]) {
   if (!securityExperience.includes(marker)) {
     throw new Error(`Session security controls must include ${marker}`);
+  }
+}
+
+const verificationExperience =
+  readFileSync(join(root, "components/email-verification-form.tsx"), "utf8") +
+  readFileSync(join(root, "app/verificar-email/page.tsx"), "utf8");
+for (const marker of [
+  "/api/auth/email-verification/confirm",
+  "/api/auth/email-verification/request",
+  "token",
+  "reenviar",
+  'aria-live="polite"',
+  "role=\"status\"",
+  "role=\"alert\""
+]) {
+  if (!verificationExperience.includes(marker)) {
+    throw new Error(`Email verification UX must include ${marker}`);
+  }
+}
+
+const passwordResetExperience =
+  readFileSync(join(root, "components/password-recovery-form.tsx"), "utf8") +
+  readFileSync(join(root, "components/password-reset-form.tsx"), "utf8") +
+  readFileSync(join(root, "app/recuperar-senha/page.tsx"), "utf8") +
+  readFileSync(join(root, "app/redefinir-senha/page.tsx"), "utf8");
+for (const marker of [
+  "/api/auth/password-reset/request",
+  "/api/auth/password-reset/confirm",
+  "new-password",
+  "aria-live=\"polite\"",
+  "Mostrar senha"
+]) {
+  if (!passwordResetExperience.includes(marker)) {
+    throw new Error(`Password reset UX must include ${marker}`);
+  }
+}
+if (passwordResetExperience.includes("12 caracteres") !== true) {
+  throw new Error("Password reset must enforce minimum length validation");
+}
+
+const mfaExperience =
+  readFileSync(join(root, "components/mfa-challenge-form.tsx"), "utf8") +
+  readFileSync(join(root, "components/mfa-settings.tsx"), "utf8") +
+  readFileSync(join(root, "app/mfa/page.tsx"), "utf8") +
+  settings;
+for (const marker of [
+  "/api/auth/mfa/challenge",
+  "/api/auth/mfa/status",
+  "/api/auth/mfa/enroll",
+  "/api/auth/mfa/confirm",
+  "/api/auth/mfa",
+  "/api/auth/mfa/recovery-codes",
+  "MfaSettings",
+  "MfaChallengeForm",
+  "QRCode",
+  "otpauth_uri",
+  "recovery_codes",
+  "Códigos de Recuperação",
+  "Baixar códigos",
+  "Entendi",
+  "Desativar MFA",
+  "Ativar Proteção MFA",
+  "aria-live=\"polite\"",
+  "role=\"alert\"",
+  "6 dígitos",
+  "inputMode=\"numeric\""
+]) {
+  if (!mfaExperience.includes(marker)) {
+    throw new Error(`MFA UX must include ${marker}`);
   }
 }
 

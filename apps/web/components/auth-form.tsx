@@ -40,7 +40,7 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-      const body = (await response.json().catch(() => ({}))) as { detail?: unknown };
+      const body = (await response.json().catch(() => ({}))) as { detail?: unknown; email?: string };
 
       if (!response.ok) {
         setError(
@@ -48,6 +48,28 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
             ? body.detail
             : "Não foi possível continuar. Confira os dados e tente novamente."
         );
+        return;
+      }
+
+      if (isRegister) {
+        const email = String(body.email ?? payload.email);
+        router.push(`/verificar-email?email=${encodeURIComponent(email)}`);
+        return;
+      }
+
+      const outcome = body as {
+        status?: "authenticated" | "mfa_required" | "email_verification_required";
+        email?: string;
+      };
+
+      if (outcome.status === "mfa_required") {
+        router.push(`/mfa?next=${encodeURIComponent(redirectTo)}`);
+        return;
+      }
+
+      if (outcome.status === "email_verification_required") {
+        const email = outcome.email ?? payload.email;
+        router.push(`/verificar-email?email=${encodeURIComponent(email)}`);
         return;
       }
 
@@ -127,10 +149,16 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
             {showPassword ? <EyeOff size={19} aria-hidden="true" /> : <Eye size={19} aria-hidden="true" />}
           </button>
         </div>
-        {isRegister && (
+        {isRegister ? (
           <span className="field-help" id="password-help">
             Use pelo menos 12 caracteres.
           </span>
+        ) : (
+          <div className="field-footer">
+            <Link className="forgot-password-link" href="/recuperar-senha">
+              Recuperar senha
+            </Link>
+          </div>
         )}
       </div>
 

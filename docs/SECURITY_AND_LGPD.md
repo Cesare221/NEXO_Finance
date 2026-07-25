@@ -17,6 +17,9 @@ Este documento descreve controles tecnicos do produto. Ele nao substitui revisao
 - Gerenciamento e revogacao de sessoes ativas.
 - Avatar validado por MIME, assinatura binaria, Base64 e limite de tamanho.
 - CI com testes, lockfiles com hashes, `pip-audit`, `npm audit`, CodeQL e dependency review.
+- Verificacao de e-mail com tokens unicos e expiracao (30 minutos).
+- Recuperacao de senha com tokens expirados (20 minutos), revogacao de todas as sessoes ativas.
+- MFA TOTP com chaves criptografadas (Fernet), 10 codigos de recuperacao de uso unico (Argon2 hash), e limitacao de 5 tentativas de challenge.
 
 ## Fronteira De Confianca Do Fin
 
@@ -49,6 +52,53 @@ O usuario pode corrigir o perfil, revogar consentimento de IA, exportar os dados
 - Auditoria financeira: definir prazo com revisao juridica e obrigacao fiscal aplicavel.
 - Backups: retencao curta e documentada, com expiracao que tambem respeite exclusoes.
 - Prompts e respostas do Fin: nao registrar por padrao.
+
+## Controles De Identidade E MFA
+
+### Temporizacao De Tokens
+
+- Token de verificacao de e-mail: 30 minutos.
+- Token de recuperacao de senha: 20 minutos.
+- Challenge MFA (TOTP): 5 minutos.
+- Access token JWT: configuravel (padrao 15 minutos).
+- Refresh token: configuravel (padrao 7 dias).
+
+### Comportamento De Revogacao
+
+- Recuperacao de senha revoca todas as sessoes ativas do usuario e incrementa `token_version`.
+- Desativacao MFA revoca todas as outras sessoes ativas do usuario.
+- Reutilizacao de refresh token revoca toda a familia de sessao.
+- Tokens invalidados retornam 401 Unauthorized.
+
+### Variaveis De Ambiente Para Identidade
+
+```text
+MAIL_PROVIDER=resend              # "resend" em producao, "console" em desenvolvimento
+RESEND_API_KEY=<chave-da-api>    # Obrigatoria quando MAIL_PROVIDER=resend
+EMAIL_FROM=Nexo <no-reply@nexo.example>
+PUBLIC_WEB_URL=https://app.nexo.example  # Deve ser HTTPS em producao
+EMAIL_VERIFICATION_TTL_MINUTES=30
+PASSWORD_RESET_TTL_MINUTES=20
+MFA_CHALLENGE_TTL_MINUTES=5
+MFA_ENCRYPTION_KEYS=v1:<chave-fernet>    # Formato: versao:chave-fernet
+MFA_ACTIVE_KEY_VERSION=v1
+```
+
+### MFA E Recuperacao
+
+- Cada usuario pode ter apenas um metodo TOTP ativo.
+- A chave TOTP e criptografada com Fernet (chave dedicada, nao SECRET_KEY).
+- 10 codigos de recuperacao sao gerados na ativacao do MFA; cada codigo e de uso unico.
+- Cada tentativa de challenge e limitada a 5 tentativas.
+- Regeneracao de codigos de recuperacao requer senha atual e invalida os anteriores.
+- Desativacao MFA requer senha + codigo TOTP ou de recuperacao.
+
+### Suporte E Recuperacao
+
+- O suporte NAO pode recuperar uma chave TOTP perdida. O usuario deve usar um codigo de recuperacao.
+- Se todos os codigos de recuperacao forem perdidos e a chave TOTP for inacessivel, a conta requer intervencao manual do operador.
+- Operadores podem redefinir senha apenas via fluxo de recuperacao de e-mail.
+- Nenhum funcionario ou sistema interno tem acesso a senhas ou chaves TOTP em texto plano.
 
 ## Resposta A Incidentes
 

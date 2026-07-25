@@ -5,6 +5,7 @@ import { ThemeSettings } from "@/components/theme-settings";
 import { DemoDatasetControl } from "@/components/demo-dataset-control";
 import { PrivacySettings } from "@/components/privacy-settings";
 import { SecuritySettings } from "@/components/security-settings";
+import { MfaSettings } from "@/components/mfa-settings";
 
 export default function ConfiguracoesPage() {
   return (
@@ -18,6 +19,7 @@ export default function ConfiguracoesPage() {
       <div className="settings-stack">
         <ProfileSettings />
         <PrivacySettings />
+        <MfaSettings />
         <SecuritySettings />
         <ThemeSettings />
         <DemoDatasetControl variant="cleanup" />

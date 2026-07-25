@@ -37,6 +37,15 @@ FIN_AI_MESSAGES_PER_DAY=200
 GROQ_API_KEY=<segredo-configurado-somente-na-api>
 GROQ_BASE_URL=https://api.groq.com/openai/v1
 TRUSTED_PROXY_IPS=<ips-dos-proxies-que-podem-enviar-x-forwarded-for>
+MAIL_PROVIDER=resend
+RESEND_API_KEY=<chave-da-api-resend>
+EMAIL_FROM=Nexo <no-reply@nexo.example>
+PUBLIC_WEB_URL=https://app.seudominio.com
+EMAIL_VERIFICATION_TTL_MINUTES=30
+PASSWORD_RESET_TTL_MINUTES=20
+MFA_CHALLENGE_TTL_MINUTES=5
+MFA_ENCRYPTION_KEYS=v1:<chave-fernet-64-caracteres>
+MFA_ACTIVE_KEY_VERSION=v1
 ```
 
 Não use `*`, HTTP ou endereços locais em `ALLOWED_ORIGINS` na produção.
@@ -59,12 +68,14 @@ GET https://api.seudominio.com/ready  -> 200 com database=ok
 
 Execute também:
 
-1. Cadastro, login, refresh e logout.
-2. Criação de conta e categoria.
-3. Criação e exclusão de uma transação.
-4. Aprovação e cancelamento de uma proposta do Fin.
-5. Instalação PWA em Android e iOS.
-6. Verificação em 375 px, 768 px e desktop.
+1. Cadastro, verificação de e-mail, login e refresh.
+2. Recuperação de senha (request + confirm) e revogação de sessões.
+3. Ativação de MFA TOTP, challenge de login, códigos de recuperação e desativação.
+4. Criação de conta e categoria.
+5. Criação e exclusão de uma transação.
+6. Aprovação e cancelamento de uma proposta do Fin.
+7. Instalação PWA em Android e iOS.
+8. Verificação em 375 px, 768 px e desktop.
 
 ## Rollout Financeiro
 
