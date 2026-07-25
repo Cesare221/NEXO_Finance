@@ -1,5 +1,7 @@
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
+from typing import Literal
 import uuid
 
 from sqlalchemy import inspect
@@ -71,18 +73,41 @@ def register_user(
     return user
 
 
+@dataclass(frozen=True)
+class LoginOutcome:
+    status: Literal["authenticated", "mfa_required", "email_verification_required"]
+    user: User
+    access_token: str | None = None
+    refresh_token: str | None = None
+    challenge_token: str | None = None
+
+
 def login_user(
     db: Session,
     email: str,
     password: str,
     device_name: str | None = None,
     ip_hash: str | None = None,
-) -> tuple[str, str, User]:
+) -> LoginOutcome:
     user = db.query(User).filter(User.email == email).first()
     if not user or not verify_password(password, user.password_hash):
         raise AuthError("Invalid email or password", 401)
     if password_needs_rehash(user.password_hash):
         user.password_hash = hash_password(password)
+
+    if user.email_verified_at is None:
+        return LoginOutcome(status="email_verification_required", user=user)
+
+    from app.services.mfa_service import create_mfa_challenge, get_mfa_status
+    mfa_enabled, _ = get_mfa_status(db, user.id)
+    if mfa_enabled:
+        challenge_token = create_mfa_challenge(db, user.id)
+        return LoginOutcome(
+            status="mfa_required",
+            user=user,
+            challenge_token=challenge_token,
+        )
+
     access_token = create_access_token(user.id, user.token_version)
     family_id = str(uuid.uuid4())
     refresh_token = create_refresh_token(user.id, family_id, user.token_version)
@@ -97,7 +122,12 @@ def login_user(
     )
     db.add(session)
     db.commit()
-    return access_token, refresh_token, user
+    return LoginOutcome(
+        status="authenticated",
+        user=user,
+        access_token=access_token,
+        refresh_token=refresh_token,
+    )
 
 
 def refresh_tokens(

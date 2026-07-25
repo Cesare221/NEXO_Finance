@@ -11,6 +11,7 @@ from app.models.user import User
 from app.schemas.account_security import RegistrationResponse
 from app.schemas.auth import (
     LoginRequest,
+    LoginResponse,
     DeleteAccountRequest,
     MeResponse,
     ProfileUpdateRequest,
@@ -129,7 +130,7 @@ def register(
     return RegistrationResponse(status="verification_required", email=user.email)
 
 
-@router.post("/login", response_model=TokenResponse)
+@router.post("/login", response_model=LoginResponse)
 def login(
     body: LoginRequest,
     request: Request,
@@ -138,11 +139,18 @@ def login(
     identity = f"{_client_host(request)}:{body.email}"
     _check_rate_limit("login", identity, limit=5)
     try:
-        access, refresh, _ = login_user(db, body.email, body.password, *_request_context(request))
+        outcome = login_user(db, body.email, body.password, *_request_context(request))
     except AuthError as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
     auth_rate_limiter.reset("login", identity)
-    return TokenResponse(access_token=access, refresh_token=refresh)
+    return LoginResponse(
+        status=outcome.status,
+        access_token=outcome.access_token,
+        refresh_token=outcome.refresh_token,
+        token_type="bearer" if outcome.access_token else None,
+        challenge_token=outcome.challenge_token,
+        email=outcome.user.email if outcome.status == "email_verification_required" else None,
+    )
 
 
 @router.post("/refresh", response_model=TokenResponse)

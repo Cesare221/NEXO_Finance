@@ -42,7 +42,7 @@ def test_register_returns_verification_required_and_sends_email(client, mail_rec
     assert len(token) > 30
 
 
-def test_unverified_user_cannot_access_financial_routes(client, mail_recorder):
+def test_unverified_user_login_requires_email_verification(client, mail_recorder):
     client.post(
         "/auth/register",
         json={
@@ -56,14 +56,9 @@ def test_unverified_user_cannot_access_financial_routes(client, mail_recorder):
         json={"email": "unverified2@example.com", "password": "ValidPassword123!"},
     )
     assert login_resp.status_code == 200
-    access_token = login_resp.json()["access_token"]
-
-    protected = client.get(
-        "/financial/dashboard",
-        headers={"Authorization": f"Bearer {access_token}"},
-    )
-    assert protected.status_code == 403
-    assert "verification" in protected.json()["detail"].lower()
+    assert login_resp.json()["status"] == "email_verification_required"
+    assert login_resp.json()["email"] == "unverified2@example.com"
+    assert login_resp.json().get("access_token") is None
 
 
 def test_confirm_email_verification_success_grants_access(client, mail_recorder):

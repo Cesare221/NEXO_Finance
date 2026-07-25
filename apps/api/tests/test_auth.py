@@ -1,4 +1,5 @@
 import pytest
+from datetime import datetime, timezone
 
 from app.models.audit_event import AuditEvent
 from app.models.session import UserSession
@@ -13,12 +14,20 @@ VALID_AVATAR = (
 )
 
 
+def _verify_user(email: str) -> None:
+    with TestingSessionLocal() as db:
+        user = db.query(User).filter(User.email == email).one()
+        user.email_verified_at = datetime.now(timezone.utc)
+        db.commit()
+
+
 def _register_theme_user(client, email: str = "theme@example.com") -> dict[str, str]:
     response = client.post(
         "/auth/register",
         json={"name": "Theme User", "email": email, "password": STRONG_PASSWORD},
     )
     assert response.status_code == 201
+    _verify_user(email)
     login_resp = client.post(
         "/auth/login",
         json={"email": email, "password": STRONG_PASSWORD},
@@ -126,6 +135,7 @@ def test_login_success(client):
             "password": STRONG_PASSWORD,
         },
     )
+    _verify_user("login@example.com")
     response = client.post(
         "/auth/login",
         json={"email": "login@example.com", "password": STRONG_PASSWORD},
@@ -145,6 +155,7 @@ def test_login_invalid_password(client):
             "password": STRONG_PASSWORD,
         },
     )
+    _verify_user("badpw@example.com")
     response = client.post(
         "/auth/login",
         json={"email": "badpw@example.com", "password": "wrong"},
@@ -161,6 +172,7 @@ def test_me_authenticated(client):
             "password": STRONG_PASSWORD,
         },
     )
+    _verify_user("me@example.com")
     login_resp = client.post(
         "/auth/login",
         json={"email": "me@example.com", "password": STRONG_PASSWORD},
@@ -188,6 +200,7 @@ def test_update_own_profile(client):
             "password": STRONG_PASSWORD,
         },
     )
+    _verify_user("profile@example.com")
     login_resp = client.post(
         "/auth/login",
         json={"email": "profile@example.com", "password": STRONG_PASSWORD},
@@ -227,6 +240,7 @@ def test_update_profile_can_remove_phone_and_avatar(client):
             "password": STRONG_PASSWORD,
         },
     )
+    _verify_user("clear-profile@example.com")
     login_resp = client.post(
         "/auth/login",
         json={"email": "clear-profile@example.com", "password": STRONG_PASSWORD},
@@ -259,6 +273,7 @@ def test_update_profile_rejects_invalid_phone_and_avatar(client):
             "password": STRONG_PASSWORD,
         },
     )
+    _verify_user("invalid-profile@example.com")
     login_resp = client.post(
         "/auth/login",
         json={"email": "invalid-profile@example.com", "password": STRONG_PASSWORD},
@@ -295,6 +310,7 @@ def test_refresh_token(client):
             "password": STRONG_PASSWORD,
         },
     )
+    _verify_user("refresh@example.com")
     login_resp = client.post(
         "/auth/login",
         json={"email": "refresh@example.com", "password": STRONG_PASSWORD},
@@ -319,6 +335,7 @@ def test_logout(client):
             "password": STRONG_PASSWORD,
         },
     )
+    _verify_user("logout@example.com")
     login_resp = client.post(
         "/auth/login",
         json={"email": "logout@example.com", "password": STRONG_PASSWORD},
@@ -346,6 +363,7 @@ def test_authorization_isolation(client):
             "password": STRONG_PASSWORD,
         },
     )
+    _verify_user("a@example.com")
     token_a = client.post("/auth/login", json={"email": "a@example.com", "password": STRONG_PASSWORD}).json()["access_token"]
     me_a = client.get(
         "/auth/me", headers={"Authorization": f"Bearer {token_a}"}
@@ -359,6 +377,7 @@ def test_authorization_isolation(client):
             "password": STRONG_PASSWORD,
         },
     )
+    _verify_user("b@example.com")
     token_b = client.post("/auth/login", json={"email": "b@example.com", "password": STRONG_PASSWORD}).json()["access_token"]
     me_b = client.get(
         "/auth/me", headers={"Authorization": f"Bearer {token_b}"}
@@ -408,6 +427,7 @@ def test_refresh_token_is_stored_as_fingerprint(client):
         },
     )
     assert response.status_code == 201
+    _verify_user("fingerprint@example.com")
     login_resp = client.post(
         "/auth/login",
         json={"email": "fingerprint@example.com", "password": STRONG_PASSWORD},
@@ -459,6 +479,7 @@ def test_refresh_token_reuse_revokes_the_entire_session_family(client):
             "password": STRONG_PASSWORD,
         },
     )
+    _verify_user("reuse@example.com")
     login_resp = client.post(
         "/auth/login",
         json={"email": "reuse@example.com", "password": STRONG_PASSWORD},
@@ -491,6 +512,7 @@ def test_user_can_export_data_without_authentication_secrets(client):
             "ai_data_processing_consent": True,
         },
     )
+    _verify_user("export@example.com")
     login_resp = client.post(
         "/auth/login",
         json={"email": "export@example.com", "password": STRONG_PASSWORD},
@@ -516,6 +538,7 @@ def test_account_deletion_requires_password_and_removes_access(client):
             "password": STRONG_PASSWORD,
         },
     )
+    _verify_user("delete@example.com")
     login_resp = client.post(
         "/auth/login",
         json={"email": "delete@example.com", "password": STRONG_PASSWORD},
@@ -537,6 +560,7 @@ def test_user_can_list_and_revoke_only_their_own_sessions(client):
         json={"name": "Session A", "email": "session-a@example.com", "password": STRONG_PASSWORD},
         headers={"User-Agent": "Mozilla/5.0 Windows Chrome/130.0"},
     )
+    _verify_user("session-a@example.com")
     login_a = client.post(
         "/auth/login",
         json={"email": "session-a@example.com", "password": STRONG_PASSWORD},
@@ -546,6 +570,7 @@ def test_user_can_list_and_revoke_only_their_own_sessions(client):
         "/auth/register",
         json={"name": "Session B", "email": "session-b@example.com", "password": STRONG_PASSWORD},
     )
+    _verify_user("session-b@example.com")
     login_b = client.post(
         "/auth/login",
         json={"email": "session-b@example.com", "password": STRONG_PASSWORD},

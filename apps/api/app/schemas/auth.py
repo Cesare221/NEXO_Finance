@@ -27,6 +27,15 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
 
 
+class LoginResponse(BaseModel):
+    status: Literal["authenticated", "mfa_required", "email_verification_required"]
+    access_token: str | None = None
+    refresh_token: str | None = None
+    token_type: str | None = None
+    challenge_token: str | None = None
+    email: EmailStr | None = None
+
+
 class RefreshRequest(BaseModel):
     refresh_token: str
 
