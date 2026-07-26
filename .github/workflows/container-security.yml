@@ -1,0 +1,50 @@
+name: Container Security
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/api/Dockerfile"
+      - "apps/web/Dockerfile"
+  push:
+    branches: [main]
+    paths:
+      - "apps/api/Dockerfile"
+      - "apps/web/Dockerfile"
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  scan-api:
+    name: Scan API Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build API image
+        run: docker build -t nexo-api:security-scan apps/api
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: nexo-api:security-scan
+          format: table
+          exit-code: 1
+          severity: CRITICAL
+          ignore-unfixed: true
+
+  scan-web:
+    name: Scan Web Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Web image
+        run: docker build --build-arg NEXT_STANDALONE=true -t nexo-web:security-scan apps/web
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: nexo-web:security-scan
+          format: table
+          exit-code: 1
+          severity: CRITICAL
+          ignore-unfixed: true
