@@ -8,6 +8,7 @@ def main():
         ["python", "-m", "alembic", "heads"],
         capture_output=True,
         text=True,
+        cwd="apps/api",
     )
     output = result.stdout.strip()
     lines = [line.strip() for line in output.splitlines() if line.strip() and not line.startswith("Rev:")]

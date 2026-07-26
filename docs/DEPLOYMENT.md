@@ -8,12 +8,23 @@
 
 Crie primeiro um ambiente de homologação. Produção deve usar banco, segredos e domínios próprios.
 
+## Guia Detalhado De Plataforma
+
+Veja **[PLATFORM_SETUP.md](PLATFORM_SETUP.md)** para configuração completa de:
+- GitHub Environments, Secrets e Variables
+- Railway (API, Cron, variáveis por ambiente)
+- Vercel (Web, domínios, variáveis)
+- Sentry (projetos, alertas, source maps)
+- Resend (domínios, DKIM/SPF/DMARC)
+- DNS, Groq, Cron de manutenção
+- Checklist de pré-deploy
+
 ## API No Railway
 
 1. Crie um serviço PostgreSQL.
 2. Crie um serviço a partir do repositório e defina `apps/api` como Root Directory.
 3. O arquivo `railway.json` usa o `Dockerfile`, executa `alembic upgrade head` antes do deploy e verifica `/ready` antes de liberar tráfego.
-4. Configure as variáveis:
+4. Configure as variáveis (valores por ambiente — veja PLATFORM_SETUP.md):
 
 ```text
 ENVIRONMENT=production
@@ -60,6 +71,52 @@ Não use `*`, HTTP ou endereços locais em `ALLOWED_ORIGINS` na produção.
 2. Configure `API_URL=https://api.seudominio.com` nos ambientes Preview e Production.
 3. Mantenha `API_URL` somente no servidor. O navegador acessa a API pelo BFF `/api` do Next.js.
 4. Faça o primeiro deploy usando o domínio temporário e depois configure o domínio definitivo.
+
+## Pipeline De Deploy Controlado
+
+O workflow `.github/workflows/deploy.yml` implementa deploy manual com aprovação:
+
+- **Inputs**: `environment` (staging|production), `git_sha`
+- **Ambiente GitHub**: `staging` (sem proteção) ou `production` (revisão obrigatória)
+- **Etapas**:
+  1. Checkout do SHA selecionado
+  2. Re-executa validações CI (API + Web)
+  3. Deploy API no Railway → aguarda `/ready`
+  4. Deploy Web na Vercel (build + deploy)
+  5. Executa smoke tests de produção (`scripts/smoke_production.py`)
+  6. Registra sumário com URLs, SHA e responsável
+
+### Secrets Necessários (por ambiente GitHub)
+
+| Segredo | Descrição |
+|---------|-----------|
+| `RAILWAY_TOKEN` | Token Railway CLI com escopo de deploy |
+| `RAILWAY_PROJECT_ID` | UUID do projeto Railway |
+| `RAILWAY_ENVIRONMENT_ID` | UUID do ambiente (staging/production) |
+| `RAILWAY_SERVICE_ID` | UUID do serviço API |
+| `VERCEL_TOKEN` | Token Vercel CLI (pessoal ou team) |
+| `VERCEL_ORG_ID` | ID da organização/team Vercel |
+| `VERCEL_PROJECT_ID` | ID do projeto Vercel |
+| `SMOKE_EMAIL` | E-mail de usuário de teste (MFA ativo) |
+| `SMOKE_PASSWORD` | Senha do usuário de teste |
+| `SMOKE_TOTP_SECRET` | Secret TOTP base32 do usuário de teste |
+
+### Variables Necessárias (por ambiente GitHub)
+
+| Variable | Staging | Production |
+|----------|---------|------------|
+| `API_URL` | `https://api-staging.nexo.example` | `https://api.nexo.example` |
+| `WEB_URL` | `https://app-staging.nexo.example` | `https://app.nexo.example` |
+
+### Executar Deploy
+
+```bash
+# Staging
+gh workflow run deploy.yml -f environment=staging -f git_sha=$(git rev-parse HEAD)
+
+# Production (requer aprovação na UI do GitHub)
+gh workflow run deploy.yml -f environment=production -f git_sha=$(git rev-parse HEAD)
+```
 
 ## Validação Antes Da Liberação
 

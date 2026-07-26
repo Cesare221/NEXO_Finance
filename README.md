@@ -22,7 +22,11 @@ $env:PYTHONPATH = (Get-Location).Path
 python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-Web:
+A API expõe endpoints de saúde em:
+- /health
+- /ready
+
+### 2. Frontend
 
 ```powershell
 cd apps/web
@@ -31,7 +35,17 @@ npm ci
 npm run dev
 ```
 
-Abra `http://localhost:3000`. A API publica liveness em `/health` e readiness com validação do banco em `/ready`.
+A aplicação fica disponível em http://localhost:3000.
+
+## Banco de dados e migrations
+
+As migrations são gerenciadas com Alembic e devem ser a única fonte de alteração do esquema.
+
+```powershell
+cd apps/api
+python -m alembic upgrade head
+python -m alembic current
+```
 
 ## Testes
 

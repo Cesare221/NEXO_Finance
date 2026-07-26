@@ -1,6 +1,42 @@
 # Task 3 Report: One-Time Tokens, Encryption, And Resend Adapter
 
-## Files
+## RED Evidence
+
+Command:
+
+```powershell
+cd apps/api; .\.venv\Scripts\python.exe -m pytest tests/test_account_token_service.py tests/test_mfa_crypto.py tests/test_mail_service.py -q
+```
+
+Result: RED. Collection stopped with 3 expected `ModuleNotFoundError` errors for `app.services.account_token_service`, `app.services.mfa_crypto`, and `app.services.mail_service`.
+
+## GREEN Evidence
+
+Focused command:
+
+```powershell
+cd apps/api; .\.venv\Scripts\python.exe -m pytest tests/test_account_token_service.py tests/test_mfa_crypto.py tests/test_mail_service.py -q
+```
+
+Result: `16 passed, 1 warning in 0.40s`.
+
+Full API command:
+
+```powershell
+cd apps/api; .\.venv\Scripts\python.exe -m pytest -q
+```
+
+Result: `159 passed, 1 warning in 24.45s`.
+
+Dependency audit command:
+
+```powershell
+cd apps/api; .\.venv\Scripts\pip-audit.exe
+```
+
+Result: no vulnerabilities found.
+
+## Delivered Files
 
 - `apps/api/app/services/account_token_service.py`
 - `apps/api/app/services/mfa_crypto.py`
@@ -9,28 +45,14 @@
 - `apps/api/tests/test_mfa_crypto.py`
 - `apps/api/tests/test_mail_service.py`
 
-## Implementation
+## Self-Review
 
-- Account-action tokens are generated with `secrets.token_urlsafe(32)` and only their SHA-256 fingerprints are stored.
-- Issuing a token consumes outstanding tokens for the same user and purpose in the same synchronous SQLAlchemy transaction.
-- Consumption uses `SELECT FOR UPDATE`, validates purpose, expiry, and prior consumption, then marks the token consumed before committing.
-- TOTP secrets use Fernet and retain the active key version used for encryption; decryption resolves only that stored version.
-- The console adapter logs delivery metadata without raw tokens. The Resend adapter uses synchronous HTTPX, a bounded timeout, one POST attempt, and only the expected payload fields.
+- Account action tokens use a 32-byte URL-safe secret, persist only its SHA-256 fingerprint, lock the user during issuance and the token during consumption, invalidate active same-purpose tokens, and enforce purpose, expiry, and single use.
+- TOTP secrets are encrypted with the active Fernet key version and decrypted only with the stored version. Crypto errors do not include ciphertext.
+- Resend requests use a single synchronous HTTPX POST with an explicit timeout, exact message fields, and no retry. Console logging excludes raw tokens.
+- `git diff --check` completed without whitespace errors. Commit `d6a410d` contains the six Task 3 service/test files and the initial task report; this expanded evidence remains uncommitted, and existing `graphify-out` changes remain outside the task commit.
 
-## Tests
+## Concerns
 
-- Focused service tests: PASS.
-- Complete API suite: `159 passed, 1 warning`.
-- Dependency audit: completed against `apps/api/requirements.lock` with no vulnerability output.
-
-## Commands
-
-- `cd apps/api; .\\.venv\\Scripts\\python.exe -m pytest tests/test_account_token_service.py tests/test_mfa_crypto.py tests/test_mail_service.py -q`
-- `cd apps/api; .\\.venv\\Scripts\\python.exe -m pytest -q`
-- `cd apps/api; .\\.venv\\Scripts\\python.exe -m pip_audit -r requirements.lock`
-- `graphify update .`
-
-## Residual Risks
-
-- Unit tests use SQLite, where `SELECT FOR UPDATE` is not enforced; a PostgreSQL concurrency integration test remains advisable before release.
-- Resend coverage uses HTTPX MockTransport. Production still requires verified Resend credentials, sender domain, and network-level delivery monitoring.
+- The sole test warning is the existing Starlette deprecation warning about `httpx` use in `fastapi.testclient`; it is unrelated to Task 3.
+- Resend delivery is verified with `httpx.MockTransport`; no live e-mail was sent.
