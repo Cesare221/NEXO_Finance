@@ -2,6 +2,10 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .env
+.env.*
 tests/
 server*.log
 *.db
+*.egg-info/
+.mypy_cache/
+.superpowers/

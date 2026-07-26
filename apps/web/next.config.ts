@@ -36,6 +36,7 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   outputFileTracingRoot: process.cwd(),
+  output: process.env.NEXT_STANDALONE === "true" ? "standalone" : undefined,
   async headers() {
     return [
       {
