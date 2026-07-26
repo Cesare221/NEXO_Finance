@@ -1,5 +1,8 @@
+from unittest.mock import patch
+
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.main import app
 
@@ -40,3 +43,48 @@ def test_readiness_check_reports_database_outage(client):
             "checks": {"database": "unavailable"},
         }
     }
+
+
+class FakeRedis:
+    def __init__(self, *, fail=False):
+        self._fail = fail
+
+    def ping(self):
+        if self._fail:
+            raise ConnectionError("redis unavailable")
+
+    def close(self):
+        pass
+
+
+def test_readiness_includes_redis_in_production(client):
+    with patch.object(settings, "environment", "production"), \
+         patch.object(settings, "redis_url", "redis://localhost:6379/0"), \
+         patch("redis.from_url") as mock_from_url:
+        mock_from_url.return_value = FakeRedis()
+        response = client.get("/ready")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "ready"
+    assert data["checks"]["database"] == "ok"
+    assert data["checks"]["redis"] == "ok"
+
+
+def test_readiness_returns_503_on_redis_failure(client):
+    with patch.object(settings, "environment", "production"), \
+         patch.object(settings, "redis_url", "redis://localhost:6379/0"), \
+         patch("redis.from_url") as mock_from_url:
+        mock_from_url.return_value = FakeRedis(fail=True)
+        response = client.get("/ready")
+    assert response.status_code == 503
+    data = response.json()
+    assert "redis" in str(data)
+
+
+def test_readiness_skips_redis_in_development(client):
+    with patch.object(settings, "environment", "development"), \
+         patch.object(settings, "redis_url", None):
+        response = client.get("/ready")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["checks"] == {"database": "ok"}
