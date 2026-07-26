@@ -1,5 +1,13 @@
 # Implantação Do Nexo
 
+## Documentos Relacionados
+
+- [Infraestrutura e plataforma](PLATFORM_SETUP.md) — secrets, variáveis, Railway/Vercel/Sentry/Resend/Groq
+- [Backup e restauração](BACKUP_AND_RESTORE.md) — estratégia, procedimentos, verificação
+- [DNS e e-mail](DNS_AND_EMAIL.md) — registros DNS, SPF/DKIM/DMARC, Resend
+- [Checklist de lançamento](LAUNCH_CHECKLIST.md) — 80+ critérios objetivos para produção
+- [Segurança e LGPD](SECURITY_AND_LGPD.md) — política de privacidade, direitos do titular, DPO
+
 ## Arquitetura Recomendada
 
 - `apps/web`: projeto Next.js na Vercel.
@@ -120,12 +128,16 @@ gh workflow run deploy.yml -f environment=production -f git_sha=$(git rev-parse 
 
 ## Validação Antes Da Liberação
 
+Veja [LAUNCH_CHECKLIST.md](docs/LAUNCH_CHECKLIST.md) para o checklist completo de produção.
+
 O workflow `.github/workflows/ci.yml` valida migrations em PostgreSQL, executa a suíte da API, o smoke test web e o build do Next.js a cada pull request.
 
 ```text
 GET https://api.seudominio.com/health -> 200 {"status":"ok"}
 GET https://api.seudominio.com/ready  -> 200 com database=ok
 ```
+
+O smoke test de produção (`scripts/smoke_production.py`) é executado automaticamente após cada deploy, validando health, readiness, headers de segurança e fluxo autenticado.
 
 Execute também:
 
@@ -140,7 +152,7 @@ Execute também:
 
 ## Rollout Financeiro
 
-Execute as migrations antes de iniciar uma nova versão da API. O rollout financeiro deve terminar no único head `c91d4e7a2f10`:
+Execute as migrations antes de iniciar uma nova versão da API. O rollout financeiro deve terminar no único head `e3b7a12c9d40`:
 
 ```powershell
 cd apps/api
@@ -157,10 +169,7 @@ O perfil do usuário armazena `theme_preference` como `system`, `light` ou `dark
 
 ## Backups
 
-- Ative backups diários do PostgreSQL antes de aceitar usuários reais.
-- Mantenha retenção semanal e mensal conforme a política do produto.
-- Faça uma restauração em homologação pelo menos uma vez por trimestre.
-- Registre horário, duração e resultado de cada teste de recuperação.
+Veja **[BACKUP_AND_RESTORE.md](docs/BACKUP_AND_RESTORE.md)** para estratégia completa de backup, restauração e verificação.
 
 ## Rollback
 
@@ -213,6 +222,8 @@ SENTRY_AUTH_TOKEN=<token-build-only>
 - Configure scoping do token para o projeto `nexo-web` apenas.
 
 ## Checklist De Produção
+
+O checklist completo com 80+ critérios objetivos está em **[LAUNCH_CHECKLIST.md](LAUNCH_CHECKLIST.md)** (este é um resumo):
 
 - [ ] Domínios e HTTPS ativos.
 - [ ] Segredos diferentes entre homologação e produção.

@@ -80,15 +80,28 @@ uv export --locked --no-dev --no-emit-project --format requirements-txt --output
 uv export --locked --extra dev --no-emit-project --format requirements-txt --output-file requirements-dev.lock
 ```
 
-## Hospedagem
+## Deploy
 
-As instruções completas, variáveis, smoke tests, backups e rollback estão em [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+| Ambiente | Plataforma | Documento |
+|----------|-----------|-----------|
+| Produção | Vercel (web) + Railway (API/DB/Redis) | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) |
+| Staging | Mesma stack, DB/domínios isolados | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) |
+| Local (Compose) | Docker Compose production-like | `docker-compose.production-like.yml` / `scripts/production-like.ps1` |
 
 Nunca publique arquivos `.env`, logs locais, tokens ou credenciais do banco.
 
+## Runbooks
+
+- [Implantação e CI/CD](docs/DEPLOYMENT.md)
+- [Infraestrutura e plataforma](docs/PLATFORM_SETUP.md)
+- [Backup e restauração](docs/BACKUP_AND_RESTORE.md)
+- [DNS e e-mail](docs/DNS_AND_EMAIL.md)
+- [Segurança e LGPD](docs/SECURITY_AND_LGPD.md)
+- [Checklist de lançamento](docs/LAUNCH_CHECKLIST.md)
+
 ## Rollout Financeiro
 
-O rollout financeiro deve terminar no único head Alembic `b81f4c6d2a10`:
+O rollout financeiro usa o único head Alembic atual (`e3b7a12c9d40`):
 
 ```powershell
 cd apps/api
