@@ -16,3 +16,4 @@ dist/
 .railway/
 .superpowers/sdd/
 tmp/
+*.tsbuildinfo
