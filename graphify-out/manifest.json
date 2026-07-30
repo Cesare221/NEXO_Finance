@@ -825,8 +825,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\app\\main.py": {
-    "mtime": 1784673329.2948592,
-    "ast_hash": "045d79123144b7b61f4f095cd31ea978",
+    "mtime": 1785020871.0298352,
+    "ast_hash": "38bbbd1c87eb826401a6e0f220220b17",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\app\\__init__.py": {
@@ -835,28 +835,28 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\app\\api\\assistant.py": {
-    "mtime": 1784672358.6998835,
-    "ast_hash": "53b73726c2064a31e070ef57d35744bc",
+    "mtime": 1785002637.2662258,
+    "ast_hash": "d22463e5fc0c5a40595ce146ba38571a",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\app\\api\\auth.py": {
-    "mtime": 1784673263.8530018,
-    "ast_hash": "fc909c4e8129ea51f75f8aa94aa6fbd5",
+    "mtime": 1785003733.7141407,
+    "ast_hash": "bb0a00be0525baa2757aea18536348cd",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\app\\api\\deps.py": {
-    "mtime": 1784324761.6756227,
-    "ast_hash": "70d6dbf73276259c94d75f4e2b7c3fb4",
+    "mtime": 1785002538.0456624,
+    "ast_hash": "14e5bb17d57bbd20c830236d1619a0ec",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\app\\api\\financial.py": {
-    "mtime": 1784628499.7863283,
-    "ast_hash": "90318c0c4d63471650ae11e9dbcaeed3",
+    "mtime": 1785002611.9421184,
+    "ast_hash": "4dc0535b5cf4bfa046cac69f6567608e",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\app\\api\\health.py": {
-    "mtime": 1784590344.741639,
-    "ast_hash": "17e5795072b08d36092c6067c36b5e3a",
+    "mtime": 1785020883.452484,
+    "ast_hash": "851872f0db6828b30fc57cf7f5e4e82b",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\app\\api\\__init__.py": {
@@ -865,8 +865,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\app\\core\\config.py": {
-    "mtime": 1784681340.484756,
-    "ast_hash": "76cb93a7507110cb90bea10c6b78b592",
+    "mtime": 1785020536.6439023,
+    "ast_hash": "e3736e0c24e5e1cae0b73a0c60665d44",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\app\\core\\database.py": {
@@ -880,8 +880,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\app\\core\\security.py": {
-    "mtime": 1784674917.9073665,
-    "ast_hash": "214a29230ac1d187964334302d341adc",
+    "mtime": 1785002522.6149306,
+    "ast_hash": "4056000f333eb37605a8d43a50c7730a",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\app\\core\\__init__.py": {
@@ -975,8 +975,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\app\\schemas\\auth.py": {
-    "mtime": 1784673223.9304478,
-    "ast_hash": "7cbe6ef878079aecec7cf925d54ff12c",
+    "mtime": 1785003659.971841,
+    "ast_hash": "5dce92bd5f723fa556eb6ac8893792c0",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\app\\schemas\\financial.py": {
@@ -995,8 +995,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\app\\services\\auth_service.py": {
-    "mtime": 1784673223.9324462,
-    "ast_hash": "6accc88a76fc3cff498e656fd63f06c1",
+    "mtime": 1785003713.9907444,
+    "ast_hash": "96e1b5c32c1f99bf9e3f82a971f4fa3d",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\app\\services\\financial_service.py": {
@@ -1010,18 +1010,18 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\tests\\conftest.py": {
-    "mtime": 1784338742.0371692,
-    "ast_hash": "41ca6532b618a88ef00d98affc65a411",
+    "mtime": 1785003807.229971,
+    "ast_hash": "18cf1e3840a95c2ec0552da3404f940b",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\tests\\test_assistant.py": {
-    "mtime": 1784673049.7088108,
-    "ast_hash": "514e69f5190504b61f291b218718f086",
+    "mtime": 1785002892.3706584,
+    "ast_hash": "a768b048c98886f0f387478c08685805",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\tests\\test_auth.py": {
-    "mtime": 1784673347.1019335,
-    "ast_hash": "60358569f0b5b6659f6b17c3c9a6dd9b",
+    "mtime": 1785003998.6654253,
+    "ast_hash": "71bf984bfa4a2a8490a3db756895adaa",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\tests\\test_config.py": {
@@ -1035,8 +1035,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\tests\\test_financial.py": {
-    "mtime": 1784605985.19695,
-    "ast_hash": "8498141076580edb4ac071e5f0e4dba9",
+    "mtime": 1785002850.6732378,
+    "ast_hash": "9439ca845288a08e7be6ed4c9ae867b4",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\tests\\test_financial_foundation.py": {
@@ -1045,8 +1045,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\tests\\test_health.py": {
-    "mtime": 1784590331.9394464,
-    "ast_hash": "a0fb93b7104b8e26f4b6e3867f46acfc",
+    "mtime": 1785023881.8294768,
+    "ast_hash": "1dfdef32ba946935ff7fb9e5982d165c",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\tests\\__init__.py": {
@@ -1055,7 +1055,7 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\middleware.ts": {
-    "mtime": 1784674078.6624677,
+    "mtime": 1785196900.9821048,
     "ast_hash": "c4c51972d4e82b11386b5760f68dd0cd",
     "semantic_hash": ""
   },
@@ -1065,13 +1065,13 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\next.config.ts": {
-    "mtime": 1784673720.335699,
-    "ast_hash": "f3a753aa7528eb78a09fc8c734380812",
+    "mtime": 1785420228.3590143,
+    "ast_hash": "149548b9d4f5f4f17464c343f83ccc3f",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\package.json": {
-    "mtime": 1784680566.1615686,
-    "ast_hash": "b8a9bdf794273c505290b47542abd039",
+    "mtime": 1785021117.3878698,
+    "ast_hash": "639cfe07fb54487e607eb3642deec4b9",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\tsconfig.json": {
@@ -1120,8 +1120,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\api\\auth\\login\\route.ts": {
-    "mtime": 1784673263.8549998,
-    "ast_hash": "01d469f03d2beed48fe8f29517a8adc7",
+    "mtime": 1785009582.4360862,
+    "ast_hash": "72031358429932f976c5566f71bcea99",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\api\\auth\\logout\\route.ts": {
@@ -1135,13 +1135,13 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\api\\auth\\register\\route.ts": {
-    "mtime": 1784673263.8560016,
-    "ast_hash": "8bb9507af136f74c4f9edb3cae89a2b5",
+    "mtime": 1785009591.4751143,
+    "ast_hash": "ee742c83070cf015819cb5c8f24c2908",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\api\\auth\\session\\route.ts": {
-    "mtime": 1784337602.4652815,
-    "ast_hash": "74d75fdaf1088b0dce003fe266b3a372",
+    "mtime": 1785420182.755489,
+    "ast_hash": "bf7b34e1250232f8a7d8464fc13aad73",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\api\\financial\\accounts\\route.ts": {
@@ -1180,8 +1180,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\api\\financial\\dashboard\\route.ts": {
-    "mtime": 1784342338.7614605,
-    "ast_hash": "2fe4d3cf1a6cd4a8aacf1353d2ad58f0",
+    "mtime": 1785420199.3358636,
+    "ast_hash": "503f88e3ef863a24babbf2de3a2773fa",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\api\\financial\\statements\\[statementId]\\pay\\route.ts": {
@@ -1215,8 +1215,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\configuracoes\\page.tsx": {
-    "mtime": 1784673309.8249695,
-    "ast_hash": "1c0afc670fd0bb42730d4241aa51b5a8",
+    "mtime": 1785010372.4620607,
+    "ast_hash": "23a772e8ce37a3e78afff26a5c316773",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\contas\\page.tsx": {
@@ -1265,8 +1265,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\components\\auth-form.tsx": {
-    "mtime": 1784672531.1159616,
-    "ast_hash": "b3ad216c9fa8e3466abbdf699e84852d",
+    "mtime": 1785012080.9151728,
+    "ast_hash": "4719530f0cdb3176f31becefd8dbeae2",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\components\\brand-assets.tsx": {
@@ -1365,13 +1365,13 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\lib\\auth-cookies.ts": {
-    "mtime": 1784672531.114571,
-    "ast_hash": "d654313a5178f5c9ec683000d94fc80c",
+    "mtime": 1785009534.5181992,
+    "ast_hash": "b7f6e54744391c269887b37fd3bbd1c9",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\lib\\auth-server.ts": {
-    "mtime": 1784673263.854002,
-    "ast_hash": "9d30957af2c35d82d2e52546f0a5897e",
+    "mtime": 1785009575.2421296,
+    "ast_hash": "1d1352fec367b545aa534e5ba1c03e96",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\lib\\financial-types.ts": {
@@ -1385,18 +1385,18 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\tests\\smoke.mjs": {
-    "mtime": 1784674515.0185108,
-    "ast_hash": "0356540cde5b0b70277c02f74ce34556",
+    "mtime": 1785420373.5161905,
+    "ast_hash": "f27e1601d40cd15c176e14b05f826dd1",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\README.md": {
-    "mtime": 1784657120.8145,
-    "ast_hash": "69277f182681aca28769e723292c7c65",
+    "mtime": 1785031826.6243465,
+    "ast_hash": "915fb47c3baf18dcd3847471bfc654ad",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\.github\\workflows\\ci.yml": {
-    "mtime": 1784672692.2795427,
-    "ast_hash": "2cf2e5bfb60af6ba0b7514bcdb7b6592",
+    "mtime": 1785420253.9288268,
+    "ast_hash": "b15befc4f6f976300c0f7f7d13d873c4",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\.superpowers\\brainstorm\\1030-1784594142\\content\\card-flow.html": {
@@ -1420,8 +1420,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\docs\\DEPLOYMENT.md": {
-    "mtime": 1784673503.4742115,
-    "ast_hash": "6eef03255e8cfe7e53d2226fc6ab7330",
+    "mtime": 1785031862.826404,
+    "ast_hash": "969339cc31a6f4076895e33df4bb4225",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\docs\\architecture\\decisions\\0001-phase-1-modular-monolith.md": {
@@ -1560,8 +1560,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\tests\\test_demo_dataset.py": {
-    "mtime": 1784629206.6757758,
-    "ast_hash": "dcadbf858aaea8c2982fdced651e0e5b",
+    "mtime": 1785002930.977841,
+    "ast_hash": "81117d81d40cdadd3ced519efd1571ba",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\api\\financial\\demo-dataset\\route.ts": {
@@ -1650,8 +1650,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\tests\\test_assistant_provider.py": {
-    "mtime": 1784674351.0666888,
-    "ast_hash": "1a16d61605dfeaa2170ac7c5a66b7980",
+    "mtime": 1785002908.7081618,
+    "ast_hash": "f15d2bc02a33ae28c954b5bd9f0047c2",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\api\\auth\\account\\route.ts": {
@@ -1700,8 +1700,8 @@
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\docs\\SECURITY_AND_LGPD.md": {
-    "mtime": 1784673477.405761,
-    "ast_hash": "34bdb0e84b43d1ac039a6258fb69de79",
+    "mtime": 1785022022.8907309,
+    "ast_hash": "c03612c28f132a9795fc3c504936812a",
     "semantic_hash": ""
   },
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\docs\\superpowers\\plans\\2026-07-21-production-delivery-implementation.md": {
@@ -1772,6 +1772,286 @@
   "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\tests\\test_mfa_crypto.py": {
     "mtime": 1784684040.965705,
     "ast_hash": "05ccf9b5f0cf7439c77cbbb3c041e532",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\railway.cron.json": {
+    "mtime": 1785021956.7192688,
+    "ast_hash": "680ea5abde8d8956ae1fcd4b4a0d591e",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\app\\maintenance.py": {
+    "mtime": 1785021718.304155,
+    "ast_hash": "44894be199e69a354698c478b6176b52",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\app\\api\\account_security.py": {
+    "mtime": 1785003778.2596717,
+    "ast_hash": "514e31ed244f7bf47f702c8688e43e8a",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\app\\core\\logging_config.py": {
+    "mtime": 1785020819.6642241,
+    "ast_hash": "86db7d452b4eea68f9f022808ba2815d",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\app\\core\\observability.py": {
+    "mtime": 1785020560.737923,
+    "ast_hash": "4c3ab327ee2d3e1b6b600908506442ca",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\app\\schemas\\account_security.py": {
+    "mtime": 1785003652.9418864,
+    "ast_hash": "8b253492de814b347869e589a415196c",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\app\\services\\account_security_service.py": {
+    "mtime": 1785002494.6532338,
+    "ast_hash": "971f08899d893d548ddde639ee44bc9b",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\app\\services\\mfa_service.py": {
+    "mtime": 1785003680.3966768,
+    "ast_hash": "5ebd678302f6891e75f4d7099acd2694",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\scripts\\smoke_production.py": {
+    "mtime": 1785027958.3875074,
+    "ast_hash": "e875d1bb2685f8dace423dc0fa5af22d",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\tests\\test_account_security.py": {
+    "mtime": 1785003914.1843214,
+    "ast_hash": "1c10d65275cf01fd54cc611eb162937a",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\tests\\test_identity_end_to_end.py": {
+    "mtime": 1785018856.6758037,
+    "ast_hash": "e54bf111b3c453e82914879096fe6185",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\tests\\test_logging.py": {
+    "mtime": 1785020775.386188,
+    "ast_hash": "8a7dd7efff3bca7cb1a8083f53d71580",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\tests\\test_maintenance.py": {
+    "mtime": 1785021883.4910705,
+    "ast_hash": "83c60b722b26cfe2466a83c5084eb36c",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\tests\\test_mfa.py": {
+    "mtime": 1785003840.64066,
+    "ast_hash": "6ffa1a347b89c2bcd9d030a26fed4d58",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\tests\\test_observability.py": {
+    "mtime": 1785020473.7521288,
+    "ast_hash": "94b81134c6508e6f591c150a164814b4",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\tests\\test_production_runtime.py": {
+    "mtime": 1785023909.0065455,
+    "ast_hash": "046044812f47d8cb71786b2644f3bd44",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\tests\\test_smoke_production.py": {
+    "mtime": 1785028003.535056,
+    "ast_hash": "7ddb6004aa93e3ecb1002d6e721cfc8b",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\api\\tests\\test_verify_restored_database.py": {
+    "mtime": 1785029739.6416237,
+    "ast_hash": "57407ade490dd434a67a42e81cfe9072",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\instrumentation-client.ts": {
+    "mtime": 1785420238.5597694,
+    "ast_hash": "92b0b2938653137455d53f53143a87ba",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\instrumentation.ts": {
+    "mtime": 1785420242.9128723,
+    "ast_hash": "d0c8900172b8f642c1ebd54a710a15ca",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\sentry.edge.config.ts": {
+    "mtime": 1785021376.964089,
+    "ast_hash": "59de0c6c11501c0166787634ea335f0f",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\sentry.server.config.ts": {
+    "mtime": 1785021368.2784486,
+    "ast_hash": "59de0c6c11501c0166787634ea335f0f",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\global-error.tsx": {
+    "mtime": 1785021192.9706624,
+    "ast_hash": "0f145689e0fa7958e1dff1e6fc5d4f1b",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\api\\auth\\email-verification\\confirm\\route.ts": {
+    "mtime": 1785009658.780653,
+    "ast_hash": "92f7e3b0b3c40c688a150aab55da4c4e",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\api\\auth\\email-verification\\request\\route.ts": {
+    "mtime": 1785009651.7673385,
+    "ast_hash": "197f5bf69be17de3a1bae554dbd5c6c4",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\api\\auth\\mfa\\route.ts": {
+    "mtime": 1785009646.49458,
+    "ast_hash": "9324eba29c2d16b4444667694bfc2d18",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\api\\auth\\mfa\\challenge\\route.ts": {
+    "mtime": 1785009753.9275682,
+    "ast_hash": "b678d684feb1d08958944b34f0f035aa",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\api\\auth\\mfa\\confirm\\route.ts": {
+    "mtime": 1785009634.3110387,
+    "ast_hash": "38d2e31b793a6c76d651ca129fb445de",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\api\\auth\\mfa\\enroll\\route.ts": {
+    "mtime": 1785009610.5400262,
+    "ast_hash": "3fbe19e64a6de66dda1dedb240d575a4",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\api\\auth\\mfa\\recovery-codes\\route.ts": {
+    "mtime": 1785009640.4797792,
+    "ast_hash": "f0ee61a2ed8449194ecf403184022236",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\api\\auth\\mfa\\status\\route.ts": {
+    "mtime": 1785009604.3084052,
+    "ast_hash": "61116050a9ad203cd08e32161dddeb1e",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\api\\auth\\password-reset\\confirm\\route.ts": {
+    "mtime": 1785009705.1599493,
+    "ast_hash": "d5c75d80ebb278f30920aabf2c7e9537",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\api\\auth\\password-reset\\request\\route.ts": {
+    "mtime": 1785009664.4076657,
+    "ast_hash": "72a10c0e3e3e6c5dcb6c7a8b77d3c402",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\mfa\\page.tsx": {
+    "mtime": 1785010332.4867022,
+    "ast_hash": "1e07815549cfbb0ccfbeb0f2de2e08af",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\recuperar-senha\\page.tsx": {
+    "mtime": 1785010274.3422575,
+    "ast_hash": "d3143bc318464dc9dbf3265d8e886394",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\redefinir-senha\\page.tsx": {
+    "mtime": 1785010310.0303962,
+    "ast_hash": "5542cb913d7dbe508c23a500ebfd0592",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\app\\verificar-email\\page.tsx": {
+    "mtime": 1785010260.490523,
+    "ast_hash": "9f724d77583aa2d116442ce7740e2c94",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\components\\email-verification-form.tsx": {
+    "mtime": 1785010252.5177982,
+    "ast_hash": "08c548f8d52a3a7b03d60d255915b798",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\components\\mfa-challenge-form.tsx": {
+    "mtime": 1785010320.9123075,
+    "ast_hash": "8fafee24a6803c2833603a5044a49bda",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\components\\mfa-settings.tsx": {
+    "mtime": 1785012303.9498835,
+    "ast_hash": "b7f325892723c5060158fef4fb60c3ba",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\lib\\runtime-config.ts": {
+    "mtime": 1785420219.6134148,
+    "ast_hash": "00fbc80e29feb14395b13e53d38f29c2",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\apps\\web\\lib\\sentry-scrub.ts": {
+    "mtime": 1785021347.540154,
+    "ast_hash": "a44f92f443c55492a36345cb8700f6d4",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\scripts\\check-migration-head.py": {
+    "mtime": 1785420261.2787192,
+    "ast_hash": "75ff737f779e715ca6996fde1b56567e",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\scripts\\production-like.ps1": {
+    "mtime": 1785024184.614517,
+    "ast_hash": "433efa4b3356ee1e9676e3c9ecac80b4",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\scripts\\verify_restored_database.py": {
+    "mtime": 1785029803.5430064,
+    "ast_hash": "13eadf187826fd943c8b4ab57255315c",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\docker-compose.production-like.yml": {
+    "mtime": 1785024139.121393,
+    "ast_hash": "e427d09ced9cf6ff31d5da3121e55ec9",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\.github\\dependabot.yml": {
+    "mtime": 1785024291.532872,
+    "ast_hash": "3706fb3bac7cc537d687c2c87adf27fe",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\.github\\workflows\\container-security.yml": {
+    "mtime": 1785024304.36212,
+    "ast_hash": "b8fdd4add225737f7e6248979631625f",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\.github\\workflows\\deploy.yml": {
+    "mtime": 1785028473.3771217,
+    "ast_hash": "a650270fcb65fc1f70280f571458e2b7",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\docs\\BACKUP_AND_RESTORE.md": {
+    "mtime": 1785029976.6800623,
+    "ast_hash": "7590e2d6ada0ae106aa5ba9e07e3e738",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\docs\\DATA_RETENTION.md": {
+    "mtime": 1785022014.1368418,
+    "ast_hash": "f3fc7adad00fa02ec2d1600d16a60894",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\docs\\DNS_AND_EMAIL.md": {
+    "mtime": 1785029950.7640393,
+    "ast_hash": "74f5e99e3ab1d94029f59087a4b1f4ab",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\docs\\IMPLEMENTATION_FINAL.md": {
+    "mtime": 1785032561.18163,
+    "ast_hash": "c40bea7b15484d1224a2e56e3ec01d35",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\docs\\INCIDENT_RESPONSE.md": {
+    "mtime": 1785021986.0168083,
+    "ast_hash": "9d412ae226ed923071d5322b5c6a8731",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\docs\\LAUNCH_CHECKLIST.md": {
+    "mtime": 1785030013.7701745,
+    "ast_hash": "2f08560498827896a3ae94ec3ae350e2",
+    "semantic_hash": ""
+  },
+  "C:\\Users\\Usuario\\Desktop\\PROJETOS\\NEXO_finance\\docs\\PLATFORM_SETUP.md": {
+    "mtime": 1785028640.5406818,
+    "ast_hash": "2cef849f76e6e071725a3656f1316066",
     "semantic_hash": ""
   }
 }

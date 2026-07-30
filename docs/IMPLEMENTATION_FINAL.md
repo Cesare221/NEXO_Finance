@@ -1,13 +1,15 @@
 # Implementação Final — Nexo v1
 
-> O código está completo. O que falta são **ações externas** de infraestrutura,
-> configuração de plataforma, validação operacional e adequação legal.
-> Nenhuma linha de código precisa ser escrita para lançar.
+> Status em 2026-07-30: o código local foi revisado e corrigido, mas o sistema
+> **ainda não está pronto para produção real**. O que falta agora é concluir
+> infraestrutura externa, staging real, validação operacional, segurança e LGPD.
+> Não realizar deploy em produção sem aprovação explícita.
 
 ---
 
 ## Sumário
 
+0. [Estado Atual Validado](#0-estado-atual-validado)
 1. [Domínio E DNS](#1-domínio-e-dns)
 2. [Contas De Plataforma](#2-contas-de-plataforma)
 3. [Configuração Das Plataformas](#3-configuração-das-plataformas)
@@ -18,6 +20,73 @@
 8. [Deploy Em Produção](#8-deploy-em-produção)
 9. [Checklist Consolidado](#9-checklist-consolidado)
 10. [Estimativa De Esforço](#10-estimativa-de-esforço)
+
+---
+
+## 0. Estado Atual Validado
+
+### Correções De Código Já Aplicadas
+
+- Rotas BFF críticas deixaram de usar mocks:
+  - `apps/web/app/api/auth/session/route.ts` voltou a usar cookies, backend, refresh token, validação de origem e limpeza de sessão em 401.
+  - `apps/web/app/api/financial/dashboard/route.ts` voltou a usar proxy autenticado real para `/financial/dashboard`.
+- Sentry/Next.js corrigido:
+  - `onRouterTransitionStart` no client instrumentation.
+  - `onRequestError` no server instrumentation.
+  - substituição de `disableLogger` por `webpack.treeshake.removeDebugLogging`.
+- CI corrigido:
+  - caminho correto para `scripts/check-migration-head.py`.
+  - execução correta do scanner PowerShell de segredos.
+- Lockfiles da API sincronizados com `sentry-sdk`.
+- Validação de `API_URL` ajustada para permitir `localhost` apenas em builds locais e exigir HTTPS para URLs reais.
+- Compose production-like ajustado para `ENVIRONMENT=staging`, pois `production` deve rejeitar configurações locais como `http://localhost`.
+
+### Validações Locais Executadas
+
+- Frontend:
+  - `npm test`: PASS.
+  - `npx tsc --noEmit`: PASS.
+  - `npm run build`: SUCCESS.
+  - `npm audit --audit-level=high`: PASS.
+  - `node --check public/sw.js`: PASS.
+  - frontend buildado iniciou e respondeu HTTP 200.
+- Backend:
+  - `uv run pytest -q`: PASS.
+  - `uv run pytest tests/test_observability.py -v -q`: 13 passed, 1 warning de deprecação.
+  - observabilidade importou e inicializou com sucesso.
+  - `uv run pip-audit --progress-spinner off`: sem vulnerabilidades conhecidas.
+  - API iniciou localmente e `/health` respondeu HTTP 200.
+- Scripts/CI:
+  - `python scripts/check-migration-head.py`: PASS.
+  - `python ../../scripts/check-migration-head.py` a partir de `apps/api`: PASS.
+  - `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-secrets.ps1`: PASS.
+  - `git diff --check`: PASS; apenas avisos LF/CRLF do Git no Windows.
+- Docker production-like:
+  - Docker client/server `29.5.3 / 29.5.3`.
+  - imagens `nexo_finance-api`, `nexo_finance-migrate` e `nexo_finance-web` geradas.
+  - `docker compose -f docker-compose.production-like.yml config --quiet`: PASS.
+  - stack subiu com Postgres, Redis, migrate, API e web.
+  - API, Postgres e Redis ficaram `healthy`; web ficou `Up`.
+  - `http://localhost:8000/health`: HTTP 200.
+  - `http://localhost:8000/ready`: HTTP 200 com `database=ok`.
+  - `http://localhost:3011`: HTTP 200.
+  - logs recentes de `api`, `web` e `migrate` sem `error`, `exception`, `traceback`, `failed`, `fatal` ou `warn`.
+
+### O Que Ainda Falta
+
+- Configurar ambientes reais `staging` e `production` em GitHub, Vercel, Railway, Resend, Sentry e Groq.
+- Provisionar PostgreSQL e Redis reais no Railway e executar migrations em staging.
+- Configurar domínios HTTPS reais, DNS, CORS, cookies `Secure`, SPF, DKIM e DMARC.
+- Executar smoke autenticado contra staging com `SMOKE_EMAIL`, `SMOKE_PASSWORD` e `SMOKE_TOTP_SECRET`.
+- Validar em navegador real/responsivo com console limpo.
+- Validar e-mails reais via Resend.
+- Configurar Sentry com scrubbing, releases e alertas.
+- Solicitar/confirmar Groq Zero Data Retention.
+- Fazer restore drill.
+- Completar dados LGPD reais: controlador, CNPJ, DPO, canal de contato e políticas publicadas.
+- Realizar pentest independente autenticado e não autenticado.
+
+Relatório detalhado da revisão: `docs/REVIEW_FIX_REPORT_2026-07-30.md`.
 
 ---
 
@@ -443,7 +512,7 @@ O workflow aguarda aprovação de um operador no GitHub.
 | 10 | Configurar Resend (domínio, DKIM, identidade) | Setup | 30 min |
 | 11 | Configurar Sentry (alertas, scrubbing) | Setup | 20 min |
 | 12 | Configurar DNS (todos os registros) | Setup | 20 min |
-| 13 | **Deploy staging + smoke tests** | **Validação** | **30 min** |
+| 13 | **Deploy staging + migrations + smoke tests** | **Validação** | **45 min** |
 | 14 | Validar ciclo de identidade completo | Validação | 30 min |
 | 15 | Validar ciclo financeiro completo | Validação | 20 min |
 | 16 | Validar PWA + mobile | Validação | 20 min |
@@ -477,14 +546,14 @@ O workflow aguarda aprovação de um operador no GitHub.
 |------|-------|------------------|
 | Domínio + Contas (1-6) | 6 | ~2 horas |
 | Configuração das plataformas (7-12) | 6 | ~3 horas |
-| Deploy + Validação em staging (13-18) | 6 | ~2 horas |
+| Deploy + Validação em staging (13-18) | 6 | ~2-3 horas |
 | Restore drill (19) | 1 | ~1 hora |
 | Legal (20-22) | 3 | ~2 horas |
 | Segurança (23-24) | 2 | ~1-3 dias |
 | Deploy produção (25-26) | 2 | ~1 hora |
 
-**Total código:** 0 horas (completo)
-**Total setup + validação:** ~8-10 horas (sem pentest)
+**Total código local após esta revisão:** 0 horas pendentes conhecidas.
+**Total setup + validação externa:** ~9-11 horas (sem pentest)
 **Total com pentest:** ~1-3 dias
 
 ---
@@ -496,6 +565,7 @@ O workflow aguarda aprovação de um operador no GitHub.
 | `docs/PLATFORM_SETUP.md` | Configuração detalhada de Railway, Vercel, Sentry, secrets |
 | `docs/DEPLOYMENT.md` | Pipeline de deploy, rollback, validação |
 | `docs/DNS_AND_EMAIL.md` | Registros DNS, SPF/DKIM/DMARC, Resend |
+| `docs/ROADMAP_IMPLEMENTACAO_PRODUCAO.md` | Roadmap passo a passo da situacao atual ate o go-live |
 | `docs/BACKUP_AND_RESTORE.md` | Estratégia de backup, restore drill, verificação |
 | `docs/LAUNCH_CHECKLIST.md` | Checklist completo de 80+ itens |
 | `docs/SECURITY_AND_LGPD.md` | Controles de segurança, LGPD, direitos do titular |

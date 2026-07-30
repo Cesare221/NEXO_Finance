@@ -152,6 +152,30 @@ for (const marker of ["/api/financial/dashboard", "DashboardSkeleton", "dashboar
     throw new Error(`Real dashboard must include ${marker}`);
   }
 }
+
+const sessionRoute = readFileSync(join(root, "app/api/auth/session/route.ts"), "utf8");
+for (const marker of ["fetchCurrentUser", "refreshSession", "validateRequestOrigin", "clearAuthCookies"]) {
+  if (!sessionRoute.includes(marker)) {
+    throw new Error(`Session route must use authenticated backend flow: missing ${marker}`);
+  }
+}
+for (const forbidden of ["mockUser", "demo@nexo.app", "Usuário Demo"]) {
+  if (sessionRoute.includes(forbidden)) {
+    throw new Error(`Session route must not include demo user marker: ${forbidden}`);
+  }
+}
+
+const dashboardRoute = readFileSync(join(root, "app/api/financial/dashboard/route.ts"), "utf8");
+for (const marker of ["authenticatedBackendRequest", "/financial/dashboard", "ACCESS_COOKIE", "REFRESH_COOKIE"]) {
+  if (!dashboardRoute.includes(marker)) {
+    throw new Error(`Dashboard route must proxy the authenticated backend: missing ${marker}`);
+  }
+}
+for (const forbidden of ["mockData", "45280.50", "Passagem Aérea"]) {
+  if (dashboardRoute.includes(forbidden)) {
+    throw new Error(`Dashboard route must not include static financial demo data: ${forbidden}`);
+  }
+}
 for (const marker of ["DateRangePicker", 'type="date"', "Últimos 30 dias", "Aplicar período"]) {
   if (!dashboard.includes(marker)) {
     throw new Error(`Dashboard period selector must include ${marker}`);
@@ -834,6 +858,9 @@ for (const marker of [
   "NEXT_RUNTIME",
   "SENTRY_DSN",
   "NEXT_PUBLIC_SENTRY_DSN",
+  "onRouterTransitionStart",
+  "onRequestError",
+  "removeDebugLogging",
   "GlobalError",
   "reset()",
   "withSentryConfig"
@@ -847,8 +874,9 @@ const runtimeConfig = readFileSync(join(root, "lib/runtime-config.ts"), "utf8");
 for (const marker of [
   "validateWebRuntime",
   "API_URL",
-  "https://",
-  "startsWith"
+  "https:",
+  "localhost",
+  "new URL"
 ]) {
   if (!runtimeConfig.includes(marker)) {
     throw new Error(`Runtime config must include ${marker}`);

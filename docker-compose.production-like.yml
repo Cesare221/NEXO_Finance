@@ -39,7 +39,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      ENVIRONMENT: production
+      ENVIRONMENT: staging
       DATABASE_URL: postgresql://nexo:nexo_dev_password@postgres:5432/nexo
       SECRET_KEY: dev-secret-key-at-least-64-characters-long-for-local-rehearsal-only-12345
       ALLOWED_ORIGINS: http://localhost:3011

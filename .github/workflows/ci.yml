@@ -56,7 +56,7 @@ jobs:
       - name: Run migrations
         run: uv run alembic upgrade head
       - name: Check single migration head
-        run: python ../scripts/check-migration-head.py
+        run: python ../../scripts/check-migration-head.py
       - name: Run scrubber-focused tests
         run: uv run pytest tests/test_observability.py -v -q
       - name: Run full API suite
@@ -111,5 +111,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Scan for leaked secrets
-        run: python scripts/check-secrets.ps1
+        run: ./scripts/check-secrets.ps1
         shell: pwsh

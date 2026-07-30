@@ -16,6 +16,7 @@ export async function GET(request: Request) {
       const value = sourceUrl.searchParams.get(key);
       if (value) query.set(key, value);
     }
+
     const cookieStore = await cookies();
     const { data, tokens } = await authenticatedBackendRequest(
       `/financial/dashboard${query.size ? `?${query}` : ""}`,

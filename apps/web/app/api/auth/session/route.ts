@@ -15,7 +15,10 @@ import {
 } from "@/lib/auth-server";
 
 export async function GET(request: Request) {
-  validateRequestOrigin(request);
+  if (!validateRequestOrigin(request)) {
+    return NextResponse.json({ detail: "Origem da requisição não permitida." }, { status: 403 });
+  }
+
   const cookieStore = await cookies();
   const accessToken = cookieStore.get(ACCESS_COOKIE)?.value;
   const refreshToken = cookieStore.get(REFRESH_COOKIE)?.value;
