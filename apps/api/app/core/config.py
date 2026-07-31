@@ -39,6 +39,7 @@ class Settings(BaseSettings):
     sentry_environment: str = "development"
     sentry_release: str = ""
     sentry_traces_sample_rate: float = 0.0
+    sentry_test_token: str = ""
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 

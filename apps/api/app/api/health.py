@@ -45,3 +45,15 @@ def readiness_check(db: Session = Depends(get_db)):
             )
 
     return {"status": "ready", "checks": checks}
+
+
+@router.get("/debug/sentry-test", include_in_schema=False)
+def sentry_test(token: str = ""):
+    if settings.environment.lower() == "production":
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+    expected_token = getattr(settings, "sentry_test_token", "")
+    if not expected_token:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+    if token != expected_token:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+    raise RuntimeError("Sentry API test event")
