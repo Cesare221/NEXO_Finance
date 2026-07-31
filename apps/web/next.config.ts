@@ -8,7 +8,7 @@ const isProduction = process.env.NODE_ENV === "production";
 const apiOrigin = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 const contentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self'${isProduction ? "" : " 'unsafe-eval'"} 'unsafe-inline' 'nonce-nexo-sentry'`,
+  `script-src 'self'${isProduction ? "" : " 'unsafe-eval'"} 'unsafe-inline'`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
