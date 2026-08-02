@@ -68,7 +68,7 @@ def test_resend_password_reset_uses_reset_copy(httpx_mock, user, monkeypatch):
     service.send_password_reset(user, "raw-token")
 
     payload = json.loads(httpx_mock.get_request().content)
-    assert "password" in payload["subject"].lower()
+    assert "senha" in payload["subject"].lower()
     assert "/reset-password?token=raw-token" in payload["html"]
 
 
