@@ -164,7 +164,7 @@ export function DashboardView() {
   ];
 
   return (
-    <>
+    <div className="dashboard-mintlify">
       <p className="sr-only" aria-live="polite">Dashboard atualizado com os dados financeiros mais recentes.</p>
       <header className="page-header dashboard-header">
         <div>
@@ -177,6 +177,21 @@ export function DashboardView() {
           <Link className="button" href="/transacoes"><Plus size={18} aria-hidden="true" />Nova transação</Link>
         </div>
       </header>
+
+      <section className="dashboard-status-rail" aria-label="Leitura rapida do periodo">
+        <div>
+          <span>Resultado</span>
+          <strong className={result >= 0 ? "positive" : ""}>{money(result)}</strong>
+        </div>
+        <div>
+          <span>Contas ativas</span>
+          <strong>{data.accounts.length}</strong>
+        </div>
+        <div>
+          <span>Receita usada</span>
+          <strong>{income > 0 ? `${expenseRatio}%` : "0%"}</strong>
+        </div>
+      </section>
 
       <MovementReviewInbox />
 
@@ -252,7 +267,7 @@ export function DashboardView() {
           <div className="due-summary"><span>Saldo após faturas</span><strong>{money(Number(data.total_balance) - Number(data.open_statement_total))}</strong></div>
         </article>
       </section>
-    </>
+    </div>
   );
 }
 

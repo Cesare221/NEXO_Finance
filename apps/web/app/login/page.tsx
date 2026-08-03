@@ -15,6 +15,27 @@ export default async function LoginPage({
 
   return (
     <main className="auth-page">
+      <section className="auth-story" aria-label="Resumo do Nexo Finance">
+        <span className="auth-kicker">NEXO Finance</span>
+        <h1>Seu centro financeiro com IA, controle e contexto.</h1>
+        <p>
+          Entre para revisar movimentações, acompanhar o fluxo de caixa e conversar com o Fin em um ambiente seguro.
+        </p>
+        <div className="auth-proof-grid" aria-label="Indicadores do produto">
+          <div>
+            <strong>2FA</strong>
+            <span>Login protegido</span>
+          </div>
+          <div>
+            <strong>30 dias</strong>
+            <span>Visão padrão</span>
+          </div>
+          <div>
+            <strong>IA</strong>
+            <span>Revisão antes de salvar</span>
+          </div>
+        </div>
+      </section>
       <section className="card auth-panel">
         <Link className="auth-brand" href="/" aria-label="Nexo">
           <NexoLogo priority />
