@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=000000,064E3B,CA8A04,10B981&height=260&section=header&text=NEXO%20FINANCE&fontSize=54&fontColor=ffffff&animation=fadeIn&fontAlignY=37&desc=Seu%20dinheiro.%20Suas%20decisões.%20Tudo%20conectado.&descAlignY=58&descAlign=50" width="100%" alt="Banner Nexo Finance"/>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&color=0:022C22,30:064E3B,55:000000,78:D4AF37,100:6EE7B7&height=260&section=header&text=NEXO%20FINANCE&fontSize=54&fontColor=ffffff&animation=fadeIn&fontAlignY=37&desc=Seu%20dinheiro.%20Suas%20decisões.%20Tudo%20conectado.&descAlignY=58&descAlign=50" width="100%" alt="Banner Nexo Finance"/>
 
 <a href="https://git.io/typing-svg">
   <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=23&pause=1000&color=34D399&center=true&vCenter=true&width=900&lines=Controle+Financeiro+Simples+e+Inteligente;Receitas%2C+Despesas+e+Metas+em+um+só+lugar;Dashboards+para+Decisões+Financeiras;Automações+e+Inteligência+Artificial" alt="Apresentação animada do Nexo Finance"/>
