@@ -1,5 +1,5 @@
 # ── Build stage ──────────────────────────────────────────────
-FROM python:3.13-slim AS builder
+FROM python:3.14-slim AS builder
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -12,7 +12,7 @@ RUN python -m pip install --upgrade pip && \
     python -m pip install --require-hashes -r requirements.lock
 
 # ── Runtime stage ───────────────────────────────────────────
-FROM python:3.13-slim
+FROM python:3.14-slim
 
 LABEL org.opencontainers.image.source="https://github.com/nexo-finance/nexo"
 LABEL org.opencontainers.image.description="Nexo API"
