@@ -10,8 +10,8 @@ export default function EmailVerificationPage() {
         <Link className="auth-brand" href="/" aria-label="Nexo">
           <NexoLogo priority />
         </Link>
-        <h1>Verificação de E-mail</h1>
-        <Suspense fallback={<div className="status-banner info">Carregando formulário...</div>}>
+        <h1>Verificação de e-mail</h1>
+        <Suspense fallback={<div className="status-banner info">Carregando formulário.</div>}>
           <EmailVerificationForm />
         </Suspense>
       </section>

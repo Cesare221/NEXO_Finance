@@ -19,6 +19,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CashFlowChart } from "@/components/ui/cash-flow-chart";
 import { MovementReviewInbox } from "@/components/movement-review-inbox";
 import { DemoDatasetControl } from "@/components/demo-dataset-control";
+import { FinMascot } from "@/components/brand-assets";
+import { useSession } from "@/components/session-profile";
 import {
   DateRangePicker,
   defaultDashboardPeriod,
@@ -79,7 +81,12 @@ function periodSummary(period: DateRange) {
   return start === end ? start : `${start} a ${end}`;
 }
 
+function firstName(name: string) {
+  return name.trim().split(/\s+/)[0] || "você";
+}
+
 export function DashboardView() {
+  const { user } = useSession();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -165,12 +172,16 @@ export function DashboardView() {
 
   return (
     <div className="dashboard-mintlify">
-      <p className="sr-only" aria-live="polite">Dashboard atualizado com os dados financeiros mais recentes.</p>
+      <p className="sr-only" aria-live="polite">Dashboard atualizado.</p>
       <header className="page-header dashboard-header">
         <div>
-          <span className="eyebrow">Visão geral</span>
-          <h1>Seu dinheiro, sem ruído.</h1>
-          <p>{data.accounts.length ? "Dados atualizados com suas movimentações." : "Comece criando sua primeira conta."}</p>
+          <span className="eyebrow">Dashboard</span>
+          <h1>Bem-vindo(a), {firstName(user.name)}.</h1>
+          <p>Período: {periodSummary(period)}.</p>
+          <div className="dashboard-fin-host" aria-label="Fin está online para revisar suas ações">
+            <FinMascot variant="avatar" />
+            <span><strong>Fin online</strong> Revisão antes de salvar.</span>
+          </div>
         </div>
         <div className="header-actions">
           <DateRangePicker value={period} onChange={changePeriod} disabled={loading} />
@@ -178,7 +189,7 @@ export function DashboardView() {
         </div>
       </header>
 
-      <section className="dashboard-status-rail" aria-label="Leitura rapida do periodo">
+      <section className="dashboard-status-rail" aria-label="Leitura rápida do período">
         <div>
           <span>Resultado</span>
           <strong className={result >= 0 ? "positive" : ""}>{money(result)}</strong>
@@ -188,7 +199,7 @@ export function DashboardView() {
           <strong>{data.accounts.length}</strong>
         </div>
         <div>
-          <span>Receita usada</span>
+          <span>Uso da receita</span>
           <strong>{income > 0 ? `${expenseRatio}%` : "0%"}</strong>
         </div>
       </section>
@@ -197,9 +208,9 @@ export function DashboardView() {
 
       {!data.accounts.length ? (
         <section className="card dashboard-state dashboard-empty">
-          <WalletCards size={28} aria-hidden="true" />
-          <h2>Seu dashboard está pronto para receber dados</h2>
-          <p>Cadastre uma conta para acompanhar saldos, receitas, despesas e vencimentos reais.</p>
+          <FinMascot className="dashboard-empty-mascot" />
+          <h2>Nenhuma conta cadastrada</h2>
+          <p>Cadastre uma conta para iniciar.</p>
           <div className="dashboard-empty-actions">
             <Link className="button" href="/onboarding"><Plus size={18} aria-hidden="true" />Configurar primeira conta</Link>
             <DemoDatasetControl variant="install" />
@@ -226,17 +237,20 @@ export function DashboardView() {
           <CashFlowChart data={chartData} />
         </article>
         <article className="card insight-card">
-          <div className="insight-icon"><Sparkles size={22} aria-hidden="true" /></div>
+          <div className="insight-fin-hero">
+            <span className="insight-fin-avatar"><FinMascot variant="avatar" /></span>
+            <span className="insight-icon"><Sparkles size={18} aria-hidden="true" /></span>
+          </div>
           <span className="eyebrow">Leitura do Fin</span>
-          <h2>{income === 0 && expenses === 0 ? "Ainda não há movimentações neste período." : result >= 0 ? `Seu resultado está positivo em ${money(result)}.` : `Suas despesas superaram as receitas em ${money(Math.abs(result))}.`}</h2>
-          <p>{income > 0 ? `As despesas representam ${expenseRatio}% das receitas do período.` : "Adicione receitas e despesas para receber uma leitura contextual."}</p>
+          <h2>{income === 0 && expenses === 0 ? "Sem movimentações no período." : result >= 0 ? `Resultado positivo: ${money(result)}.` : `Resultado negativo: ${money(Math.abs(result))}.`}</h2>
+          <p>{income > 0 ? `Despesas: ${expenseRatio}% das receitas.` : "Adicione uma movimentação para iniciar a análise."}</p>
           <button type="button" className="text-action" onClick={() => window.dispatchEvent(new Event("nexo:open-fin"))}>Conversar com o Fin <ChevronRight size={17} aria-hidden="true" /></button>
         </article>
       </section>
 
       <section className="dashboard-grid lower-grid">
         <article className="card list-card">
-          <div className="section-heading"><div><span className="eyebrow">Atividade real</span><h2>Movimentações recentes</h2></div><Link className="text-action quiet" href="/transacoes">Ver todas <ChevronRight size={16} aria-hidden="true" /></Link></div>
+          <div className="section-heading"><div><span className="eyebrow">Atividade</span><h2>Movimentações recentes</h2></div><Link className="text-action quiet" href="/transacoes">Ver todas <ChevronRight size={16} aria-hidden="true" /></Link></div>
           <div className="transaction-list">
             {data.recent_transactions.length ? data.recent_transactions.slice(0, 5).map((transaction) => {
               const Icon = transactionIcon(transaction);
@@ -253,7 +267,7 @@ export function DashboardView() {
         </article>
 
         <article className="card due-card">
-          <div className="section-heading"><div><span className="eyebrow">Compromissos</span><h2>Próximos vencimentos</h2></div></div>
+          <div className="section-heading"><div><span className="eyebrow">Vencimentos</span><h2>Próximos</h2></div></div>
           {data.upcoming_due.length ? data.upcoming_due.slice(0, 3).map((statement) => {
             const due = new Date(`${statement.due_on}T00:00:00Z`);
             return (

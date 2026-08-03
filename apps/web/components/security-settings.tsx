@@ -61,7 +61,7 @@ export function SecuritySettings() {
           <RefreshCw className={loading ? "spin" : ""} size={18} />
         </button>
       </div>
-      {loading ? <p className="security-loading"><LoaderCircle className="spin" size={18} /> Carregando sessões...</p> : null}
+      {loading ? <p className="security-loading"><LoaderCircle className="spin" size={18} /> Carregando sessões.</p> : null}
       {!loading && !sessions.length ? <p className="security-loading">Nenhuma sessão ativa encontrada.</p> : null}
       <div className="session-list">
         {sessions.map((session) => (

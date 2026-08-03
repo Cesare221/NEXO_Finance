@@ -106,7 +106,7 @@ export function MovementReviewInbox() {
         {proposals.length ? <span className="pending-count">{proposals.length} pendente{proposals.length === 1 ? "" : "s"}</span> : null}
       </div>
 
-      {loading ? <p className="inbox-state"><LoaderCircle className="spin" size={18} /> Carregando reconhecimentos...</p> : null}
+      {loading ? <p className="inbox-state"><LoaderCircle className="spin" size={18} /> Carregando reconhecimentos.</p> : null}
       {error ? <p className="error" role="alert">{error}</p> : null}
       {!loading && !error && !groups.length ? (
         <div className="inbox-empty"><Inbox size={22} aria-hidden="true" /><div><strong>Nenhuma movimentação para revisar</strong><span>Quando o Fin reconhecer algo, o aviso aparecerá aqui.</span></div></div>

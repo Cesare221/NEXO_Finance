@@ -30,6 +30,8 @@ type ExpenseDraft = {
   occurredOn: string;
 };
 
+const expenseWizardOrder: ExpenseWizardStep[] = ["amount", "account", "category", "description", "date", "review"];
+
 const suggestions = [
   "Quanto gastei este mês?",
   "Qual é o meu saldo?",
@@ -99,7 +101,7 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
     {
       id: "welcome",
       role: "assistant",
-      text: "Olá! Posso consultar seus números ou preparar um lançamento para você revisar."
+      text: "Olá! Posso consultar dados ou preparar um lançamento."
     }
   ]);
   const [message, setMessage] = useState("");
@@ -192,8 +194,8 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
       ]);
       const accountsBody = await accountsResponse.json().catch(() => []) as FinancialAccount[] | { detail?: string };
       const categoriesBody = await categoriesResponse.json().catch(() => []) as FinancialCategory[] | { detail?: string };
-      if (!accountsResponse.ok) throw new Error("detail" in accountsBody && accountsBody.detail ? accountsBody.detail : "Nao foi possivel carregar as contas.");
-      if (!categoriesResponse.ok) throw new Error("detail" in categoriesBody && categoriesBody.detail ? categoriesBody.detail : "Nao foi possivel carregar as categorias.");
+      if (!accountsResponse.ok) throw new Error("detail" in accountsBody && accountsBody.detail ? accountsBody.detail : "Não foi possível carregar as contas.");
+      if (!categoriesResponse.ok) throw new Error("detail" in categoriesBody && categoriesBody.detail ? categoriesBody.detail : "Não foi possível carregar as categorias.");
 
       const accounts = (accountsBody as FinancialAccount[]).filter((account) => !account.is_archived);
       if (!accounts.length) {
@@ -214,9 +216,9 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
           occurredOn: todayIsoDate()
         }
       });
-      addAssistantMessage("Vamos registrar a despesa por etapas. Preencha um campo por vez e eu preparo a proposta para revisao.");
+      addAssistantMessage("Vamos por etapas. Preencha um campo por vez.");
     } catch (requestError) {
-      setWizardError(requestError instanceof Error ? requestError.message : "Nao foi possivel iniciar o questionario.");
+      setWizardError(requestError instanceof Error ? requestError.message : "Não foi possível iniciar o questionário.");
     } finally {
       setWizardLoading(false);
     }
@@ -232,15 +234,13 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
 
   function nextExpenseStep() {
     if (!expenseWizard) return;
-    const order: ExpenseWizardStep[] = ["amount", "account", "category", "description", "date", "review"];
-    const next = order[Math.min(order.indexOf(expenseWizard.step) + 1, order.length - 1)];
+    const next = expenseWizardOrder[Math.min(expenseWizardOrder.indexOf(expenseWizard.step) + 1, expenseWizardOrder.length - 1)];
     setExpenseStep(next);
   }
 
   function previousExpenseStep() {
     if (!expenseWizard) return;
-    const order: ExpenseWizardStep[] = ["amount", "account", "category", "description", "date", "review"];
-    const previous = order[Math.max(order.indexOf(expenseWizard.step) - 1, 0)];
+    const previous = expenseWizardOrder[Math.max(expenseWizardOrder.indexOf(expenseWizard.step) - 1, 0)];
     setExpenseStep(previous);
   }
 
@@ -251,7 +251,7 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
     const category = wizardCategories.find((item) => String(item.id) === expenseWizard.draft.categoryId);
     const description = expenseWizard.draft.description.trim();
     if (!amount || Number(amount) <= 0 || !account || description.length < 2) {
-      setWizardError("Confira valor, conta e descricao antes de criar a proposta.");
+      setWizardError("Confira valor, conta e descrição.");
       return;
     }
 
@@ -280,13 +280,13 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
         })
       });
       const body = (await response.json().catch(() => ({}))) as ActionProposal & { detail?: string };
-      if (!response.ok) throw new Error(body.detail ?? "Nao foi possivel criar a proposta.");
+      if (!response.ok) throw new Error(body.detail ?? "Não foi possível criar a proposta.");
       setProposal(body);
       setExpenseWizard(null);
       notifyProposalsChanged();
-      addAssistantMessage("Preparei a proposta abaixo. Revise os dados antes de confirmar.");
+      addAssistantMessage("Proposta pronta para revisão.");
     } catch (requestError) {
-      setWizardError(requestError instanceof Error ? requestError.message : "Nao foi possivel criar a proposta.");
+      setWizardError(requestError instanceof Error ? requestError.message : "Não foi possível criar a proposta.");
     } finally {
       setWizardLoading(false);
     }
@@ -390,7 +390,7 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
       if (!response.ok) throw new Error(body.detail ?? "Não foi possível editar a proposta.");
       setProposal(body);
       notifyProposalsChanged();
-      addAssistantMessage("Atualizei a proposta. Revise novamente antes de confirmar.");
+      addAssistantMessage("Proposta atualizada.");
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Não foi possível editar a proposta.");
       throw requestError;
@@ -424,22 +424,35 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
       amount: "Valor",
       account: "Conta",
       category: "Categoria",
-      description: "Descricao",
+      description: "Descrição",
       date: "Data",
-      review: "Revisao"
+      review: "Revisão"
     };
+    const currentStepIndex = expenseWizardOrder.indexOf(step);
 
     return (
-      <section className="fin-wizard-card" aria-label="Questionario para adicionar despesa">
+      <section className="fin-wizard-card" aria-label="Questionário para adicionar despesa">
         <div className="fin-wizard-heading">
           <div>
             <span className="eyebrow">Adicionar despesa</span>
             <h3>{stepLabels[step]}</h3>
           </div>
-          <button className="icon-button" type="button" aria-label="Fechar questionario" onClick={() => setExpenseWizard(null)}>
+          <button className="icon-button" type="button" aria-label="Fechar questionário" onClick={() => setExpenseWizard(null)}>
             <X size={17} aria-hidden="true" />
           </button>
         </div>
+        <ol className="fin-wizard-steps" aria-label="Progresso do questionário">
+          {expenseWizardOrder.map((item, index) => (
+            <li
+              className={index <= currentStepIndex ? "active" : ""}
+              key={item}
+              aria-current={item === step ? "step" : undefined}
+            >
+              <span>{index + 1}</span>
+              <strong>{stepLabels[item]}</strong>
+            </li>
+          ))}
+        </ol>
 
         {step === "amount" ? (
           <label className="field">
@@ -494,7 +507,7 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
 
         {step === "description" ? (
           <label className="field">
-            Descricao curta
+            Descrição curta
             <input
               className="input"
               value={draft.description}
@@ -523,7 +536,7 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
             <span><strong>Valor</strong>{Number.isFinite(amount) ? currencyFormatter.format(amount) : "-"}</span>
             <span><strong>Conta</strong>{account?.name ?? "-"}</span>
             <span><strong>Categoria</strong>{category?.name ?? "Sem categoria"}</span>
-            <span><strong>Descricao</strong>{draft.description}</span>
+            <span><strong>Descrição</strong>{draft.description}</span>
             <span><strong>Data</strong>{draft.occurredOn}</span>
           </div>
         ) : null}
@@ -538,7 +551,7 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
           ) : null}
           {step !== "review" ? (
             <button className="button" type="button" onClick={nextExpenseStep} disabled={!canGoNext || wizardLoading}>
-              Proximo
+              Próximo
             </button>
           ) : (
             <button className="button" type="button" onClick={() => void createExpenseProposalFromWizard()} disabled={wizardLoading}>
@@ -555,13 +568,13 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
     <section className={compact ? "fin-chat compact" : "fin-chat"} aria-busy={sending || pendingAction !== null || contextLoading} aria-labelledby="fin-chat-title">
       <div className="fin-chat-header">
         <span className="fin-avatar" aria-hidden="true"><FinMascot variant="avatar" /></span>
-        <div><h2 id="fin-chat-title">Conversa com o Fin</h2><span>Online · suas ações sempre passam por revisão</span></div>
+        <div><h2 id="fin-chat-title">Conversa com o Fin</h2><span>Revisão antes de salvar.</span></div>
         {onClose ? <button className="icon-button fin-chat-close" type="button" aria-label="Fechar conversa com o Fin" onClick={onClose}><X size={18} aria-hidden="true" /></button> : null}
       </div>
 
       <section className="fin-financial-context" aria-busy={contextLoading} aria-live="polite" aria-label="Resumo financeiro atual">
         <div className="fin-financial-context-heading">
-          <span>Contexto financeiro</span>
+          <span>Resumo</span>
           {contextLoading && <span role="status">Atualizando</span>}
         </div>
         {financialContext && (
@@ -572,7 +585,7 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
             <div><dt>Faturas</dt><dd>{formatCurrency(financialContext.open_statement_total)}</dd></div>
           </dl>
         )}
-        {!financialContext && contextLoading && <p className="fin-context-state">Carregando dados financeiros...</p>}
+        {!financialContext && contextLoading && <p className="fin-context-state">Carregando dados.</p>}
         {contextError && <p className="fin-context-state error" role="status">{contextError}</p>}
       </section>
 

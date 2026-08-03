@@ -141,7 +141,7 @@ export function PasswordResetForm() {
             ) : (
               <>
                 <LockKeyhole size={18} aria-hidden="true" />
-                Redefinir Senha
+                Redefinir senha
               </>
             )}
           </button>

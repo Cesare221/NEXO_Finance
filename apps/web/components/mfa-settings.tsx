@@ -181,7 +181,7 @@ export function MfaSettings() {
   if (loading) {
     return (
       <section className="card settings-card">
-        <div className="status-banner info">Carregando configurações de segurança...</div>
+        <div className="status-banner info">Carregando configurações de segurança.</div>
       </section>
     );
   }
@@ -195,7 +195,7 @@ export function MfaSettings() {
           {isEnabled ? <ShieldCheck size={24} className="text-primary" /> : <ShieldAlert size={24} />}
         </div>
         <div>
-          <h2>Autenticação em Duas Etapas (MFA)</h2>
+          <h2>Autenticação em duas etapas (MFA)</h2>
           <p>
             {isEnabled
               ? "Sua conta está protegida por verificação em duas etapas via aplicativo autenticador."

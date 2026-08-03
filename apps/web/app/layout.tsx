@@ -28,7 +28,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#101a19"
+  themeColor: "#0a0a0a"
 };
 
 const themeScript = `
@@ -42,7 +42,7 @@ const themeScript = `
     document.documentElement.dataset.theme = resolved;
     document.documentElement.style.colorScheme = resolved;
     var themeMeta = document.querySelector('meta[name="theme-color"]');
-    if (themeMeta) themeMeta.setAttribute("content", resolved === "dark" ? "#071817" : "#f5f7fa");
+    if (themeMeta) themeMeta.setAttribute("content", resolved === "dark" ? "#0a0a0a" : "#f7f7f7");
   } catch (error) {}
 })();`;
 

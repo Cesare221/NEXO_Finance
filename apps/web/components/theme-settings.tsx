@@ -18,8 +18,8 @@ const options: Array<{
     description: "Acompanha este dispositivo",
     icon: Laptop
   },
-  { value: "light", label: "Claro", description: "Maior luminosidade", icon: Sun },
-  { value: "dark", label: "Escuro", description: "Petr\u00f3leo Nexo", icon: Moon }
+  { value: "light", label: "Claro", description: "Neutro e luminoso", icon: Sun },
+  { value: "dark", label: "Escuro", description: "Preto Nexo", icon: Moon }
 ];
 
 async function readError(response: Response) {

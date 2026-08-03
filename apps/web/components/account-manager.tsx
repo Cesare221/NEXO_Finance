@@ -224,7 +224,7 @@ export function AccountManager() {
       </div>
 
       {loading ? (
-        <section className="card resource-state"><LoaderCircle className="spin" aria-hidden="true" /><p>Carregando contas...</p></section>
+        <section className="card resource-state"><LoaderCircle className="spin" aria-hidden="true" /><p>Carregando contas.</p></section>
       ) : accounts.length === 0 ? (
         <section className="card resource-state">
           <WalletCards aria-hidden="true" />

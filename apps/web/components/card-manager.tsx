@@ -262,7 +262,7 @@ export function CardManager() {
       <div className="resource-feedback" aria-live="polite">{error && <p className="error">{error}</p>}{success && <p className="success-message"><CheckCircle2 size={17} aria-hidden="true" />{success}</p>}</div>
 
       {loading ? (
-        <section className="card resource-state"><LoaderCircle className="spin" aria-hidden="true" /><p>Carregando cartões...</p></section>
+        <section className="card resource-state"><LoaderCircle className="spin" aria-hidden="true" /><p>Carregando cartões.</p></section>
       ) : cards.length === 0 ? (
         <section className="card resource-state"><CreditCard aria-hidden="true" /><h2>Nenhum cartão cadastrado</h2><p>Adicione um cartão para acompanhar limite e fatura sem duplicar as despesas.</p><button className="button" type="button" onClick={startCreateCard}>Adicionar cartão</button></section>
       ) : (

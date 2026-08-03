@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { AuthForm } from "@/components/auth-form";
-import { NexoLogo } from "@/components/brand-assets";
+import { FinMascot, NexoLogo } from "@/components/brand-assets";
 
 export default async function LoginPage({
   searchParams
@@ -17,10 +17,15 @@ export default async function LoginPage({
     <main className="auth-page">
       <section className="auth-story" aria-label="Resumo do Nexo Finance">
         <span className="auth-kicker">NEXO Finance</span>
-        <h1>Seu centro financeiro com IA, controle e contexto.</h1>
-        <p>
-          Entre para revisar movimentações, acompanhar o fluxo de caixa e conversar com o Fin em um ambiente seguro.
-        </p>
+        <h1>Finanças com IA e revisão humana.</h1>
+        <p>Acompanhe saldos, fluxo de caixa e lançamentos em um só lugar.</p>
+        <div className="auth-fin-showcase" aria-label="Fin, assistente financeiro do Nexo">
+          <FinMascot priority />
+          <div>
+            <span>Fin online</span>
+            <strong>Revisão antes de salvar.</strong>
+          </div>
+        </div>
         <div className="auth-proof-grid" aria-label="Indicadores do produto">
           <div>
             <strong>2FA</strong>
@@ -41,7 +46,7 @@ export default async function LoginPage({
           <NexoLogo priority />
         </Link>
         <h1>Entrar no Nexo</h1>
-        <p className="auth-intro">Acesse seu espaço financeiro com segurança.</p>
+        <p className="auth-intro">Acesse sua conta.</p>
         <AuthForm mode="login" redirectTo={redirectTo} />
         <p>
           Ainda não tem conta? <Link href="/cadastro">Criar cadastro</Link>

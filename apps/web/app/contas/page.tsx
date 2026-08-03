@@ -6,9 +6,9 @@ export default function ContasPage() {
     <AppShell>
       <header className="page-header">
         <div>
-          <span className="section-kicker">Seu dinheiro</span>
+          <span className="section-kicker">Saldos</span>
           <h1>Contas</h1>
-          <p>Centralize bancos, carteiras e investimentos com saldos calculados pelas movimentações.</p>
+          <p>Gerencie bancos, carteiras e investimentos.</p>
         </div>
       </header>
       <AccountManager />

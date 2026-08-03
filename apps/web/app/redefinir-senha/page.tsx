@@ -10,8 +10,8 @@ export default function PasswordResetPage() {
         <Link className="auth-brand" href="/" aria-label="Nexo">
           <NexoLogo priority />
         </Link>
-        <h1>Redefinir Senha</h1>
-        <Suspense fallback={<div className="status-banner info">Carregando formulário...</div>}>
+        <h1>Redefinir senha</h1>
+        <Suspense fallback={<div className="status-banner info">Carregando formulário.</div>}>
           <PasswordResetForm />
         </Suspense>
       </section>

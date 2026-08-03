@@ -2,6 +2,7 @@
 
 import { Check, LoaderCircle, Pencil, Save, ShieldCheck, X } from "lucide-react";
 import { FormEvent, useState } from "react";
+import { FinMascot } from "@/components/brand-assets";
 
 export type ActionProposal = {
   id: number;
@@ -68,7 +69,10 @@ export function ProposalCard({
   return (
     <section className="proposal-card" aria-labelledby={`proposal-title-${proposal.id}`}>
       <div className="proposal-heading">
-        <span className="proposal-icon"><ShieldCheck size={20} aria-hidden="true" /></span>
+        <span className="proposal-icon proposal-fin-icon">
+          <FinMascot variant="avatar" />
+          <ShieldCheck size={16} aria-hidden="true" />
+        </span>
         <div>
           <span className="eyebrow">Revisão obrigatória</span>
           <h3 id={`proposal-title-${proposal.id}`}>Proposta do Fin</h3>
@@ -79,7 +83,7 @@ export function ProposalCard({
       </div>
 
       <p className="proposal-summary">{proposal.human_summary}</p>
-      <p className="proposal-safety">Nada é salvo antes de você confirmar.</p>
+      <p className="proposal-safety">Confirme para salvar.</p>
 
       {editing ? (
         <form className="proposal-edit-form" onSubmit={handleEdit}>

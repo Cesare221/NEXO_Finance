@@ -76,7 +76,7 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
       router.replace(redirectTo);
       router.refresh();
     } catch {
-      setError("Não foi possível conectar ao Fin. Verifique sua internet e tente novamente.");
+      setError("Não foi possível conectar. Verifique sua internet e tente novamente.");
     } finally {
       setPending(false);
     }
@@ -116,11 +116,11 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
         <div className="auth-consents">
           <label className="checkbox-row">
             <input type="checkbox" name="privacy_accepted" required />
-            <span>Li e aceito o <Link href="/privacidade" target="_blank">Aviso de Privacidade</Link>.</span>
+            <span>Li e aceito o <Link href="/privacidade" target="_blank">Aviso de privacidade</Link>.</span>
           </label>
           <label className="checkbox-row">
             <input type="checkbox" name="ai_data_processing_consent" />
-            <span>Permito que o Fin envie somente o contexto necessário à Groq. Posso revogar depois.</span>
+            <span>Permito o uso do contexto necessário pela IA. Posso revogar depois.</span>
           </label>
         </div>
       ) : null}
@@ -170,7 +170,7 @@ export function AuthForm({ mode, redirectTo }: AuthFormProps) {
         {pending ? (
           <>
             <LoaderCircle className="spin" size={18} aria-hidden="true" />
-            Aguarde...
+            Aguarde
           </>
         ) : (
           <>

@@ -23,6 +23,6 @@ export function applyTheme(preference: ThemePreference): ResolvedTheme {
   document.documentElement.style.colorScheme = resolved;
   document
     .querySelector<HTMLMetaElement>('meta[name="theme-color"]')
-    ?.setAttribute("content", resolved === "dark" ? "#071817" : "#f5f7fa");
+    ?.setAttribute("content", resolved === "dark" ? "#0a0a0a" : "#f7f7f7");
   return resolved;
 }

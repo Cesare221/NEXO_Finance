@@ -198,7 +198,7 @@ export function CategoryManager() {
       </div>
 
       {loading ? (
-        <section className="card resource-state"><LoaderCircle className="spin" aria-hidden="true" /><p>Carregando categorias...</p></section>
+        <section className="card resource-state"><LoaderCircle className="spin" aria-hidden="true" /><p>Carregando categorias.</p></section>
       ) : rows.length === 0 ? (
         <section className="card resource-state">
           <FolderTree aria-hidden="true" />

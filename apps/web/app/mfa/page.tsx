@@ -20,9 +20,9 @@ export default async function MfaPage({
         <Link className="auth-brand" href="/" aria-label="Nexo">
           <NexoLogo priority />
         </Link>
-        <h1>Autenticação de Duas Etapas</h1>
+        <h1>Autenticação de duas etapas</h1>
         <p className="auth-intro">Proteção adicional ativada para sua conta.</p>
-        <Suspense fallback={<div className="status-banner info">Carregando formulário...</div>}>
+        <Suspense fallback={<div className="status-banner info">Carregando formulário.</div>}>
           <MfaChallengeForm redirectTo={redirectTo} />
         </Suspense>
       </section>

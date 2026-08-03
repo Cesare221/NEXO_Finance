@@ -307,7 +307,7 @@ export function TransactionManager() {
         </div>
 
         {loading ? (
-          <div className="transaction-state" role="status"><LoaderCircle className="spin" aria-hidden="true" />Carregando movimentações...</div>
+          <div className="transaction-state" role="status"><LoaderCircle className="spin" aria-hidden="true" />Carregando movimentações.</div>
         ) : transactions.length === 0 ? (
           <div className="transaction-empty"><ReceiptText aria-hidden="true" /><strong>Nenhuma movimentação registrada</strong><span>Seu histórico começa com o primeiro lançamento.</span></div>
         ) : (

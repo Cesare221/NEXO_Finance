@@ -8,13 +8,13 @@ export default function FinPage() {
       <header className="page-header">
         <div>
           <span className="eyebrow">Agente financeiro</span>
-          <h1>Conversas com o Fin</h1>
-          <p>Consulte seus dados e revise movimentações reconhecidas no painel ao lado.</p>
+          <h1>Fin</h1>
+          <p>Consulte dados e revise lançamentos.</p>
         </div>
       </header>
       <section className="card fin-page-prompt">
         <FinMascot className="fin-page-mascot" priority />
-        <div><h2>O Fin está disponível neste painel</h2><p>A conversa acompanha você em todas as áreas do Nexo.</p></div>
+        <div><h2>Conversa ativa</h2><p>Use o painel lateral para continuar.</p></div>
         <MessageSquareText className="fin-page-message-icon" size={22} aria-hidden="true" />
         <span className="status ok">Painel aberto</span>
       </section>
