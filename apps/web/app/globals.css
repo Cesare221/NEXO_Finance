@@ -1166,7 +1166,7 @@ p {
   position: relative;
   z-index: 1;
   margin-top: 18px;
-  font-size: 25px;
+  font-size: 22px;
   line-height: 1.15;
   font-weight: 750;
   font-variant-numeric: tabular-nums;
@@ -2075,11 +2075,15 @@ textarea.input {
   margin: 0;
   overflow: hidden;
   color: var(--ink);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.fin-chat.compact .fin-financial-summary {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .fin-context-state {
@@ -2174,7 +2178,8 @@ textarea.input {
 
 .proposal-heading {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
   gap: 11px;
 }
 
@@ -2191,7 +2196,7 @@ textarea.input {
 
 .proposal-heading > div {
   min-width: 0;
-  flex: 1;
+  flex: 1 1 160px;
 }
 
 .proposal-heading .eyebrow {
@@ -2201,9 +2206,13 @@ textarea.input {
 .proposal-heading h3 {
   margin: 0;
   font-size: 16px;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .proposal-status {
+  flex: 0 0 auto;
+  margin-left: 51px;
   white-space: nowrap;
 }
 
@@ -2247,6 +2256,79 @@ textarea.input {
 
 .proposal-edit-form .proposal-actions {
   grid-column: 1 / -1;
+}
+
+.fin-wizard-card {
+  width: min(680px, calc(100% - 43px));
+  margin-left: 43px;
+  padding: 16px;
+  border: 1px solid var(--primary-border);
+  border-left: 4px solid var(--teal);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.fin-wizard-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.fin-wizard-heading h3 {
+  margin: 2px 0 0;
+  font-size: 16px;
+}
+
+.fin-wizard-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fin-wizard-options button {
+  min-height: 38px;
+  padding: 8px 11px;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--body);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.fin-wizard-options button.selected {
+  border-color: var(--teal);
+  background: var(--mint);
+  color: var(--teal);
+}
+
+.fin-wizard-review {
+  display: grid;
+  gap: 8px;
+}
+
+.fin-wizard-review span {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 10px;
+  font-size: 13px;
+}
+
+.fin-wizard-review strong {
+  color: var(--muted);
+}
+
+.fin-wizard-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.fin-wizard-error {
+  margin: 10px 0 0;
 }
 
 .chat-suggestions {
@@ -3264,17 +3346,18 @@ textarea.input {
     padding: 15px;
   }
 
+  .fin-wizard-card {
+    width: 100%;
+    margin-left: 0;
+    padding: 15px;
+  }
+
   .proposal-heading {
     align-items: flex-start;
-    flex-wrap: wrap;
   }
 
   .proposal-heading > div {
-    min-width: calc(100% - 54px);
-  }
-
-  .proposal-status {
-    margin-left: 51px;
+    min-width: min(160px, calc(100% - 54px));
   }
 
   .proposal-edit-form {
@@ -3287,6 +3370,10 @@ textarea.input {
 
   .proposal-actions .button {
     flex: 1 1 130px;
+  }
+
+  .fin-wizard-actions .button {
+    flex: 1 1 120px;
   }
 
   .chat-suggestions {

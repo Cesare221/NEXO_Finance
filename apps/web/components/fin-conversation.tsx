@@ -3,9 +3,10 @@
 import { LoaderCircle, Send, UserRound, X } from "lucide-react";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { FinMascot } from "@/components/brand-assets";
+import { defaultDashboardPeriod } from "@/components/date-range-picker";
 import { notifyProposalsChanged } from "@/components/pending-proposals-provider";
 import { ActionProposal, ProposalCard } from "@/components/proposal-card";
-import type { DashboardData } from "@/lib/financial-types";
+import type { DashboardData, FinancialAccount, FinancialCategory } from "@/lib/financial-types";
 
 type ChatMessage = {
   id: string;
@@ -19,16 +20,78 @@ type AssistantResponse = {
   proposal: ActionProposal | null;
 };
 
+type ExpenseWizardStep = "amount" | "account" | "category" | "description" | "date" | "review";
+
+type ExpenseDraft = {
+  amount: string;
+  accountId: string;
+  categoryId: string;
+  description: string;
+  occurredOn: string;
+};
+
 const suggestions = [
   "Quanto gastei este mês?",
   "Qual é o meu saldo?",
+  "Adicionar despesa",
   "Gastei R$ 35 no mercado"
 ];
 
 const currencyFormatter = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+const compactCurrencyFormatter = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+  notation: "compact",
+  maximumFractionDigits: 1
+});
 
 function formatCurrency(value: string) {
-  return currencyFormatter.format(Number(value));
+  const amount = Number(value);
+  return Math.abs(amount) >= 10_000
+    ? compactCurrencyFormatter.format(amount)
+    : currencyFormatter.format(amount);
+}
+
+function dashboardContextQuery() {
+  const period = defaultDashboardPeriod();
+  return new URLSearchParams({
+    start_date: period.start,
+    end_date: period.end
+  }).toString();
+}
+
+function normalizeText(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("pt-BR");
+}
+
+function isExpenseQuestionnaireIntent(value: string) {
+  const normalized = normalizeText(value);
+  return /(adicionar|lancar|registrar|cadastrar|nova|novo)/.test(normalized)
+    && /(despesa|compra|gasto)/.test(normalized);
+}
+
+function todayIsoDate() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function extractAmountFromMessage(value: string) {
+  const match = value.match(/(?:r\$\s*)?(\d{1,3}(?:\.\d{3})+(?:,\d{1,2})?|\d+\.\d{1,2}|\d+(?:,\d{1,2})?)/i);
+  return match?.[1] ?? "";
+}
+
+function normalizeAmount(value: string) {
+  const cleaned = value.trim().replace(/\s/g, "");
+  if (!cleaned) return "";
+  if (cleaned.includes(".") && cleaned.includes(",")) return cleaned.replace(/\./g, "").replace(",", ".");
+  if (cleaned.includes(",")) return cleaned.replace(",", ".");
+  return cleaned;
+}
+
+function flattenCategories(categories: FinancialCategory[]): FinancialCategory[] {
+  return categories.flatMap((category) => [category, ...flattenCategories(category.children ?? [])]);
 }
 
 export function FinConversation({ compact = false, onClose }: { compact?: boolean; onClose?: () => void }) {
@@ -41,6 +104,11 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
   ]);
   const [message, setMessage] = useState("");
   const [proposal, setProposal] = useState<ActionProposal | null>(null);
+  const [expenseWizard, setExpenseWizard] = useState<{ step: ExpenseWizardStep; draft: ExpenseDraft } | null>(null);
+  const [wizardAccounts, setWizardAccounts] = useState<FinancialAccount[]>([]);
+  const [wizardCategories, setWizardCategories] = useState<FinancialCategory[]>([]);
+  const [wizardLoading, setWizardLoading] = useState(false);
+  const [wizardError, setWizardError] = useState("");
   const [sending, setSending] = useState(false);
   const [pendingAction, setPendingAction] = useState<"confirm" | "cancel" | "edit" | null>(null);
   const [error, setError] = useState("");
@@ -68,7 +136,7 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
 
     const refreshPromise = (async () => {
       try {
-        const response = await fetch("/api/financial/dashboard", { cache: "no-store" });
+        const response = await fetch("/api/financial/dashboard" + `?${dashboardContextQuery()}`, { cache: "no-store" });
         const body = (await response.json().catch(() => ({}))) as DashboardData & { detail?: string };
         if (!response.ok) throw new Error(body.detail ?? "Não foi possível atualizar o contexto financeiro.");
         if (requestId === contextRequestRef.current) setFinancialContext(body);
@@ -112,10 +180,134 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
     }
   }
 
+  async function startExpenseWizard(seedMessage = "") {
+    if (!conversationId.current) conversationId.current = crypto.randomUUID();
+    setWizardLoading(true);
+    setWizardError("");
+    setError("");
+    try {
+      const [accountsResponse, categoriesResponse] = await Promise.all([
+        fetch("/api/financial/accounts", { cache: "no-store" }),
+        fetch("/api/financial/categories", { cache: "no-store" })
+      ]);
+      const accountsBody = await accountsResponse.json().catch(() => []) as FinancialAccount[] | { detail?: string };
+      const categoriesBody = await categoriesResponse.json().catch(() => []) as FinancialCategory[] | { detail?: string };
+      if (!accountsResponse.ok) throw new Error("detail" in accountsBody && accountsBody.detail ? accountsBody.detail : "Nao foi possivel carregar as contas.");
+      if (!categoriesResponse.ok) throw new Error("detail" in categoriesBody && categoriesBody.detail ? categoriesBody.detail : "Nao foi possivel carregar as categorias.");
+
+      const accounts = (accountsBody as FinancialAccount[]).filter((account) => !account.is_archived);
+      if (!accounts.length) {
+        addAssistantMessage("Antes de registrar uma despesa, cadastre pelo menos uma conta.");
+        setExpenseWizard(null);
+        return;
+      }
+
+      setWizardAccounts(accounts);
+      setWizardCategories(flattenCategories(categoriesBody as FinancialCategory[]).filter((category) => !category.is_archived));
+      setExpenseWizard({
+        step: extractAmountFromMessage(seedMessage) ? "account" : "amount",
+        draft: {
+          amount: extractAmountFromMessage(seedMessage),
+          accountId: String(accounts[0].id),
+          categoryId: "",
+          description: "",
+          occurredOn: todayIsoDate()
+        }
+      });
+      addAssistantMessage("Vamos registrar a despesa por etapas. Preencha um campo por vez e eu preparo a proposta para revisao.");
+    } catch (requestError) {
+      setWizardError(requestError instanceof Error ? requestError.message : "Nao foi possivel iniciar o questionario.");
+    } finally {
+      setWizardLoading(false);
+    }
+  }
+
+  function updateExpenseDraft(patch: Partial<ExpenseDraft>) {
+    setExpenseWizard((current) => current ? { ...current, draft: { ...current.draft, ...patch } } : current);
+  }
+
+  function setExpenseStep(step: ExpenseWizardStep) {
+    setExpenseWizard((current) => current ? { ...current, step } : current);
+  }
+
+  function nextExpenseStep() {
+    if (!expenseWizard) return;
+    const order: ExpenseWizardStep[] = ["amount", "account", "category", "description", "date", "review"];
+    const next = order[Math.min(order.indexOf(expenseWizard.step) + 1, order.length - 1)];
+    setExpenseStep(next);
+  }
+
+  function previousExpenseStep() {
+    if (!expenseWizard) return;
+    const order: ExpenseWizardStep[] = ["amount", "account", "category", "description", "date", "review"];
+    const previous = order[Math.max(order.indexOf(expenseWizard.step) - 1, 0)];
+    setExpenseStep(previous);
+  }
+
+  async function createExpenseProposalFromWizard() {
+    if (!expenseWizard || wizardLoading) return;
+    const amount = normalizeAmount(expenseWizard.draft.amount);
+    const account = wizardAccounts.find((item) => String(item.id) === expenseWizard.draft.accountId);
+    const category = wizardCategories.find((item) => String(item.id) === expenseWizard.draft.categoryId);
+    const description = expenseWizard.draft.description.trim();
+    if (!amount || Number(amount) <= 0 || !account || description.length < 2) {
+      setWizardError("Confira valor, conta e descricao antes de criar a proposta.");
+      return;
+    }
+
+    setWizardLoading(true);
+    setWizardError("");
+    try {
+      const summary = `Criar despesa de ${currencyFormatter.format(Number(amount))}${category ? ` em ${category.name}` : ""} na conta ${account.name}.`;
+      const response = await fetch("/api/assistant/proposals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversation_id: conversationId.current,
+          action_type: "create_transaction",
+          payload: {
+            type: "expense",
+            account_id: account.id,
+            category_id: category?.id ?? null,
+            amount,
+            description,
+            occurred_on: expenseWizard.draft.occurredOn,
+            origin: "fin"
+          },
+          human_summary: summary,
+          previous_state_snapshot: { source: "fin_questionnaire" },
+          idempotency_key: `fin-questionnaire-${crypto.randomUUID()}`
+        })
+      });
+      const body = (await response.json().catch(() => ({}))) as ActionProposal & { detail?: string };
+      if (!response.ok) throw new Error(body.detail ?? "Nao foi possivel criar a proposta.");
+      setProposal(body);
+      setExpenseWizard(null);
+      notifyProposalsChanged();
+      addAssistantMessage("Preparei a proposta abaixo. Revise os dados antes de confirmar.");
+    } catch (requestError) {
+      setWizardError(requestError instanceof Error ? requestError.message : "Nao foi possivel criar a proposta.");
+    } finally {
+      setWizardLoading(false);
+    }
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const content = message.trim();
     if (!content || sending || messageSubmissionRef.current) return;
+
+    if (isExpenseQuestionnaireIntent(content)) {
+      const clientMessageId = crypto.randomUUID();
+      if (!conversationId.current) conversationId.current = crypto.randomUUID();
+      setMessages((current) => [
+        ...current,
+        { id: clientMessageId, role: "user", text: content }
+      ]);
+      setMessage("");
+      void startExpenseWizard(content);
+      return;
+    }
 
     messageSubmissionRef.current = true;
     try {
@@ -208,8 +400,155 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
   }
 
   function useSuggestion(value: string) {
+    if (isExpenseQuestionnaireIntent(value)) {
+      void startExpenseWizard(value);
+      return;
+    }
     setMessage(value);
     inputRef.current?.focus();
+  }
+
+  function renderExpenseWizard() {
+    if (!expenseWizard) return null;
+    const { step, draft } = expenseWizard;
+    const amount = Number(normalizeAmount(draft.amount));
+    const account = wizardAccounts.find((item) => String(item.id) === draft.accountId);
+    const category = wizardCategories.find((item) => String(item.id) === draft.categoryId);
+    const canGoNext =
+      (step === "amount" && Number.isFinite(amount) && amount > 0)
+      || (step === "account" && Boolean(account))
+      || step === "category"
+      || (step === "description" && draft.description.trim().length >= 2)
+      || (step === "date" && Boolean(draft.occurredOn));
+    const stepLabels: Record<ExpenseWizardStep, string> = {
+      amount: "Valor",
+      account: "Conta",
+      category: "Categoria",
+      description: "Descricao",
+      date: "Data",
+      review: "Revisao"
+    };
+
+    return (
+      <section className="fin-wizard-card" aria-label="Questionario para adicionar despesa">
+        <div className="fin-wizard-heading">
+          <div>
+            <span className="eyebrow">Adicionar despesa</span>
+            <h3>{stepLabels[step]}</h3>
+          </div>
+          <button className="icon-button" type="button" aria-label="Fechar questionario" onClick={() => setExpenseWizard(null)}>
+            <X size={17} aria-hidden="true" />
+          </button>
+        </div>
+
+        {step === "amount" ? (
+          <label className="field">
+            Valor da despesa
+            <input
+              className="input"
+              inputMode="decimal"
+              value={draft.amount}
+              onChange={(event) => updateExpenseDraft({ amount: event.target.value })}
+              placeholder="190,00"
+              autoFocus
+            />
+          </label>
+        ) : null}
+
+        {step === "account" ? (
+          <div className="fin-wizard-options" role="group" aria-label="Selecionar conta">
+            {wizardAccounts.map((item) => (
+              <button
+                className={String(item.id) === draft.accountId ? "selected" : ""}
+                key={item.id}
+                type="button"
+                onClick={() => updateExpenseDraft({ accountId: String(item.id) })}
+              >
+                {item.name}
+              </button>
+            ))}
+          </div>
+        ) : null}
+
+        {step === "category" ? (
+          <div className="fin-wizard-options" role="group" aria-label="Selecionar categoria">
+            <button
+              className={!draft.categoryId ? "selected" : ""}
+              type="button"
+              onClick={() => updateExpenseDraft({ categoryId: "" })}
+            >
+              Sem categoria
+            </button>
+            {wizardCategories.map((item) => (
+              <button
+                className={String(item.id) === draft.categoryId ? "selected" : ""}
+                key={item.id}
+                type="button"
+                onClick={() => updateExpenseDraft({ categoryId: String(item.id) })}
+              >
+                {item.name}
+              </button>
+            ))}
+          </div>
+        ) : null}
+
+        {step === "description" ? (
+          <label className="field">
+            Descricao curta
+            <input
+              className="input"
+              value={draft.description}
+              onChange={(event) => updateExpenseDraft({ description: event.target.value })}
+              placeholder="Ex.: Compra no mercado"
+              maxLength={120}
+              autoFocus
+            />
+          </label>
+        ) : null}
+
+        {step === "date" ? (
+          <label className="field">
+            Data da despesa
+            <input
+              className="input"
+              type="date"
+              value={draft.occurredOn}
+              onChange={(event) => updateExpenseDraft({ occurredOn: event.target.value })}
+            />
+          </label>
+        ) : null}
+
+        {step === "review" ? (
+          <div className="fin-wizard-review">
+            <span><strong>Valor</strong>{Number.isFinite(amount) ? currencyFormatter.format(amount) : "-"}</span>
+            <span><strong>Conta</strong>{account?.name ?? "-"}</span>
+            <span><strong>Categoria</strong>{category?.name ?? "Sem categoria"}</span>
+            <span><strong>Descricao</strong>{draft.description}</span>
+            <span><strong>Data</strong>{draft.occurredOn}</span>
+          </div>
+        ) : null}
+
+        {wizardError ? <p className="error fin-wizard-error" role="alert">{wizardError}</p> : null}
+
+        <div className="fin-wizard-actions">
+          {step !== "amount" ? (
+            <button className="button secondary" type="button" onClick={previousExpenseStep} disabled={wizardLoading}>
+              Voltar
+            </button>
+          ) : null}
+          {step !== "review" ? (
+            <button className="button" type="button" onClick={nextExpenseStep} disabled={!canGoNext || wizardLoading}>
+              Proximo
+            </button>
+          ) : (
+            <button className="button" type="button" onClick={() => void createExpenseProposalFromWizard()} disabled={wizardLoading}>
+              {wizardLoading ? <LoaderCircle className="spin" size={18} aria-hidden="true" /> : null}
+              Criar proposta
+            </button>
+          )}
+        </div>
+      </section>
+    );
   }
 
   return (
@@ -252,6 +591,7 @@ export function FinConversation({ compact = false, onClose }: { compact?: boolea
             <p className="typing"><span /><span /><span /><span className="sr-only">Fin está analisando</span></p>
           </div>
         )}
+        {renderExpenseWizard()}
         {proposal && (
           <ProposalCard
             proposal={proposal}

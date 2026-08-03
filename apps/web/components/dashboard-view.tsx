@@ -15,7 +15,7 @@ import {
   TrendingUp,
   WalletCards
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CashFlowChart } from "@/components/ui/cash-flow-chart";
 import { MovementReviewInbox } from "@/components/movement-review-inbox";
 import { DemoDatasetControl } from "@/components/demo-dataset-control";
@@ -84,19 +84,27 @@ export function DashboardView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [period, setPeriod] = useState<DateRange>(initialPeriod);
+  const requestRef = useRef(0);
+  const hasLoadedRef = useRef(false);
 
   const loadDashboard = useCallback(async () => {
-    setLoading(true);
+    const requestId = requestRef.current + 1;
+    requestRef.current = requestId;
+    if (!hasLoadedRef.current) setLoading(true);
     setError("");
     try {
       const response = await fetch(`/api/financial/dashboard?${periodQuery(period)}`, { cache: "no-store" });
       const body = (await response.json().catch(() => ({}))) as DashboardData & { detail?: string };
       if (!response.ok) throw new Error(body.detail ?? "Não foi possível carregar o dashboard.");
-      setData(body);
+      if (requestId === requestRef.current) setData(body);
     } catch (requestError) {
+      if (requestId !== requestRef.current) return;
       setError(requestError instanceof Error ? requestError.message : "Não foi possível carregar o dashboard.");
     } finally {
-      setLoading(false);
+      if (requestId === requestRef.current) {
+        hasLoadedRef.current = true;
+        setLoading(false);
+      }
     }
   }, [period]);
 
@@ -110,7 +118,10 @@ export function DashboardView() {
 
   useEffect(() => {
     void loadDashboard();
-    const refresh = () => void loadDashboard();
+    const refresh = () => {
+      void loadDashboard();
+      window.setTimeout(() => void loadDashboard(), 700);
+    };
     window.addEventListener("nexo:financial-data-changed", refresh);
     return () => window.removeEventListener("nexo:financial-data-changed", refresh);
   }, [loadDashboard]);

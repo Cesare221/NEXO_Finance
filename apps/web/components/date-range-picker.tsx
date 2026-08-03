@@ -52,7 +52,7 @@ function presetRange(preset: string): DateRange {
 }
 
 export function defaultDashboardPeriod() {
-  return presetRange("current-month");
+  return presetRange("30-days");
 }
 
 function rangeLabel(value: DateRange) {
