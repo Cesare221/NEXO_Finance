@@ -21,11 +21,11 @@ jobs:
     name: Scan API Image
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Build API image
         run: docker build -t nexo-api:security-scan apps/api
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: nexo-api:security-scan
           format: table
@@ -37,11 +37,11 @@ jobs:
     name: Scan Web Image
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Build Web image
         run: docker build --build-arg NEXT_STANDALONE=true -t nexo-web:security-scan apps/web
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: nexo-web:security-scan
           format: table
